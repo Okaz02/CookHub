@@ -4,7 +4,7 @@ export default function Index() {
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       <Text style={styles.h1Text}>世界のレシピを、みんなで改良。</Text>
-      <Text style={styles.text}>CookHubは、レシピの更新を記録したり、レシピを自分に合うようにアレンジ、より良いアレンジをもとのレシピに統合</Text>
+      <Text style={styles.h3Text}>CookHubは、レシピの更新を記録したり、レシピを自分に合うようにアレンジ、より良いアレンジをもとのレシピに統合</Text>
 
       <Pressable style={styles.button}>
         <Text style={styles.buttonText}>+ レシピを作る</Text>
@@ -42,20 +42,32 @@ export default function Index() {
       <ScrollView style={styles.updateScrollView} contentContainerStyle={styles.recipeContainer}>
 
         <View style={styles.update}>
-          <Text style={styles.text}>アントニオ猪木さんがアレンジしました</Text>
+          <View style={styles.rowStartExpand}>
+            <Image style={styles.userIcon} />
+            <View style={styles.updateTextColumn}>
+              <Text style={styles.h4Text}>アントニオ猪木さんがアレンジしました</Text>
+              <Text style={styles.text}>10分前</Text>
+              <View style={styles.updateContent}>
+                <Text style={styles.h4Text}>カレーのスパイスにセイレーンを追加しました。</Text>
+              </View>
+            </View>
+          </View>
         </View>
+
         <View style={styles.update}>
-          <Text style={styles.text}>アントニオ猪木さんがアレンジしました</Text>
-        </View>
-        <View style={styles.update}>
-          <Text style={styles.text}>アントニオ猪木さんがアレンジしました</Text>
-        </View>
-        <View style={styles.update}>
-          <Text style={styles.text}>アントニオ猪木さんがアレンジしました</Text>
+          <View style={styles.rowStartExpand}>
+            <Image style={styles.userIcon} />
+            <View style={styles.updateTextColumn}>
+              <Text style={styles.h4Text}>アントニオ猪木さんがアレンジしました</Text>
+              <Text style={styles.text}>10分前</Text>
+              <View style={styles.updateContent}>
+                <Text style={styles.h4Text}>カレーのスパイスにセイレーンを追加しました。</Text>
+              </View>
+            </View>
+          </View>
         </View>
 
       </ScrollView>
-
     </ScrollView>
   );
 }
@@ -85,15 +97,33 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   h3Text: {
-    fontSize: 17,
+    fontSize: 15,
+  },
+  h4Text: {
+    fontSize: 13,
   },
   text: {
-    fontSize: 15
+    fontSize: 10
   },
   rowBetween: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center"
+  },
+  rowStart: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center"
+  },
+  rowStartExpand: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "flex-start"
+  },
+  updateTextColumn: {
+    flex: 1,
+    alignSelf: "stretch"
   },
   button: {
     height: 40,
@@ -114,6 +144,11 @@ const styles = StyleSheet.create({
     borderColor: "#b1b1b1",
     backgroundColor: "#dbdbdb"
   },
+  userIcon: {
+    height: 20,
+    width: 20,
+    borderRadius: 10
+  },
   recipe: {
     backgroundColor: "black",
     height: 350,
@@ -126,14 +161,18 @@ const styles = StyleSheet.create({
     height: 200,
   },
   recipeExplain: {
-    width: 300,
-    height: 150,
+    flex: 1,
     padding: 20,
     backgroundColor: "#dbdbdb"
   },
   update: {
-    height: 100,
-    padding: 10,
-    backgroundColor: "#dbdbdb"
+    height: 125,
+    padding: 20,
+    backgroundColor: "#dbdbdb",
+    borderRadius: 20
+  },
+  updateContent: {
+    flex: 1,
+    justifyContent: "center"
   }
 });
