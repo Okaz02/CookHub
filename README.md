@@ -1,56 +1,70 @@
-# Welcome to your Expo app 👋
+# CookHub
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**レシピのための GitHub**
 
-## Get started
+CookHub は、GitHub の「リポジトリ」「フォーク」「プルリクエスト」「コミット」という考え方を、エンジニアではない一般家庭のユーザーでも迷わず使えるレベルまで簡略化してレシピに応用したプラットフォームです。
 
-1. Install dependencies
+## 解決したい課題
+
+現在のレシピサービスでは、レシピの改良が可視化されていません。
+
+- レシピの改良の履歴が残らず、「誰が何を、なぜ変えたか」が失われる
+- 良い改良案が元レシピの作者に届かず、レシピが最善の形に収束しない
+- 過去バージョンに戻したいときの手段がない
+- 複数人でひとつのレシピを育てていく共同作業がしづらい
+
+## コンセプト
+
+GitHub の概念をそのまま持ち込むのではなく、日常語の操作に置き換えています。
+
+| GitHub の概念 | CookHub での対応（ユーザーに見える言葉） |
+| --- | --- |
+| リポジトリ | レシピ（材料・手順・写真をまとめたもの） |
+| コミット | 変更履歴（自動で記録され、ユーザーは意識しない） |
+| フォーク | 「アレンジする」ボタンで自分用にコピー |
+| プルリクエスト | 「作者に送る」ボタンでアレンジを提案 |
+| マージ | 作者が「取り込む」を押すだけで反映 |
+| Star | 「いいね」相当。人気度の指標 |
+
+## 主要機能
+
+- **レシピ制作画面** — 材料・必須環境を記入し、ブロック状のUIで手順を組み立てる
+- **アレンジ（フォーク）** — 既存レシピをワンタップで複製し、自分のバリエーションとして育てる。環境・人数に合わせた移植と、自由なアレンジの2種類がある
+- **改良提案（プルリク相当）** — フォーク先の変更点を元レシピ作者に送信し、Before/Afterの差分を並べて表示
+- **履歴・差分表示** — 過去のバージョンをいつでも閲覧・比較・復元できる
+- **家系図ビュー** — 1つのレシピからどれだけ派生が生まれたかをツリー表示
+
+詳細な要件は PRD を参照してください。
+
+## 技術スタック
+
+- [Expo](https://expo.dev) / React Native
+- [expo-router](https://docs.expo.dev/router/introduction) によるファイルベースルーティング
+- TypeScript
+
+## セットアップ
+
+1. 依存関係をインストール
 
    ```bash
-   npm install
+   pnpm install
    ```
 
-2. Start the app
+2. アプリを起動
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+出力されるオプションから、以下のいずれかでアプリを開けます。
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- [Expo Go](https://expo.dev/go)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+画面のコードは `src/app` 配下にあります。
 
-## Get a fresh project
+### その他
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Lint: `npm run lint`（`expo lint`）

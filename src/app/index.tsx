@@ -16,19 +16,19 @@ export default function Index() {
         <Text style={styles.text}>すべて見る</Text>
       </View>
 
-      <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recipeContainer}>
+      <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
 
         <View style={styles.recipe}>
           <Image style={styles.recipeImage} />
           <View style={styles.recipeExplain}>
-            <Text style={styles.h3Text}>ヴォルデモート</Text>
+            <Text style={styles.h3Text}>肉じゃが</Text>
           </View>
         </View>
 
         <View style={styles.recipe}>
           <Image style={styles.recipeImage} />
           <View style={styles.recipeExplain}>
-            <Text style={styles.h3Text}>ヴォルデモート</Text>
+            <Text style={styles.h3Text}>カレーライス</Text>
           </View>
         </View>
 
@@ -39,16 +39,16 @@ export default function Index() {
         <Text style={styles.text}>すべて見る</Text>
       </View>
 
-      <ScrollView style={styles.updateScrollView} contentContainerStyle={styles.recipeContainer}>
+      <ScrollView style={styles.updateScrollView} contentContainerStyle={styles.listContainer}>
 
         <View style={styles.update}>
           <View style={styles.rowStartExpand}>
             <Image style={styles.userIcon} />
-            <View style={styles.updateTextColumn}>
-              <Text style={styles.h4Text}>アントニオ猪木さんがアレンジしました</Text>
+            <View style={styles.updateInfo}>
+              <Text style={styles.h4Text}>田中さんがアレンジしました</Text>
               <Text style={styles.text}>10分前</Text>
-              <View style={styles.updateContent}>
-                <Text style={styles.h4Text}>カレーのスパイスにセイレーンを追加しました。</Text>
+              <View style={styles.updateMessage}>
+                <Text style={styles.h4Text}>カレーのスパイスにクミンを追加しました。</Text>
               </View>
             </View>
           </View>
@@ -57,11 +57,11 @@ export default function Index() {
         <View style={styles.update}>
           <View style={styles.rowStartExpand}>
             <Image style={styles.userIcon} />
-            <View style={styles.updateTextColumn}>
-              <Text style={styles.h4Text}>アントニオ猪木さんがアレンジしました</Text>
-              <Text style={styles.text}>10分前</Text>
-              <View style={styles.updateContent}>
-                <Text style={styles.h4Text}>カレーのスパイスにセイレーンを追加しました。</Text>
+            <View style={styles.updateInfo}>
+              <Text style={styles.h4Text}>佐藤さんがアレンジしました</Text>
+              <Text style={styles.text}>1時間前</Text>
+              <View style={styles.updateMessage}>
+                <Text style={styles.h4Text}>じゃがいもを大根に置き換えました。</Text>
               </View>
             </View>
           </View>
@@ -81,14 +81,11 @@ const styles = StyleSheet.create({
     gap: 20,
     padding: 20
   },
-  recipeContainer: {
+  listContainer: {
     gap: 20,
   },
   updateScrollView: {
     maxHeight: 300
-  },
-  updateContainer: {
-    gap: 20
   },
   h1Text: {
     fontSize: 40,
@@ -110,18 +107,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center"
   },
-  rowStart: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center"
-  },
   rowStartExpand: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "flex-start"
   },
-  updateTextColumn: {
+  updateInfo: {
     flex: 1,
     alignSelf: "stretch"
   },
@@ -172,7 +164,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#dbdbdb",
     borderRadius: 20
   },
-  updateContent: {
+  updateMessage: {
     flex: 1,
     justifyContent: "center"
   }

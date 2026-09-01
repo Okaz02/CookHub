@@ -8,7 +8,7 @@ export default function Search() {
         <View style={styles.recipe}>
           <Image style={styles.recipeImage} />
           <View style={styles.recipeExplain}>
-            <Text>ヴォルデモート</Text>
+            <Text style={styles.h3Text}>肉じゃが</Text>
           </View>
         </View>
       </ScrollView>
@@ -52,5 +52,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#dbdbdb"
+  },
+  h3Text: {
+    fontSize: 15,
   }
 });
