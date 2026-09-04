@@ -22,6 +22,7 @@ export default function RootLayout() {
         name="post"
         options={{
           title: "投稿",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => <MaterialIcons name="add-circle-outline" size={size} color={color} />,
         }}
       />

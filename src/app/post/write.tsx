@@ -1,31 +1,15 @@
 import { Text, View, Image, TextInput, Pressable, ScrollView, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { colors } from "./theme";
 
-const colors = {
-  surface: "#fbf9f4",
-  surfaceContainerLowest: "#ffffff",
-  surfaceContainerLow: "#f5f3ee",
-  surfaceContainer: "#f0eee9",
-  surfaceContainerHigh: "#eae8e3",
-  outline: "#827472",
-  outlineVariant: "#d3c3c0",
-  roastedBean: "#3E2723",
-  primary: "#271310",
-  linenCream: "#F7F5F0",
-  dustyRose: "#A67B73",
-  mutedForest: "#5E6B5E",
-  secondary: "#556255",
-  secondaryContainer: "#d3e1d1",
-  onSurface: "#1b1c19",
-  onSurfaceVariant: "#504442",
-  error: "#ba1a1a",
-};
+export default function Write() {
+  const router = useRouter();
 
-export default function Post() {
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <Pressable style={styles.discardButton}>
+        <Pressable style={styles.discardButton} onPress={() => router.back()}>
           <MaterialIcons name="close" size={20} color={colors.onSurfaceVariant} />
           <Text style={styles.discardText}>破棄</Text>
         </Pressable>
@@ -36,7 +20,7 @@ export default function Post() {
             <Text style={styles.autosaveText}>自動保存中: 14:02</Text>
           </View>
         </View>
-        <Pressable style={styles.draftButton}>
+        <Pressable style={styles.draftButton} onPress={() => router.back()}>
           <Text style={styles.draftButtonText}>下書き</Text>
         </Pressable>
       </View>
@@ -353,11 +337,11 @@ export default function Post() {
 
       <View style={styles.bottomBar}>
         <View style={styles.bottomBarRow}>
-          <Pressable style={styles.draftSaveButton}>
+          <Pressable style={styles.draftSaveButton} onPress={() => router.back()}>
             <MaterialIcons name="bookmark-border" size={18} color={colors.roastedBean} />
             <Text style={styles.draftSaveButtonText}>下書き保存</Text>
           </Pressable>
-          <Pressable style={styles.publishButton}>
+          <Pressable style={styles.publishButton} onPress={() => router.back()}>
             <MaterialIcons name="publish" size={18} color={colors.linenCream} />
             <Text style={styles.publishButtonText}>公開する (v1.0.0)</Text>
           </Pressable>
