@@ -207,17 +207,15 @@ const styles = StyleSheet.create({
   recipe: {
     backgroundColor: "black",
     height: 350,
-    width: 300,
     overflow: "hidden",
     borderRadius: 20,
   },
   recipeImage: {
-    width: 300,
     height: 200,
   },
   recipeExplain: {
     flex: 1,
     padding: 20,
     backgroundColor: "#dbdbdb"
-  },
+  }
 });
