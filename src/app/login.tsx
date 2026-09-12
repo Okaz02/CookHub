@@ -5,31 +5,30 @@ import { colors } from "../theme";
 import { useAuth } from "../context/AuthContext";
 import { ApiError } from "../lib/api";
 
-export default function SignIn() {
+export default function Login() {
   const router = useRouter();
-  const { signUp } = useAuth();
+  const { signIn } = useAuth();
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSignIn() {
-    if (!username || !email || !password) {
-      setErrorMessage("ユーザー名・メールアドレス・パスワードを入力してください。");
+  async function handleLogin() {
+    if (!username || !password) {
+      setErrorMessage("ユーザー名とパスワードを入力してください。");
       return;
     }
 
     setErrorMessage("");
     setIsSubmitting(true);
     try {
-      await signUp(username, email, password);
+      await signIn(username, password);
       router.replace("/tabs");
     } catch (error) {
-      if (error instanceof ApiError && error.status === 409) {
-        setErrorMessage("そのユーザー名またはメールアドレスは既に使われています。");
+      if (error instanceof ApiError && error.status === 401) {
+        setErrorMessage("ユーザー名またはパスワードが違います。");
       } else {
-        setErrorMessage("登録に失敗しました。時間をおいて再度お試しください。");
+        setErrorMessage("ログインに失敗しました。時間をおいて再度お試しください。");
       }
     } finally {
       setIsSubmitting(false);
@@ -38,7 +37,7 @@ export default function SignIn() {
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.title}>サインイン</Text>
+      <Text style={styles.title}>ログイン</Text>
 
       <View style={styles.form}>
         <TextInput
@@ -48,15 +47,6 @@ export default function SignIn() {
           autoCapitalize="none"
           value={username}
           onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="メールアドレス"
-          placeholderTextColor={colors.outline}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
@@ -70,16 +60,16 @@ export default function SignIn() {
 
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      <Pressable style={styles.submitButton} onPress={handleSignIn} disabled={isSubmitting}>
+      <Pressable style={styles.submitButton} onPress={handleLogin} disabled={isSubmitting}>
         {isSubmitting ? (
           <ActivityIndicator color={colors.linenCream} />
         ) : (
-          <Text style={styles.submitButtonText}>サインイン</Text>
+          <Text style={styles.submitButtonText}>ログイン</Text>
         )}
       </Pressable>
 
-      <Pressable onPress={() => router.push("/login")}>
-        <Text style={styles.linkText}>すでにアカウントをお持ちの方はこちら</Text>
+      <Pressable onPress={() => router.push("/sign-in")}>
+        <Text style={styles.linkText}>アカウントをお持ちでない方はこちら</Text>
       </Pressable>
     </View>
   );

@@ -58,6 +58,14 @@ export async function login(username: string, password: string): Promise<AuthRes
   return splitAccountAndToken(body);
 }
 
+export async function register(username: string, email: string, password: string): Promise<AuthResult> {
+  const body = await request<Record<string, unknown>>("/api/accounts/register", {
+    method: "POST",
+    body: JSON.stringify({ username, email, password }),
+  });
+  return splitAccountAndToken(body);
+}
+
 export async function fetchSession(token: string): Promise<Account> {
   return request<Account>("/api/accounts/session", {
     method: "GET",

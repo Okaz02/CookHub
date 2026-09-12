@@ -13,7 +13,7 @@ export default function Index() {
     );
   }
 
-  return <Redirect href={account ? "/tabs" : "/sign-in"} />;
+  return <Redirect href={account ? "/tabs" : "/login"} />;
 }
 
 const styles = StyleSheet.create({
