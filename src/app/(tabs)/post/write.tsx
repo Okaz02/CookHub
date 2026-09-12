@@ -1,7 +1,7 @@
 import { Text, View, Image, TextInput, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { colors } from "./theme";
+import { colors } from "../../theme";
 
 export default function Write() {
   const router = useRouter();
