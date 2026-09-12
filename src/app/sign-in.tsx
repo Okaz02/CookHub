@@ -1,12 +1,39 @@
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { colors } from "./theme";
+import { useAuth } from "../context/AuthContext";
+import { ApiError } from "../lib/api";
 
 export default function SignIn() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const { signIn } = useAuth();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSignIn() {
+    if (!username || !password) {
+      setErrorMessage("ユーザー名とパスワードを入力してください。");
+      return;
+    }
+
+    setErrorMessage("");
+    setIsSubmitting(true);
+    try {
+      await signIn(username, password);
+      router.replace("/tabs");
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        setErrorMessage("ユーザー名またはパスワードが違います。");
+      } else {
+        setErrorMessage("ログインに失敗しました。時間をおいて再度お試しください。");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <View style={styles.screen}>
@@ -15,12 +42,11 @@ export default function SignIn() {
       <View style={styles.form}>
         <TextInput
           style={styles.input}
-          placeholder="メールアドレス"
+          placeholder="ユーザー名"
           placeholderTextColor={colors.outline}
           autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
+          value={username}
+          onChangeText={setUsername}
         />
         <TextInput
           style={styles.input}
@@ -32,8 +58,14 @@ export default function SignIn() {
         />
       </View>
 
-      <Pressable style={styles.signInButton} onPress={() => router.replace("/tabs")}>
-        <Text style={styles.signInButtonText}>ログイン</Text>
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
+      <Pressable style={styles.signInButton} onPress={handleSignIn} disabled={isSubmitting}>
+        {isSubmitting ? (
+          <ActivityIndicator color={colors.linenCream} />
+        ) : (
+          <Text style={styles.signInButtonText}>ログイン</Text>
+        )}
       </Pressable>
     </View>
   );
@@ -64,6 +96,10 @@ const styles = StyleSheet.create({
     borderColor: colors.outlineVariant,
     backgroundColor: colors.surfaceContainerLowest,
     color: colors.onSurface,
+  },
+  errorText: {
+    color: colors.error,
+    textAlign: "center",
   },
   signInButton: {
     height: 48,

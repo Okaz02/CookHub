@@ -1,5 +1,25 @@
 import { Redirect } from "expo-router";
+import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { useAuth } from "../context/AuthContext";
 
 export default function Index() {
-  return <Redirect href="/tabs" />;
+  const { account, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  return <Redirect href={account ? "/tabs" : "/sign-in"} />;
 }
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
