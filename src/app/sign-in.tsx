@@ -32,7 +32,7 @@ export default function SignIn() {
         />
       </View>
 
-      <Pressable style={styles.signInButton} onPress={() => router.replace("/")}>
+      <Pressable style={styles.signInButton} onPress={() => router.replace("/tabs")}>
         <Text style={styles.signInButtonText}>ログイン</Text>
       </Pressable>
     </View>

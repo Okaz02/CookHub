@@ -13,7 +13,7 @@ export default function PostList() {
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-        <Pressable style={styles.newButton} onPress={() => router.push("/post/write")}>
+        <Pressable style={styles.newButton} onPress={() => router.push("/tabs/post/write")}>
           <MaterialIcons name="add" size={20} color={colors.linenCream} />
           <Text style={styles.newButtonText}>新規レシピを作成</Text>
         </Pressable>
@@ -21,7 +21,7 @@ export default function PostList() {
         <Text style={styles.sectionLabel}>下書き</Text>
 
         <View style={styles.draftList}>
-          <Pressable style={styles.draftCard} onPress={() => router.push("/post/write")}>
+          <Pressable style={styles.draftCard} onPress={() => router.push("/tabs/post/write")}>
             <Image style={styles.draftThumbnail} />
             <View style={styles.draftInfo}>
               <Text style={styles.draftTitle}>我が家の絶品ふっくら煮込みハンバーグ</Text>
@@ -30,7 +30,7 @@ export default function PostList() {
             <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
           </Pressable>
 
-          <Pressable style={styles.draftCard} onPress={() => router.push("/post/write")}>
+          <Pressable style={styles.draftCard} onPress={() => router.push("/tabs/post/write")}>
             <Image style={styles.draftThumbnail} />
             <View style={styles.draftInfo}>
               <Text style={styles.draftTitle}>特製から揚げの甘辛ソース</Text>
@@ -39,7 +39,7 @@ export default function PostList() {
             <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
           </Pressable>
 
-          <Pressable style={styles.draftCard} onPress={() => router.push("/post/write")}>
+          <Pressable style={styles.draftCard} onPress={() => router.push("/tabs/post/write")}>
             <Image style={styles.draftThumbnail} />
             <View style={styles.draftInfo}>
               <Text style={styles.draftTitle}>簡単オムライス</Text>
