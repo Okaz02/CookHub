@@ -1,8 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import * as SecureStore from "expo-secure-store";
 import { login as apiLogin, fetchSession, type Account } from "../lib/api";
-
-const TOKEN_KEY = "cookhub_token";
+import { getToken, setToken, deleteToken } from "../lib/tokenStorage";
 
 type AuthContextValue = {
   account: Account | null;
@@ -19,7 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      const token = await getToken();
       if (!token) {
         setIsLoading(false);
         return;
@@ -28,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const restoredAccount = await fetchSession(token);
         setAccount(restoredAccount);
       } catch {
-        await SecureStore.deleteItemAsync(TOKEN_KEY);
+        await deleteToken();
       } finally {
         setIsLoading(false);
       }
@@ -37,12 +35,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signIn(username: string, password: string) {
     const { account: signedInAccount, token } = await apiLogin(username, password);
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
+    await setToken(token);
     setAccount(signedInAccount);
   }
 
   async function signOut() {
-    await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await deleteToken();
     setAccount(null);
   }
 
