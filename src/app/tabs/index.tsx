@@ -1,6 +1,16 @@
+import { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TextInput, Pressable, ScrollView, Image } from "react-native";
+import { getTrend, type Repository } from "../../lib/api-repo"
 
 export default function Index() {
+  const [trendRepos, setTrendRepos] = useState<Repository[]>([]);
+
+  useEffect(() => {
+    getTrend()
+      .then((res) => setTrendRepos(res.data))
+      .catch(() => setTrendRepos([]));
+  }, []);
+
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       <Text style={styles.h1Text}>世界のレシピを、みんなで改良。</Text>
@@ -18,19 +28,14 @@ export default function Index() {
 
       <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
 
-        <View style={styles.recipe}>
-          <Image style={styles.recipeImage} />
-          <View style={styles.recipeExplain}>
-            <Text style={styles.h3Text}>肉じゃが</Text>
+        {trendRepos.map((repo) => (
+          <View key={repo.id} style={styles.recipe}>
+            <Image style={styles.recipeImage} source={{ uri: repo.owner.avatar_url }} />
+            <View style={styles.recipeExplain}>
+              <Text style={styles.h3Text}>{repo.name}</Text>
+            </View>
           </View>
-        </View>
-
-        <View style={styles.recipe}>
-          <Image style={styles.recipeImage} />
-          <View style={styles.recipeExplain}>
-            <Text style={styles.h3Text}>カレーライス</Text>
-          </View>
-        </View>
+        ))}
 
       </ScrollView>
 

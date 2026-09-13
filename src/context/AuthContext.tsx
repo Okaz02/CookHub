@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { login as apiLogin, register as apiRegister, fetchSession, type Account } from "../lib/api";
+import { login as apiLogin, register as apiRegister, fetchSession, type Account } from "../lib/api-login";
 import { getToken, setToken, deleteToken } from "../lib/tokenStorage";
 
 type AuthContextValue = {
