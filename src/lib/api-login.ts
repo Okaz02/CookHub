@@ -1,4 +1,4 @@
-import { request } from "./api"
+import { request, authHeaders } from "./api"
 
 export type Account = {
   id: number;
@@ -37,6 +37,6 @@ export async function register(username: string, email: string, password: string
 export async function fetchSession(token: string): Promise<Account> {
   return request<Account>("/api/accounts/session", {
     method: "GET",
-    headers: { Authorization: `token ${token}` },
+    headers: authHeaders(token),
   });
 }

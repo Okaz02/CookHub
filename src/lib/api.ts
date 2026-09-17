@@ -9,6 +9,10 @@ export class ApiError extends Error {
     }
 }
 
+export function authHeaders(token?: string | null): Record<string, string> {
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function request<T>(path: string, options: RequestInit): Promise<T> {
     let response: Response;
     try {

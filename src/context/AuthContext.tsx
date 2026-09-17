@@ -4,6 +4,7 @@ import { getToken, setToken, deleteToken } from "../lib/tokenStorage";
 
 type AuthContextValue = {
   account: Account | null;
+  token: string | null;
   isLoading: boolean;
   signIn: (username: string, password: string) => Promise<void>;
   signUp: (username: string, email: string, password: string) => Promise<void>;
@@ -14,18 +15,20 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<Account | null>(null);
+  const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const token = await getToken();
-      if (!token) {
+      const storedToken = await getToken();
+      if (!storedToken) {
         setIsLoading(false);
         return;
       }
       try {
-        const restoredAccount = await fetchSession(token);
+        const restoredAccount = await fetchSession(storedToken);
         setAccount(restoredAccount);
+        setTokenState(storedToken);
       } catch {
         await deleteToken();
       } finally {
@@ -35,24 +38,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function signIn(username: string, password: string) {
-    const { account: signedInAccount, token } = await apiLogin(username, password);
-    await setToken(token);
+    const { account: signedInAccount, token: newToken } = await apiLogin(username, password);
+    await setToken(newToken);
     setAccount(signedInAccount);
+    setTokenState(newToken);
   }
 
   async function signUp(username: string, email: string, password: string) {
-    const { account: createdAccount, token } = await apiRegister(username, email, password);
-    await setToken(token);
+    const { account: createdAccount, token: newToken } = await apiRegister(username, email, password);
+    await setToken(newToken);
     setAccount(createdAccount);
+    setTokenState(newToken);
   }
 
   async function signOut() {
     await deleteToken();
     setAccount(null);
+    setTokenState(null);
   }
 
   return (
-    <AuthContext.Provider value={{ account, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ account, token, isLoading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
