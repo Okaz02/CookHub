@@ -1,35 +1,29 @@
-import { useState } from "react";
-import { Text, View, Image, StyleSheet, ScrollView, useWindowDimensions } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Text, View, Image, StyleSheet, ScrollView, Pressable, ActivityIndicator, useWindowDimensions } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useAuth } from "../../context/AuthContext";
+import { getUserRepo, type Repository } from "../../lib/api-repo";
 
-function RecipesRoute() {
+function RepoListRoute({ repos, emptyText }: { repos: Repository[]; emptyText: string }) {
+  const router = useRouter();
+
   return (
     <ScrollView contentContainerStyle={styles.tabContent}>
-      <View style={styles.recipe}>
-        <Image style={styles.recipeImage} />
-        <View style={styles.recipeExplain}>
-          <Text style={styles.h3Text}>肉じゃが</Text>
-        </View>
-      </View>
-      <View style={styles.recipe}>
-        <Image style={styles.recipeImage} />
-        <View style={styles.recipeExplain}>
-          <Text style={styles.h3Text}>カレーライス</Text>
-        </View>
-      </View>
-    </ScrollView>
-  );
-}
-
-function ArrangementsRoute() {
-  return (
-    <ScrollView contentContainerStyle={styles.tabContent}>
-      <View style={styles.listItem}>
-        <Text style={styles.h4Text}>カレーのスパイスにクミンを追加</Text>
-      </View>
-      <View style={styles.listItem}>
-        <Text style={styles.h4Text}>じゃがいもを大根に置き換え</Text>
-      </View>
+      {repos.map((repo) => (
+        <Pressable key={repo.id} style={styles.recipe} onPress={() => router.push(`/tabs/repo/${repo.id}`)}>
+          {repo.thumbnail ? (
+            <Image style={styles.recipeImage} source={{ uri: repo.thumbnail }} />
+          ) : (
+            <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
+          )}
+          <View style={styles.recipeExplain}>
+            <Text style={styles.h3Text}>{repo.name}</Text>
+            {repo.private ? <Text style={styles.text}>非公開</Text> : null}
+          </View>
+        </Pressable>
+      ))}
+      {repos.length === 0 ? <Text style={styles.emptyText}>{emptyText}</Text> : null}
     </ScrollView>
   );
 }
@@ -37,24 +31,15 @@ function ArrangementsRoute() {
 function ProposalsRoute() {
   return (
     <ScrollView contentContainerStyle={styles.tabContent}>
-      <View style={styles.listItem}>
-        <Text style={styles.h4Text}>出汁を昆布だしに変更する提案</Text>
-      </View>
-      <View style={styles.listItem}>
-        <Text style={styles.h4Text}>砂糖を控えめにする提案</Text>
-      </View>
+      <Text style={styles.emptyText}>採択提案の一覧はまだ準備中です。</Text>
     </ScrollView>
   );
 }
 
-const renderScene = SceneMap({
-  recipes: RecipesRoute,
-  arrangements: ArrangementsRoute,
-  proposals: ProposalsRoute,
-});
-
 export default function Profile() {
   const layout = useWindowDimensions();
+  const router = useRouter();
+  const { account, token, signOut } = useAuth();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "recipes", title: "レシピ" },
@@ -62,39 +47,76 @@ export default function Profile() {
     { key: "proposals", title: "採択提案" },
   ]);
 
+  const [repos, setRepos] = useState<Repository[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!token) {
+        setRepos([]);
+        setIsLoading(false);
+        return;
+      }
+      let cancelled = false;
+      setIsLoading(true);
+      getUserRepo(token)
+        .then((res) => {
+          if (!cancelled) setRepos(res.data);
+        })
+        .catch(() => {
+          if (!cancelled) setRepos([]);
+        })
+        .finally(() => {
+          if (!cancelled) setIsLoading(false);
+        });
+      return () => {
+        cancelled = true;
+      };
+    }, [token])
+  );
+
+  const ownRepos = useMemo(() => repos.filter((repo) => !repo.fork), [repos]);
+  const forkedRepos = useMemo(() => repos.filter((repo) => repo.fork), [repos]);
+
+  async function handleSignOut() {
+    await signOut();
+    router.replace("/login");
+  }
+
+  const renderScene = SceneMap({
+    recipes: () => <RepoListRoute repos={ownRepos} emptyText="まだレシピがありません。" />,
+    arrangements: () => <RepoListRoute repos={forkedRepos} emptyText="まだアレンジしたレシピがありません。" />,
+    proposals: ProposalsRoute,
+  });
+
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       <View style={styles.profile}>
         <View style={styles.profileMain}>
           <Image style={styles.profileIcon}></Image>
           <View style={styles.profileName}>
-            <Text style={styles.h2Text}>田中 品子</Text>
-            <Text style={styles.h4Text}>家庭料理リサーチャー</Text>
+            <Text style={styles.h2Text}>{account?.username ?? "ゲスト"}</Text>
+            <Text style={styles.h4Text}>{account?.email ?? ""}</Text>
           </View>
+          <Pressable onPress={handleSignOut}>
+            <Text style={styles.signOutText}>ログアウト</Text>
+          </Pressable>
         </View>
-        <Text style={styles.h4Text}>毎日の料理を美味しく。定番おかずの微調整や出汁の配合を研究中。アレンジ気軽に提案してください！</Text>
-        <View style={styles.lineVertical} />
-        <View style={styles.profileStatus}>
-          <View style={styles.profileStatusItem}>
-            <Text>24</Text>
-            <Text>レシピ</Text>
+        {isLoading ? (
+          <ActivityIndicator color="#1b110f" />
+        ) : (
+          <View style={styles.profileStatus}>
+            <View style={styles.profileStatusItem}>
+              <Text>{ownRepos.length}</Text>
+              <Text>レシピ</Text>
+            </View>
+            <View style={styles.lineHorizontal} />
+            <View style={styles.profileStatusItem}>
+              <Text>{forkedRepos.length}</Text>
+              <Text>アレンジ</Text>
+            </View>
           </View>
-          <View style={styles.lineHorizontal} />
-          <View style={styles.profileStatusItem}>
-            <Text>18</Text>
-            <Text>アレンジ</Text>
-          </View>
-          <View style={styles.lineHorizontal} />
-          <View style={styles.profileStatusItem}>
-            <Text>35</Text>
-            <Text>採択提案</Text>
-          </View>
-          <View style={styles.lineHorizontal} />
-          <View style={styles.profileStatusItem}>
-            <Text>1240</Text>
-            <Text>フォロワー</Text>
-          </View>
-        </View>
+        )}
       </View>
 
       <TabView
@@ -178,6 +200,16 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 10
   },
+  signOutText: {
+    fontSize: 12,
+    color: "#ba1a1a",
+  },
+  emptyText: {
+    fontSize: 12,
+    color: "#8a8a8a",
+    textAlign: "center",
+    padding: 20,
+  },
   tabView: {
     flexGrow: 0,
     flexShrink: 0,
@@ -212,6 +244,9 @@ const styles = StyleSheet.create({
   },
   recipeImage: {
     height: 200,
+  },
+  recipeImagePlaceholder: {
+    backgroundColor: "#3a3a3a",
   },
   recipeExplain: {
     flex: 1,
