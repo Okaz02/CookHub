@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
-import { Text, View, Image, Pressable, ScrollView, ActivityIndicator, StyleSheet } from "react-native";
+import { Text, View, Image, Pressable, ScrollView, ActivityIndicator, StyleSheet, Alert } from "react-native";
 import { useFocusEffect, useLocalSearchParams, useRouter, Stack } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../../theme";
 import { useAuth } from "../../../../context/AuthContext";
-import { getRepo, forkRepo, type RepositoryDetail } from "../../../../lib/api-repo";
+import { getRepo, forkRepo, deleteRepo, type RepositoryDetail } from "../../../../lib/api-repo";
 import { ApiError } from "../../../../lib/api";
 
 export default function RepoDetail() {
@@ -47,6 +47,25 @@ export default function RepoDetail() {
       };
     }, [repoId, token])
   );
+
+  function handleDelete() {
+    if (!token || !repo) return;
+    Alert.alert("レシピを削除しますか？", "この操作は取り消せません。", [
+      { text: "キャンセル", style: "cancel" },
+      {
+        text: "削除する",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteRepo(repo.id, token);
+            router.replace("/tabs/post");
+          } catch {
+            setErrorMessage("削除に失敗しました。");
+          }
+        },
+      },
+    ]);
+  }
 
   async function handleFork() {
     if (!token || !repo) {
@@ -129,13 +148,18 @@ export default function RepoDetail() {
             <Text style={styles.actionButtonText}>更新履歴</Text>
           </Pressable>
           {isOwner ? (
-            <Pressable
-              style={styles.forkButton}
-              onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(repo.id) } })}
-            >
-              <MaterialIcons name="edit" size={16} color={colors.linenCream} />
-              <Text style={styles.forkButtonText}>編集する</Text>
-            </Pressable>
+            <>
+              <Pressable
+                style={styles.forkButton}
+                onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(repo.id) } })}
+              >
+                <MaterialIcons name="edit" size={16} color={colors.linenCream} />
+                <Text style={styles.forkButtonText}>編集する</Text>
+              </Pressable>
+              <Pressable style={styles.deleteButton} onPress={handleDelete}>
+                <MaterialIcons name="delete-outline" size={16} color={colors.error} />
+              </Pressable>
+            </>
           ) : (
             <Pressable style={styles.forkButton} onPress={handleFork} disabled={isForking}>
               {isForking ? (
@@ -300,6 +324,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     color: colors.linenCream,
+  },
+  deleteButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(186,26,26,0.4)",
+    backgroundColor: colors.surfaceContainerLowest,
   },
   section: {
     gap: 8,
