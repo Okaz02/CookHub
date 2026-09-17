@@ -1,10 +1,11 @@
 import { useCallback, useState } from "react";
-import { Text, View, Image, Pressable, ScrollView, ActivityIndicator, StyleSheet, Alert } from "react-native";
+import { Text, View, Image, Pressable, ScrollView, ActivityIndicator, StyleSheet, Alert, TextInput } from "react-native";
 import { useFocusEffect, useLocalSearchParams, useRouter, Stack } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../../theme";
 import { useAuth } from "../../../../context/AuthContext";
 import { getRepo, forkRepo, deleteRepo, type RepositoryDetail } from "../../../../lib/api-repo";
+import { createPullRequest, mergePullRequest } from "../../../../lib/api-pull-request";
 import { ApiError } from "../../../../lib/api";
 
 export default function RepoDetail() {
@@ -17,6 +18,18 @@ export default function RepoDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [isForking, setIsForking] = useState(false);
+
+  const [showProposeForm, setShowProposeForm] = useState(false);
+  const [proposeTitle, setProposeTitle] = useState("");
+  const [proposeContent, setProposeContent] = useState("");
+  const [isProposing, setIsProposing] = useState(false);
+  const [proposeResult, setProposeResult] = useState("");
+
+  const [showMergeForm, setShowMergeForm] = useState(false);
+  const [mergePrId, setMergePrId] = useState("");
+  const [mergeCommitMessage, setMergeCommitMessage] = useState("");
+  const [isMerging, setIsMerging] = useState(false);
+  const [mergeResult, setMergeResult] = useState("");
 
   useFocusEffect(
     useCallback(() => {
@@ -80,6 +93,51 @@ export default function RepoDetail() {
       setErrorMessage("フォークに失敗しました。");
     } finally {
       setIsForking(false);
+    }
+  }
+
+  async function handlePropose() {
+    if (!token || !repo || !proposeTitle.trim()) return;
+    setIsProposing(true);
+    setProposeResult("");
+    try {
+      const res = await createPullRequest(repo.id, { title: proposeTitle, content: proposeContent }, token);
+      setProposeResult(`提案を送信しました（PR番号: ${res.data.id}）`);
+      setProposeTitle("");
+      setProposeContent("");
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 400) {
+        setProposeResult("このレシピはフォークではないため提案できません。");
+      } else {
+        setProposeResult("提案の送信に失敗しました。");
+      }
+    } finally {
+      setIsProposing(false);
+    }
+  }
+
+  async function handleMerge() {
+    if (!token || !mergePrId.trim()) return;
+    setIsMerging(true);
+    setMergeResult("");
+    try {
+      await mergePullRequest(Number(mergePrId), { commit_message: mergeCommitMessage || undefined }, token);
+      setMergeResult("マージしました。");
+      setMergePrId("");
+      setMergeCommitMessage("");
+      getRepo(repoId, token).then((res) => setRepo(res.data));
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 403) {
+        setMergeResult("取り込み先のオーナーのみマージできます。");
+      } else if (error instanceof ApiError && error.status === 409) {
+        setMergeResult("このプルリクエストは既にマージ済みです。");
+      } else if (error instanceof ApiError && error.status === 404) {
+        setMergeResult("プルリクエストが見つかりませんでした。");
+      } else {
+        setMergeResult("マージに失敗しました。");
+      }
+    } finally {
+      setIsMerging(false);
     }
   }
 
@@ -173,6 +231,74 @@ export default function RepoDetail() {
             </Pressable>
           )}
         </View>
+
+        {isOwner && repo.fork ? (
+          <View style={styles.section}>
+            <Pressable style={styles.sectionToggle} onPress={() => setShowProposeForm((v) => !v)}>
+              <MaterialIcons name="call-merge" size={16} color={colors.mutedForest} />
+              <Text style={styles.sectionTitle}>元レシピに変更を提案する</Text>
+            </Pressable>
+            {showProposeForm ? (
+              <View style={styles.formCard}>
+                <TextInput
+                  style={styles.formInput}
+                  value={proposeTitle}
+                  onChangeText={setProposeTitle}
+                  placeholder="提案のタイトル（必須）"
+                />
+                <TextInput
+                  style={styles.formInput}
+                  value={proposeContent}
+                  onChangeText={setProposeContent}
+                  placeholder="提案の説明（任意）"
+                  multiline
+                />
+                <Pressable style={styles.formSubmitButton} onPress={handlePropose} disabled={isProposing}>
+                  {isProposing ? (
+                    <ActivityIndicator size="small" color={colors.linenCream} />
+                  ) : (
+                    <Text style={styles.formSubmitButtonText}>提案を送信</Text>
+                  )}
+                </Pressable>
+                {proposeResult ? <Text style={styles.formResultText}>{proposeResult}</Text> : null}
+              </View>
+            ) : null}
+          </View>
+        ) : null}
+
+        {isOwner ? (
+          <View style={styles.section}>
+            <Pressable style={styles.sectionToggle} onPress={() => setShowMergeForm((v) => !v)}>
+              <MaterialIcons name="call-merge" size={16} color={colors.mutedForest} />
+              <Text style={styles.sectionTitle}>提案をマージする</Text>
+            </Pressable>
+            {showMergeForm ? (
+              <View style={styles.formCard}>
+                <TextInput
+                  style={styles.formInput}
+                  value={mergePrId}
+                  onChangeText={setMergePrId}
+                  placeholder="プルリクエスト番号"
+                  keyboardType="number-pad"
+                />
+                <TextInput
+                  style={styles.formInput}
+                  value={mergeCommitMessage}
+                  onChangeText={setMergeCommitMessage}
+                  placeholder="コミットメッセージ（任意）"
+                />
+                <Pressable style={styles.formSubmitButton} onPress={handleMerge} disabled={isMerging}>
+                  {isMerging ? (
+                    <ActivityIndicator size="small" color={colors.linenCream} />
+                  ) : (
+                    <Text style={styles.formSubmitButtonText}>マージする</Text>
+                  )}
+                </Pressable>
+                {mergeResult ? <Text style={styles.formResultText}>{mergeResult}</Text> : null}
+              </View>
+            ) : null}
+          </View>
+        ) : null}
 
         {repo.environment.length > 0 ? (
           <View style={styles.section}>
@@ -344,6 +470,45 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: colors.roastedBean,
+  },
+  sectionToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  formCard: {
+    gap: 8,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
+    backgroundColor: colors.surfaceContainerLowest,
+  },
+  formInput: {
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 13,
+    color: colors.onSurface,
+  },
+  formSubmitButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: colors.roastedBean,
+  },
+  formSubmitButtonText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: colors.linenCream,
+  },
+  formResultText: {
+    fontSize: 12,
+    color: colors.mutedForest,
+    textAlign: "center",
   },
   envRow: {
     flexDirection: "row",
