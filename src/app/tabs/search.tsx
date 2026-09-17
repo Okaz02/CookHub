@@ -1,17 +1,65 @@
-import { Text, TextInput, View, StyleSheet, ScrollView, Image } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Text, TextInput, View, StyleSheet, ScrollView, Image, Pressable, ActivityIndicator } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { getTrend, type Repository } from "../../lib/api-repo";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Search() {
+  const router = useRouter();
+  const { token } = useAuth();
+  const [query, setQuery] = useState("");
+  const [repos, setRepos] = useState<Repository[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsLoading(true);
+      getTrend(token)
+        .then((res) => setRepos(res.data))
+        .catch(() => setRepos([]))
+        .finally(() => setIsLoading(false));
+    }, [token])
+  );
+
+  const filteredRepos = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return repos;
+    return repos.filter(
+      (repo) =>
+        repo.name.toLowerCase().includes(normalized) ||
+        repo.description?.toLowerCase().includes(normalized) ||
+        repo.owner.username.toLowerCase().includes(normalized)
+    );
+  }, [repos, query]);
+
   return (
     <View style={styles.screen}>
-      <TextInput style={styles.inputBox} />
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
-        <View style={styles.recipe}>
-          <Image style={styles.recipeImage} />
-          <View style={styles.recipeExplain}>
-            <Text style={styles.h3Text}>肉じゃが</Text>
-          </View>
-        </View>
-      </ScrollView>
+      <TextInput
+        style={styles.inputBox}
+        placeholder="レシピ名・投稿者で検索"
+        value={query}
+        onChangeText={setQuery}
+      />
+      {isLoading ? (
+        <ActivityIndicator color="#1b110f" />
+      ) : (
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+          {filteredRepos.map((repo) => (
+            <Pressable key={repo.id} style={styles.recipe} onPress={() => router.push(`/tabs/repo/${repo.id}`)}>
+              {repo.thumbnail ? (
+                <Image style={styles.recipeImage} source={{ uri: repo.thumbnail }} />
+              ) : (
+                <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
+              )}
+              <View style={styles.recipeExplain}>
+                <Text style={styles.h3Text}>{repo.name}</Text>
+                <Text style={styles.text}>{repo.owner.username}</Text>
+              </View>
+            </Pressable>
+          ))}
+          {filteredRepos.length === 0 ? <Text style={styles.text}>該当するレシピが見つかりませんでした。</Text> : null}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -48,6 +96,9 @@ const styles = StyleSheet.create({
   recipeImage: {
     height: 200,
   },
+  recipeImagePlaceholder: {
+    backgroundColor: "#3a3a3a",
+  },
   recipeExplain: {
     flex: 1,
     padding: 20,
@@ -55,5 +106,8 @@ const styles = StyleSheet.create({
   },
   h3Text: {
     fontSize: 15,
+  },
+  text: {
+    fontSize: 10,
   }
 });
