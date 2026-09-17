@@ -1,10 +1,41 @@
-import { Text, View, Image, Pressable, ScrollView, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { Text, View, Image, Pressable, ScrollView, ActivityIndicator, StyleSheet } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../theme";
+import { useAuth } from "../../../context/AuthContext";
+import { getUserRepo, type Repository } from "../../../lib/api-repo";
 
 export default function PostList() {
   const router = useRouter();
+  const { token } = useAuth();
+  const [drafts, setDrafts] = useState<Repository[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!token) {
+        setDrafts([]);
+        setIsLoading(false);
+        return;
+      }
+      let cancelled = false;
+      setIsLoading(true);
+      getUserRepo(token)
+        .then((res) => {
+          if (!cancelled) setDrafts(res.data.filter((repo) => repo.draft));
+        })
+        .catch(() => {
+          if (!cancelled) setDrafts([]);
+        })
+        .finally(() => {
+          if (!cancelled) setIsLoading(false);
+        });
+      return () => {
+        cancelled = true;
+      };
+    }, [token])
+  );
 
   return (
     <View style={styles.screen}>
@@ -20,34 +51,33 @@ export default function PostList() {
 
         <Text style={styles.sectionLabel}>下書き</Text>
 
-        <View style={styles.draftList}>
-          <Pressable style={styles.draftCard} onPress={() => router.push("/tabs/post/write")}>
-            <Image style={styles.draftThumbnail} />
-            <View style={styles.draftInfo}>
-              <Text style={styles.draftTitle}>我が家の絶品ふっくら煮込みハンバーグ</Text>
-              <Text style={styles.draftMeta}>下書き保存: 5分前</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
-          </Pressable>
-
-          <Pressable style={styles.draftCard} onPress={() => router.push("/tabs/post/write")}>
-            <Image style={styles.draftThumbnail} />
-            <View style={styles.draftInfo}>
-              <Text style={styles.draftTitle}>特製から揚げの甘辛ソース</Text>
-              <Text style={styles.draftMeta}>下書き保存: 2日前</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
-          </Pressable>
-
-          <Pressable style={styles.draftCard} onPress={() => router.push("/tabs/post/write")}>
-            <Image style={styles.draftThumbnail} />
-            <View style={styles.draftInfo}>
-              <Text style={styles.draftTitle}>簡単オムライス</Text>
-              <Text style={styles.draftMeta}>下書き保存: 1週間前</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
-          </Pressable>
-        </View>
+        {isLoading ? (
+          <ActivityIndicator color={colors.roastedBean} />
+        ) : (
+          <View style={styles.draftList}>
+            {drafts.map((repo) => (
+              <Pressable
+                key={repo.id}
+                style={styles.draftCard}
+                onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(repo.id) } })}
+              >
+                {repo.thumbnail ? (
+                  <Image style={styles.draftThumbnail} source={{ uri: repo.thumbnail }} />
+                ) : (
+                  <View style={styles.draftThumbnail} />
+                )}
+                <View style={styles.draftInfo}>
+                  <Text style={styles.draftTitle}>{repo.name}</Text>
+                  <Text style={styles.draftMeta}>
+                    最終更新: {new Date(repo.updated_at).toLocaleDateString("ja-JP")}
+                  </Text>
+                </View>
+                <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
+              </Pressable>
+            ))}
+            {drafts.length === 0 ? <Text style={styles.emptyText}>下書きはありません。</Text> : null}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -95,6 +125,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: colors.roastedBean,
+  },
+  emptyText: {
+    fontSize: 12,
+    color: colors.onSurfaceVariant,
+    textAlign: "center",
+    paddingVertical: 12,
   },
   draftList: {
     gap: 10,
