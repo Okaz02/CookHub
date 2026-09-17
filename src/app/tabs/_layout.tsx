@@ -33,6 +33,12 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => <MaterialIcons name="person" size={size} color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="repo"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

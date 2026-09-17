@@ -1,41 +1,56 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Text, View, StyleSheet, TextInput, Pressable, ScrollView, Image } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
 import { getTrend, type Repository } from "../../lib/api-repo"
+import { useAuth } from "../../context/AuthContext";
 
 export default function Index() {
+  const router = useRouter();
+  const { token } = useAuth();
   const [trendRepos, setTrendRepos] = useState<Repository[]>([]);
 
-  useEffect(() => {
-    getTrend()
-      .then((res) => setTrendRepos(res.data))
-      .catch(() => setTrendRepos([]));
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getTrend(token)
+        .then((res) => setTrendRepos(res.data))
+        .catch(() => setTrendRepos([]));
+    }, [token])
+  );
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       <Text style={styles.h1Text}>世界のレシピを、みんなで改良。</Text>
       <Text style={styles.h3Text}>CookHubは、レシピの更新を記録したり、レシピを自分に合うようにアレンジ、より良いアレンジをもとのレシピに統合</Text>
 
-      <Pressable style={styles.button}>
+      <Pressable style={styles.button} onPress={() => router.push("/tabs/post/write")}>
         <Text style={styles.buttonText}>+ レシピを作る</Text>
       </Pressable>
 
-      <TextInput style={styles.inputBox} />
+      <TextInput style={styles.inputBox} placeholder="レシピを検索" onFocus={() => router.push("/tabs/search")} />
       <View style={styles.rowBetween}>
         <Text style={styles.h2Text}>人気のレシピ</Text>
-        <Text style={styles.text}>すべて見る</Text>
+        <Pressable onPress={() => router.push("/tabs/search")}>
+          <Text style={styles.text}>すべて見る</Text>
+        </Pressable>
       </View>
 
       <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
 
         {trendRepos.map((repo) => (
-          <View key={repo.id} style={styles.recipe}>
-            <Image style={styles.recipeImage} source={{ uri: repo.owner.avatar_url }} />
+          <Pressable key={repo.id} style={styles.recipe} onPress={() => router.push(`/tabs/repo/${repo.id}`)}>
+            {repo.thumbnail ? (
+              <Image style={styles.recipeImage} source={{ uri: repo.thumbnail }} />
+            ) : (
+              <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
+            )}
             <View style={styles.recipeExplain}>
               <Text style={styles.h3Text}>{repo.name}</Text>
+              <Text style={styles.text}>{repo.owner.username}</Text>
             </View>
-          </View>
+          </Pressable>
         ))}
+
+        {trendRepos.length === 0 ? <Text style={styles.text}>まだ公開されたレシピがありません。</Text> : null}
 
       </ScrollView>
 
@@ -157,6 +172,9 @@ const styles = StyleSheet.create({
   recipeImage: {
     width: 300,
     height: 200,
+  },
+  recipeImagePlaceholder: {
+    backgroundColor: "#3a3a3a",
   },
   recipeExplain: {
     flex: 1,
