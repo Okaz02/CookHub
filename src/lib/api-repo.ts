@@ -64,6 +64,13 @@ export function getCommitAuthorName(author: CommitAuthor): string {
     return "unknown";
 }
 
+export function formatCommitDate(value: string | null | undefined): string {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleString("ja-JP");
+}
+
 export type DiffRow = {
     diff_type: "added" | "modified" | "removed";
     [key: string]: unknown;

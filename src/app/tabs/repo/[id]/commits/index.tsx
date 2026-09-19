@@ -4,7 +4,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter, Stack } from "expo-rou
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../../../theme";
 import { useAuth } from "../../../../../context/AuthContext";
-import { getCommitAuthorName, getRepoCommits, type Commit } from "../../../../../lib/api-repo";
+import { formatCommitDate, getCommitAuthorName, getRepoCommits, type Commit } from "../../../../../lib/api-repo";
 
 export default function RepoCommits() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -62,7 +62,7 @@ export default function RepoCommits() {
             <View style={styles.commitInfo}>
               <Text style={styles.commitMessage}>{item.message}</Text>
               <Text style={styles.commitMeta}>
-                {getCommitAuthorName(item.author)} ・ {new Date(item.date).toLocaleString("ja-JP")}
+                {getCommitAuthorName(item.author)} ・ {formatCommitDate(item.date)}
               </Text>
             </View>
             <MaterialIcons name="chevron-right" size={20} color={colors.outline} />

@@ -3,7 +3,13 @@ import { Text, View, ScrollView, ActivityIndicator, StyleSheet } from "react-nat
 import { useFocusEffect, useLocalSearchParams, Stack } from "expo-router";
 import { colors } from "../../../../../theme";
 import { useAuth } from "../../../../../context/AuthContext";
-import { getCommitAuthorName, getRepoCommit, type CommitDetail, type DiffRow } from "../../../../../lib/api-repo";
+import {
+  formatCommitDate,
+  getCommitAuthorName,
+  getRepoCommit,
+  type CommitDetail,
+  type DiffRow,
+} from "../../../../../lib/api-repo";
 
 const DIFF_LABEL: Record<DiffRow["diff_type"], string> = {
   added: "追加",
@@ -18,10 +24,37 @@ const SECTION_LABEL: Record<string, string> = {
   steps: "手順",
 };
 
+const FIELD_LABEL: Record<string, string> = {
+  sort_order: "順番",
+  key_name: "項目",
+  value: "内容",
+  name: "材料名",
+  amount: "分量",
+  unit: "単位",
+  body: "手順",
+  image_url: "画像URL",
+  title: "タイトル",
+  description: "説明",
+  thumbnail: "サムネイル",
+};
+
+// 並び順は 0 始まりで返ってくるが、画面では 1 番目から数える。
+function formatValue(field: string, value: unknown) {
+  if (value === null || value === undefined) return "";
+  if (field === "sort_order" && typeof value === "number") return String(value + 1);
+  return String(value);
+}
+
 function DiffRowView({ row }: { row: DiffRow }) {
   const fields = Object.keys(row)
     .filter((key) => key.startsWith("to_"))
-    .map((key) => key.slice(3));
+    .map((key) => key.slice(3))
+    .filter((field) => {
+      const from = formatValue(field, row[`from_${field}`]);
+      const to = formatValue(field, row[`to_${field}`]);
+      if (row.diff_type === "modified") return from !== to;
+      return (row.diff_type === "removed" ? from : to) !== "";
+    });
 
   return (
     <View style={styles.diffRow}>
@@ -30,18 +63,17 @@ function DiffRowView({ row }: { row: DiffRow }) {
       </View>
       <View style={styles.diffFields}>
         {fields.map((field) => {
-          const from = row[`from_${field}`];
-          const to = row[`to_${field}`];
+          const from = formatValue(field, row[`from_${field}`]);
+          const to = formatValue(field, row[`to_${field}`]);
           return (
             <View key={field} style={styles.diffField}>
-              <Text style={styles.diffFieldLabel}>{field}</Text>
+              <Text style={styles.diffFieldLabel}>{FIELD_LABEL[field] ?? field}</Text>
               {row.diff_type === "modified" ? (
                 <Text style={styles.diffFieldValue}>
-                  <Text style={styles.diffFrom}>{String(from ?? "")}</Text> {"→"}{" "}
-                  <Text style={styles.diffTo}>{String(to ?? "")}</Text>
+                  <Text style={styles.diffFrom}>{from}</Text> {"→"} <Text style={styles.diffTo}>{to}</Text>
                 </Text>
               ) : (
-                <Text style={styles.diffFieldValue}>{String((row.diff_type === "removed" ? from : to) ?? "")}</Text>
+                <Text style={styles.diffFieldValue}>{row.diff_type === "removed" ? from : to}</Text>
               )}
             </View>
           );
@@ -106,7 +138,7 @@ export default function CommitDetailScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.message}>{commit.message}</Text>
         <Text style={styles.meta}>
-          {getCommitAuthorName(commit.author)} ・ {new Date(commit.date).toLocaleString("ja-JP")}
+          {getCommitAuthorName(commit.author)} ・ {formatCommitDate(commit.date)}
         </Text>
 
         {sections.length === 0 ? (
