@@ -45,7 +45,7 @@ export default function Index() {
               <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
             )}
             <View style={styles.recipeExplain}>
-              <Text style={textStyles.h3Text}>{recipe.name}</Text>
+              <Text style={textStyles.h3Text}>{recipe.title}</Text>
               <Text style={textStyles.text}>{recipe.owner.username}</Text>
             </View>
           </Pressable>

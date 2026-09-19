@@ -11,28 +11,29 @@ export type Permissions = {
     pull: boolean;
 };
 
+// キー名はバックエンドのDBの列名そのまま。`is_fork` だけはサーバー側で
+// `parent_recipe_id` があるかどうかから計算された値。
 export type Recipe = {
     id: number;
-    name: string;
-    full_name: string;
-    description: string;
+    title: string;
+    description: string | null;
     owner: Owner;
-    private: boolean;
-    draft: boolean;
+    is_private: boolean;
+    is_draft: boolean;
     thumbnail: string | null;
     permissions: Permissions;
     default_branch: string;
-    fork: boolean;
+    is_fork: boolean;
     fork_type: number;
-    parent_id: number | null;
+    parent_recipe_id: number | null;
     stars_count: number;
     created_at: string;
     updated_at: string;
 };
 
-// 下書き(draft)と公開範囲(private)は独立した2つの軸として扱う。
-//   draft   : 執筆中かどうか。下書きの間は公開範囲に関わらず他人には表示されない。
-//   private : 公開済みになったときに誰が見られるか（自分のみ / 全体）。
+// 下書き(is_draft)と公開範囲(is_private)は独立した2つの軸として扱う。
+//   is_draft   : 執筆中かどうか。下書きの間は公開範囲に関わらず他人には表示されない。
+//   is_private : 公開済みになったときに誰が見られるか（自分のみ / 全体）。
 export type RecipeStateTone = "draft" | "private" | "public";
 
 export type RecipeStateBadge = {
@@ -41,32 +42,32 @@ export type RecipeStateBadge = {
     tone: RecipeStateTone;
 };
 
-export type RecipeState = Pick<Recipe, "draft" | "private">;
+export type RecipeState = Pick<Recipe, "is_draft" | "is_private">;
 
 export function getRecipeStatusLabel(recipe: RecipeState): string {
-    return recipe.draft ? "下書き" : "公開済み";
+    return recipe.is_draft ? "下書き" : "公開済み";
 }
 
 export function getRecipeVisibilityLabel(recipe: RecipeState): string {
-    return recipe.private ? "自分のみ" : "全体公開";
+    return recipe.is_private ? "自分のみ" : "全体公開";
 }
 
 export function getRecipeStateBadges(recipe: RecipeState): RecipeStateBadge[] {
     return [
-        { key: "status", label: getRecipeStatusLabel(recipe), tone: recipe.draft ? "draft" : "public" },
-        { key: "visibility", label: getRecipeVisibilityLabel(recipe), tone: recipe.private ? "private" : "public" },
+        { key: "status", label: getRecipeStatusLabel(recipe), tone: recipe.is_draft ? "draft" : "public" },
+        { key: "visibility", label: getRecipeVisibilityLabel(recipe), tone: recipe.is_private ? "private" : "public" },
     ];
 }
 
 // 2つの軸の組み合わせを、閲覧できる相手の観点で説明する。
 export function getRecipeStateNotice(recipe: RecipeState): string | null {
-    if (recipe.draft && recipe.private) {
+    if (recipe.is_draft && recipe.is_private) {
         return "下書きです。公開範囲も「自分のみ」なので、自分だけが閲覧できます。";
     }
-    if (recipe.draft) {
+    if (recipe.is_draft) {
         return "下書きです。公開範囲は「全体公開」ですが、公開するまで他の人には表示されません。";
     }
-    if (recipe.private) {
+    if (recipe.is_private) {
         return "公開済みですが、公開範囲が「自分のみ」のため他の人には表示されません。";
     }
     return null;
@@ -77,10 +78,11 @@ export type Environment = {
     value: string;
 };
 
+// 「少々」のように数量が無い材料は amount / unit が null になる。
 export type Ingredient = {
     name: string;
-    amount: number | string;
-    unit: string;
+    amount?: number | string | null;
+    unit?: string | null;
 };
 
 export type Step = {
@@ -157,7 +159,6 @@ export type CommitResponse = {
 
 export type RecipeInput = {
     title?: string;
-    name?: string;
     description?: string;
     is_private?: boolean;
     is_draft?: boolean;
@@ -172,44 +173,43 @@ export type ForkInput = RecipeInput & {
     fork_type?: 1 | 2;
 };
 
-// バックエンドのエンドポイントは /api/repos のままなので、URL だけは repos を使う。
 export async function getTrend(token?: string | null): Promise<RecipesResponse> {
-    return request<RecipesResponse>("/api/repos/trend", {
+    return request<RecipesResponse>("/api/recipes/trend", {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function getUserRecipe(token: string): Promise<RecipesResponse> {
-    return request<RecipesResponse>("/api/repos/mine", {
+    return request<RecipesResponse>("/api/recipes/mine", {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function getRecipe(id: number, token?: string | null): Promise<RecipeResponse> {
-    return request<RecipeResponse>(`/api/repos/${id}`, {
+    return request<RecipeResponse>(`/api/recipes/${id}`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function getRecipeCommits(id: number, token?: string | null): Promise<CommitsResponse> {
-    return request<CommitsResponse>(`/api/repos/${id}/commits`, {
+    return request<CommitsResponse>(`/api/recipes/${id}/commits`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function getRecipeCommit(id: number, commitId: string, token?: string | null): Promise<CommitResponse> {
-    return request<CommitResponse>(`/api/repos/${id}/commits/${commitId}`, {
+    return request<CommitResponse>(`/api/recipes/${id}/commits/${commitId}`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function createRecipe(input: RecipeInput, token: string): Promise<RecipeResponse> {
-    return request<RecipeResponse>("/api/repos", {
+    return request<RecipeResponse>("/api/recipes", {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify(input),
@@ -217,7 +217,7 @@ export async function createRecipe(input: RecipeInput, token: string): Promise<R
 }
 
 export async function updateRecipe(id: number, input: RecipeInput, token: string): Promise<RecipeResponse> {
-    return request<RecipeResponse>(`/api/repos/${id}`, {
+    return request<RecipeResponse>(`/api/recipes/${id}`, {
         method: "PATCH",
         headers: authHeaders(token),
         body: JSON.stringify(input),
@@ -225,14 +225,14 @@ export async function updateRecipe(id: number, input: RecipeInput, token: string
 }
 
 export async function deleteRecipe(id: number, token: string): Promise<{ ok: boolean; commit?: string | null; data: { id: number } }> {
-    return request(`/api/repos/${id}`, {
+    return request(`/api/recipes/${id}`, {
         method: "DELETE",
         headers: authHeaders(token),
     });
 }
 
 export async function forkRecipe(id: number, input: ForkInput, token: string): Promise<RecipeResponse> {
-    return request<RecipeResponse>(`/api/repos/${id}/fork`, {
+    return request<RecipeResponse>(`/api/recipes/${id}/fork`, {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify(input),

@@ -27,7 +27,7 @@ export default function Search() {
     if (!normalized) return recipes;
     return recipes.filter(
       (recipe) =>
-        recipe.name.toLowerCase().includes(normalized) ||
+        recipe.title.toLowerCase().includes(normalized) ||
         recipe.description?.toLowerCase().includes(normalized) ||
         recipe.owner.username.toLowerCase().includes(normalized)
     );
@@ -53,7 +53,7 @@ export default function Search() {
                 <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
               )}
               <View style={styles.recipeExplain}>
-                <Text style={textStyles.h3Text}>{recipe.name}</Text>
+                <Text style={textStyles.h3Text}>{recipe.title}</Text>
                 <Text style={textStyles.text}>{recipe.owner.username}</Text>
               </View>
             </Pressable>

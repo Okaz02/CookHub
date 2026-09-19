@@ -20,7 +20,7 @@ function RecipeListRoute({ recipes, emptyText }: { recipes: Recipe[]; emptyText:
             <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
           )}
           <View style={styles.recipeExplain}>
-            <Text style={textStyles.h3Text}>{recipe.name}</Text>
+            <Text style={textStyles.h3Text}>{recipe.title}</Text>
             <RecipeStateBadges recipe={recipe} />
           </View>
         </Pressable>
@@ -77,8 +77,8 @@ export default function Profile() {
     }, [token])
   );
 
-  const ownRecipes = useMemo(() => recipes.filter((recipe) => !recipe.fork), [recipes]);
-  const forkedRecipes = useMemo(() => recipes.filter((recipe) => recipe.fork), [recipes]);
+  const ownRecipes = useMemo(() => recipes.filter((recipe) => !recipe.is_fork), [recipes]);
+  const forkedRecipes = useMemo(() => recipes.filter((recipe) => recipe.is_fork), [recipes]);
 
   async function handleSignOut() {
     await signOut();

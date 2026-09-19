@@ -3,7 +3,7 @@ import { colors } from "../theme";
 import { getRecipeStateBadges, type Recipe, type RecipeStateTone } from "../lib/api-recipe";
 
 type Props = {
-  recipe: Pick<Recipe, "draft" | "private" | "fork" | "fork_type">;
+  recipe: Pick<Recipe, "is_draft" | "is_private" | "is_fork" | "fork_type">;
   showFork?: boolean;
 };
 
@@ -16,7 +16,7 @@ export function RecipeStateBadges({ recipe, showFork = false }: Props) {
           <Text style={styles.badgeText}>{badge.label}</Text>
         </View>
       ))}
-      {showFork && recipe.fork ? (
+      {showFork && recipe.is_fork ? (
         <View style={[styles.badge, toneStyles.neutral]}>
           <Text style={styles.badgeText}>{recipe.fork_type === 2 ? "移植" : "アレンジ"}</Text>
         </View>

@@ -17,7 +17,9 @@ import {
 const SERVING_PRESETS = ["1人分", "2人分", "3〜4人"];
 const SERVING_CUSTOM = "その他";
 
-type IngredientDraft = Ingredient & { key: string };
+// 入力欄は文字列しか扱えないので、下書き中は分量・単位も文字列で持つ。
+// 「少々」のように数量の無い材料は、送信時に null に戻してサーバーに渡す。
+type IngredientDraft = { key: string; name: string; amount: string; unit: string };
 type StepDraft = Step & { key: string };
 
 let draftKeySeed = 0;
@@ -60,11 +62,11 @@ export default function Write() {
         .then((res) => {
           if (cancelled) return;
           const recipe = res.data;
-          setTitle(recipe.name);
+          setTitle(recipe.title);
           setDescription(recipe.description ?? "");
           setThumbnail(recipe.thumbnail ?? "");
-          setIsDraft(recipe.draft);
-          setIsPrivate(recipe.private);
+          setIsDraft(recipe.is_draft);
+          setIsPrivate(recipe.is_private);
           const servingEnv = recipe.environment.find((env) => env.key_name === "人数");
           if (servingEnv) {
             setServing(servingEnv.value);
@@ -72,7 +74,12 @@ export default function Write() {
           }
           setIngredients(
             recipe.ingredients.length > 0
-              ? recipe.ingredients.map((item) => ({ ...item, key: nextKey() }))
+              ? recipe.ingredients.map((item) => ({
+                  key: nextKey(),
+                  name: item.name,
+                  amount: item.amount == null ? "" : String(item.amount),
+                  unit: item.unit ?? "",
+                }))
               : [{ key: nextKey(), name: "", amount: "", unit: "" }]
           );
           setSteps(
@@ -93,7 +100,7 @@ export default function Write() {
     }, [editingRecipeId, token])
   );
 
-  function updateIngredient(key: string, patch: Partial<Ingredient>) {
+  function updateIngredient(key: string, patch: Partial<Omit<IngredientDraft, "key">>) {
     setIngredients((prev) => prev.map((item) => (item.key === key ? { ...item, ...patch } : item)));
   }
 
@@ -125,9 +132,13 @@ export default function Write() {
     }
 
     const environment: Environment[] = [{ key_name: "人数", value: serving.trim() }];
-    const cleanedIngredients = ingredients
+    const cleanedIngredients: Ingredient[] = ingredients
       .filter((item) => item.name.trim())
-      .map(({ name, amount, unit }) => ({ name, amount, unit }));
+      .map(({ name, amount, unit }) => ({
+        name: name.trim(),
+        amount: amount.trim() || null,
+        unit: unit.trim() || null,
+      }));
     const cleanedSteps = steps
       .filter((item) => item.body.trim())
       .map(({ body, image_url }) => ({ body, image_url: image_url || null }));
@@ -289,7 +300,7 @@ export default function Write() {
                 />
                 <TextInput
                   style={styles.ingredientAmountInput}
-                  value={String(item.amount)}
+                  value={item.amount}
                   onChangeText={(text) => updateIngredient(item.key, { amount: text })}
                   placeholder="分量"
                 />
