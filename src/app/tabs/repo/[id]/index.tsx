@@ -4,7 +4,8 @@ import { useFocusEffect, useLocalSearchParams, useRouter, Stack } from "expo-rou
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../../theme";
 import { useAuth } from "../../../../context/AuthContext";
-import { getRepo, forkRepo, deleteRepo, type RepositoryDetail } from "../../../../lib/api-repo";
+import { getRepo, forkRepo, deleteRepo, getRepoStateNotice, type RepositoryDetail } from "../../../../lib/api-repo";
+import { RepoStateBadges } from "../../../../components/RepoStateBadges";
 import { createPullRequest, mergePullRequest } from "../../../../lib/api-pull-request";
 import { ApiError } from "../../../../lib/api";
 
@@ -44,7 +45,7 @@ export default function RepoDetail() {
         .catch((error) => {
           if (cancelled) return;
           if (error instanceof ApiError && error.status === 403) {
-            setErrorMessage("このレシピは非公開です。");
+            setErrorMessage("このレシピは閲覧できません。下書き、または公開範囲が「自分のみ」に設定されています。");
           } else if (error instanceof ApiError && error.status === 404) {
             setErrorMessage("レシピが見つかりませんでした。");
           } else {
@@ -158,6 +159,7 @@ export default function RepoDetail() {
   }
 
   const isOwner = account?.id === repo.owner.user_id;
+  const stateNotice = getRepoStateNotice(repo);
 
   return (
     <View style={styles.screen}>
@@ -174,17 +176,19 @@ export default function RepoDetail() {
             <Text style={styles.title}>{repo.name}</Text>
             <Text style={styles.subtitle}>{repo.owner.username}</Text>
           </View>
-          {repo.private ? (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>非公開</Text>
-            </View>
-          ) : null}
-          {repo.draft ? (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>下書き</Text>
-            </View>
-          ) : null}
+          <RepoStateBadges repo={repo} />
         </View>
+
+        {isOwner && stateNotice ? (
+          <View style={styles.stateNotice}>
+            <MaterialIcons
+              name={repo.draft ? "edit-note" : "lock"}
+              size={16}
+              color={colors.dustyRose}
+            />
+            <Text style={styles.stateNoticeText}>{stateNotice}</Text>
+          </View>
+        ) : null}
 
         {repo.fork ? (
           <View style={styles.forkNotice}>
@@ -393,16 +397,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.onSurfaceVariant,
   },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
-    backgroundColor: colors.secondaryContainer,
+  stateNotice: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: colors.surfaceContainerLow,
   },
-  badgeText: {
-    fontSize: 10,
-    color: colors.secondary,
-    fontWeight: "600",
+  stateNoticeText: {
+    flex: 1,
+    fontSize: 12,
+    color: colors.onSurfaceVariant,
   },
   forkNotice: {
     flexDirection: "row",

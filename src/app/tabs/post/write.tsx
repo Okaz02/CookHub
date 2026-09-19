@@ -38,6 +38,8 @@ export default function Write() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [thumbnail, setThumbnail] = useState("");
+  // 下書きかどうか(isDraft)と公開範囲(isPrivate)は独立した設定として保持する。
+  const [isDraft, setIsDraft] = useState(true);
   const [isPrivate, setIsPrivate] = useState(false);
   const [serving, setServing] = useState("2人分");
   const [commitMessage, setCommitMessage] = useState("");
@@ -58,6 +60,7 @@ export default function Write() {
           setTitle(repo.name);
           setDescription(repo.description ?? "");
           setThumbnail(repo.thumbnail ?? "");
+          setIsDraft(repo.draft);
           setIsPrivate(repo.private);
           const servingEnv = repo.environment.find((env) => env.key_name === "人数");
           if (servingEnv) setServing(servingEnv.value);
@@ -100,7 +103,7 @@ export default function Write() {
     setSteps((prev) => (prev.length > 1 ? prev.filter((item) => item.key !== key) : prev));
   }
 
-  async function handleSubmit(isDraft: boolean) {
+  async function handleSubmit(nextIsDraft: boolean) {
     if (!token) {
       router.push("/login");
       return;
@@ -109,9 +112,6 @@ export default function Write() {
       setErrorMessage("レシピのタイトルを入力してください。");
       return;
     }
-
-    // 「公開する」は文言どおり必ず公開にする。公開範囲スイッチが効くのは下書き保存のときだけ。
-    const willBePrivate = isDraft ? isPrivate : false;
 
     const environment: Environment[] = [{ key_name: "人数", value: serving }];
     const cleanedIngredients = ingredients
@@ -128,8 +128,9 @@ export default function Write() {
         title,
         description,
         thumbnail: thumbnail || null,
-        is_private: willBePrivate,
-        is_draft: isDraft,
+        // 公開範囲は下書き保存でも公開でもユーザーの選択をそのまま送る。
+        is_private: isPrivate,
+        is_draft: nextIsDraft,
         environment,
         ingredients: cleanedIngredients,
         steps: cleanedSteps,
@@ -340,17 +341,36 @@ export default function Write() {
           />
         </View>
 
+        <View style={styles.stateRow}>
+          <MaterialIcons
+            name={isDraft ? "edit-note" : "check-circle"}
+            size={20}
+            color={colors.mutedForest}
+          />
+          <View style={styles.stateRowText}>
+            <Text style={styles.stateTitle}>状態</Text>
+            <Text style={styles.stateSubtitle}>
+              {isDraft ? "下書き（まだ公開していません）" : "公開済み"}
+            </Text>
+            <Text style={styles.stateHint}>
+              {isDraft
+                ? "下書きの間は公開範囲の設定に関わらず、自分以外には表示されません。"
+                : "下の公開範囲の設定どおりに表示されます。"}
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.visibilityRow}>
           <View style={styles.visibilityRowLeft}>
-            <MaterialIcons name="public" size={20} color={colors.mutedForest} />
-            <View>
+            <MaterialIcons name={isPrivate ? "lock" : "public"} size={20} color={colors.mutedForest} />
+            <View style={styles.visibilityRowText}>
               <Text style={styles.visibilityTitle}>公開範囲</Text>
               <Text style={styles.visibilitySubtitle}>
-                {isPrivate ? "非公開（自分のみ閲覧可能）" : "全体に公開（CookHubタイムライン）"}
+                {isPrivate ? "自分のみ（自分だけが閲覧可能）" : "全体公開（CookHubタイムラインに表示）"}
               </Text>
-              {isPrivate ? (
-                <Text style={styles.visibilityHint}>「公開する」を押すと全体に公開されます。</Text>
-              ) : null}
+              <Text style={styles.visibilityHint}>
+                下書きかどうかとは別の設定です。下書き保存でもこの設定は保持されます。
+              </Text>
             </View>
           </View>
           <Switch value={!isPrivate} onValueChange={(value) => setIsPrivate(!value)} />
@@ -364,8 +384,12 @@ export default function Write() {
             onPress={() => handleSubmit(true)}
             disabled={isSubmitting}
           >
-            <MaterialIcons name="bookmark-border" size={18} color={colors.roastedBean} />
-            <Text style={styles.draftSaveButtonText}>下書き保存</Text>
+            <MaterialIcons
+              name={isDraft ? "bookmark-border" : "undo"}
+              size={18}
+              color={colors.roastedBean}
+            />
+            <Text style={styles.draftSaveButtonText}>{isDraft ? "下書き保存" : "下書きに戻す"}</Text>
           </Pressable>
           <Pressable
             style={styles.publishButton}
@@ -376,8 +400,14 @@ export default function Write() {
               <ActivityIndicator size="small" color={colors.linenCream} />
             ) : (
               <>
-                <MaterialIcons name="publish" size={18} color={colors.linenCream} />
-                <Text style={styles.publishButtonText}>公開する</Text>
+                <MaterialIcons
+                  name={isPrivate ? "lock" : "publish"}
+                  size={18}
+                  color={colors.linenCream}
+                />
+                <Text style={styles.publishButtonText}>
+                  {!isDraft ? "更新する" : isPrivate ? "自分のみに公開" : "公開する"}
+                </Text>
               </>
             )}
           </Pressable>
@@ -644,18 +674,49 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     textAlignVertical: "top",
   },
+  stateRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceContainerLow,
+  },
+  stateRowText: {
+    flex: 1,
+    gap: 2,
+  },
+  stateTitle: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.roastedBean,
+  },
+  stateSubtitle: {
+    fontSize: 11,
+    color: colors.onSurfaceVariant,
+  },
+  stateHint: {
+    fontSize: 11,
+    color: colors.mutedForest,
+  },
   visibilityRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 8,
     padding: 14,
     borderRadius: 12,
     backgroundColor: colors.surfaceContainerLow,
   },
   visibilityRowLeft: {
+    flex: 1,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 8,
+  },
+  visibilityRowText: {
+    flex: 1,
+    gap: 2,
   },
   visibilityTitle: {
     fontSize: 12,
@@ -664,7 +725,7 @@ const styles = StyleSheet.create({
   },
   visibilityHint: {
     fontSize: 11,
-    color: colors.error,
+    color: colors.mutedForest,
   },
   visibilitySubtitle: {
     fontSize: 11,

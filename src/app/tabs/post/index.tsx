@@ -5,24 +5,8 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../theme";
 import { useAuth } from "../../../context/AuthContext";
 import { getUserRepo, type Repository } from "../../../lib/api-repo";
+import { RepoStateBadges } from "../../../components/RepoStateBadges";
 
-function RepoBadges({ repo }: { repo: Repository }) {
-  const labels: string[] = [];
-  if (repo.draft) labels.push("下書き");
-  if (repo.private) labels.push("非公開");
-  if (repo.fork) labels.push(repo.fork_type === 2 ? "移植" : "アレンジ");
-  if (labels.length === 0) labels.push("公開中");
-
-  return (
-    <View style={styles.badgeRow}>
-      {labels.map((label) => (
-        <View key={label} style={styles.badge}>
-          <Text style={styles.badgeText}>{label}</Text>
-        </View>
-      ))}
-    </View>
-  );
-}
 
 export default function PostList() {
   const router = useRouter();
@@ -86,7 +70,7 @@ export default function PostList() {
                 )}
                 <View style={styles.draftInfo}>
                   <Text style={styles.draftTitle}>{repo.name}</Text>
-                  <RepoBadges repo={repo} />
+                  <RepoStateBadges repo={repo} showFork />
                   <Text style={styles.draftMeta}>
                     最終更新: {new Date(repo.updated_at).toLocaleDateString("ja-JP")}
                   </Text>
@@ -181,21 +165,6 @@ const styles = StyleSheet.create({
   },
   draftMeta: {
     fontSize: 11,
-    color: colors.onSurfaceVariant,
-  },
-  badgeRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 4,
-  },
-  badge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 999,
-    backgroundColor: colors.surfaceContainerHigh,
-  },
-  badgeText: {
-    fontSize: 10,
     color: colors.onSurfaceVariant,
   },
 });

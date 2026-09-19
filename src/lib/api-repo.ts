@@ -30,6 +30,48 @@ export type Repository = {
     updated_at: string;
 };
 
+// 下書き(draft)と公開範囲(private)は独立した2つの軸として扱う。
+//   draft   : 執筆中かどうか。下書きの間は公開範囲に関わらず他人には表示されない。
+//   private : 公開済みになったときに誰が見られるか（自分のみ / 全体）。
+export type RepoStateTone = "draft" | "private" | "public";
+
+export type RepoStateBadge = {
+    key: "status" | "visibility";
+    label: string;
+    tone: RepoStateTone;
+};
+
+export type RepoState = Pick<Repository, "draft" | "private">;
+
+export function getRepoStatusLabel(repo: RepoState): string {
+    return repo.draft ? "下書き" : "公開済み";
+}
+
+export function getRepoVisibilityLabel(repo: RepoState): string {
+    return repo.private ? "自分のみ" : "全体公開";
+}
+
+export function getRepoStateBadges(repo: RepoState): RepoStateBadge[] {
+    return [
+        { key: "status", label: getRepoStatusLabel(repo), tone: repo.draft ? "draft" : "public" },
+        { key: "visibility", label: getRepoVisibilityLabel(repo), tone: repo.private ? "private" : "public" },
+    ];
+}
+
+// 2つの軸の組み合わせを、閲覧できる相手の観点で説明する。
+export function getRepoStateNotice(repo: RepoState): string | null {
+    if (repo.draft && repo.private) {
+        return "下書きです。公開範囲も「自分のみ」なので、自分だけが閲覧できます。";
+    }
+    if (repo.draft) {
+        return "下書きです。公開範囲は「全体公開」ですが、公開するまで他の人には表示されません。";
+    }
+    if (repo.private) {
+        return "公開済みですが、公開範囲が「自分のみ」のため他の人には表示されません。";
+    }
+    return null;
+}
+
 export type Environment = {
     key_name: string;
     value: string;
