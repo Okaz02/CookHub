@@ -4,18 +4,18 @@ import { useFocusEffect, useLocalSearchParams, useRouter, Stack } from "expo-rou
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../../theme";
 import { useAuth } from "../../../../context/AuthContext";
-import { getRepo, forkRepo, deleteRepo, getRepoStateNotice, type RepositoryDetail } from "../../../../lib/api-repo";
-import { RepoStateBadges } from "../../../../components/RepoStateBadges";
+import { getRecipe, forkRecipe, deleteRecipe, getRecipeStateNotice, type RecipeDetail } from "../../../../lib/api-recipe";
+import { RecipeStateBadges } from "../../../../components/RecipeStateBadges";
 import { createPullRequest, mergePullRequest } from "../../../../lib/api-pull-request";
 import { ApiError } from "../../../../lib/api";
 
-export default function RepoDetail() {
+export default function RecipeDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const repoId = Number(id);
+  const recipeId = Number(id);
   const router = useRouter();
   const { token, account } = useAuth();
 
-  const [repo, setRepo] = useState<RepositoryDetail | null>(null);
+  const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [isForking, setIsForking] = useState(false);
@@ -38,9 +38,9 @@ export default function RepoDetail() {
       setIsLoading(true);
       setErrorMessage("");
 
-      getRepo(repoId, token)
+      getRecipe(recipeId, token)
         .then((res) => {
-          if (!cancelled) setRepo(res.data);
+          if (!cancelled) setRecipe(res.data);
         })
         .catch((error) => {
           if (cancelled) return;
@@ -59,11 +59,11 @@ export default function RepoDetail() {
       return () => {
         cancelled = true;
       };
-    }, [repoId, token])
+    }, [recipeId, token])
   );
 
   function handleDelete() {
-    if (!token || !repo) return;
+    if (!token || !recipe) return;
     Alert.alert("レシピを削除しますか？", "この操作は取り消せません。", [
       { text: "キャンセル", style: "cancel" },
       {
@@ -71,7 +71,7 @@ export default function RepoDetail() {
         style: "destructive",
         onPress: async () => {
           try {
-            await deleteRepo(repo.id, token);
+            await deleteRecipe(recipe.id, token);
             router.replace("/tabs/post");
           } catch {
             setErrorMessage("削除に失敗しました。");
@@ -82,14 +82,14 @@ export default function RepoDetail() {
   }
 
   async function handleFork() {
-    if (!token || !repo) {
+    if (!token || !recipe) {
       router.push("/login");
       return;
     }
     setIsForking(true);
     try {
-      const res = await forkRepo(repo.id, { title: repo.name + " (forked)" }, token);
-      router.replace(`/tabs/repo/${res.data.id}`);
+      const res = await forkRecipe(recipe.id, { title: recipe.name + " (forked)" }, token);
+      router.replace(`/tabs/recipe/${res.data.id}`);
     } catch {
       setErrorMessage("フォークに失敗しました。");
     } finally {
@@ -98,11 +98,11 @@ export default function RepoDetail() {
   }
 
   async function handlePropose() {
-    if (!token || !repo || !proposeTitle.trim()) return;
+    if (!token || !recipe || !proposeTitle.trim()) return;
     setIsProposing(true);
     setProposeResult("");
     try {
-      const res = await createPullRequest(repo.id, { title: proposeTitle, content: proposeContent }, token);
+      const res = await createPullRequest(recipe.id, { title: proposeTitle, content: proposeContent }, token);
       setProposeResult(`提案を送信しました（PR番号: ${res.data.id}）`);
       setProposeTitle("");
       setProposeContent("");
@@ -126,7 +126,7 @@ export default function RepoDetail() {
       setMergeResult("マージしました。");
       setMergePrId("");
       setMergeCommitMessage("");
-      getRepo(repoId, token).then((res) => setRepo(res.data));
+      getRecipe(recipeId, token).then((res) => setRecipe(res.data));
     } catch (error) {
       if (error instanceof ApiError && error.status === 403) {
         setMergeResult("取り込み先のオーナーのみマージできます。");
@@ -150,7 +150,7 @@ export default function RepoDetail() {
     );
   }
 
-  if (errorMessage || !repo) {
+  if (errorMessage || !recipe) {
     return (
       <View style={styles.centered}>
         <Text style={styles.errorText}>{errorMessage || "レシピの取得に失敗しました。"}</Text>
@@ -158,31 +158,31 @@ export default function RepoDetail() {
     );
   }
 
-  const isOwner = account?.id === repo.owner.user_id;
-  const stateNotice = getRepoStateNotice(repo);
+  const isOwner = account?.id === recipe.owner.user_id;
+  const stateNotice = getRecipeStateNotice(recipe);
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen options={{ title: repo.name }} />
+      <Stack.Screen options={{ title: recipe.name }} />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-        {repo.thumbnail ? (
-          <Image style={styles.thumbnail} source={{ uri: repo.thumbnail }} />
+        {recipe.thumbnail ? (
+          <Image style={styles.thumbnail} source={{ uri: recipe.thumbnail }} />
         ) : (
           <View style={[styles.thumbnail, styles.thumbnailPlaceholder]} />
         )}
 
         <View style={styles.titleRow}>
           <View style={styles.titleGroup}>
-            <Text style={styles.title}>{repo.name}</Text>
-            <Text style={styles.subtitle}>{repo.owner.username}</Text>
+            <Text style={styles.title}>{recipe.name}</Text>
+            <Text style={styles.subtitle}>{recipe.owner.username}</Text>
           </View>
-          <RepoStateBadges repo={repo} />
+          <RecipeStateBadges recipe={recipe} />
         </View>
 
         {isOwner && stateNotice ? (
           <View style={styles.stateNotice}>
             <MaterialIcons
-              name={repo.draft ? "edit-note" : "lock"}
+              name={recipe.draft ? "edit-note" : "lock"}
               size={16}
               color={colors.dustyRose}
             />
@@ -190,21 +190,21 @@ export default function RepoDetail() {
           </View>
         ) : null}
 
-        {repo.fork ? (
+        {recipe.fork ? (
           <View style={styles.forkNotice}>
             <MaterialIcons name="fork-right" size={16} color={colors.mutedForest} />
             <Text style={styles.forkNoticeText}>
-              {repo.fork_type === 2 ? "移植" : "アレンジ"} ・元レシピ #{repo.parent_id}
+              {recipe.fork_type === 2 ? "移植" : "アレンジ"} ・元レシピ #{recipe.parent_id}
             </Text>
           </View>
         ) : null}
 
-        {repo.description ? <Text style={styles.description}>{repo.description}</Text> : null}
+        {recipe.description ? <Text style={styles.description}>{recipe.description}</Text> : null}
 
         <View style={styles.actionRow}>
           <Pressable
             style={styles.actionButton}
-            onPress={() => router.push(`/tabs/repo/${repo.id}/commits`)}
+            onPress={() => router.push(`/tabs/recipe/${recipe.id}/commits`)}
           >
             <MaterialIcons name="history" size={16} color={colors.roastedBean} />
             <Text style={styles.actionButtonText}>更新履歴</Text>
@@ -212,7 +212,7 @@ export default function RepoDetail() {
           {/* 編集できるかどうかの判定はバックエンドに任せ、フロントは編集画面へ遷移するだけにする。 */}
           <Pressable
             style={styles.forkButton}
-            onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(repo.id) } })}
+            onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(recipe.id) } })}
           >
             <MaterialIcons name="edit" size={16} color={colors.linenCream} />
             <Text style={styles.forkButtonText}>編集する</Text>
@@ -235,7 +235,7 @@ export default function RepoDetail() {
           )}
         </View>
 
-        {isOwner && repo.fork ? (
+        {isOwner && recipe.fork ? (
           <View style={styles.section}>
             <Pressable style={styles.sectionToggle} onPress={() => setShowProposeForm((v) => !v)}>
               <MaterialIcons name="call-merge" size={16} color={colors.mutedForest} />
@@ -303,10 +303,10 @@ export default function RepoDetail() {
           </View>
         ) : null}
 
-        {repo.environment.length > 0 ? (
+        {recipe.environment.length > 0 ? (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>必須環境</Text>
-            {repo.environment.map((item, index) => (
+            {recipe.environment.map((item, index) => (
               <View key={index} style={styles.envRow}>
                 <Text style={styles.envKey}>{item.key_name}</Text>
                 <Text style={styles.envValue}>{item.value}</Text>
@@ -315,10 +315,10 @@ export default function RepoDetail() {
           </View>
         ) : null}
 
-        {repo.ingredients.length > 0 ? (
+        {recipe.ingredients.length > 0 ? (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>材料</Text>
-            {repo.ingredients.map((item, index) => (
+            {recipe.ingredients.map((item, index) => (
               <View key={index} style={styles.ingredientRow}>
                 <Text style={styles.ingredientName}>{item.name}</Text>
                 <Text style={styles.ingredientAmount}>
@@ -329,10 +329,10 @@ export default function RepoDetail() {
           </View>
         ) : null}
 
-        {repo.steps.length > 0 ? (
+        {recipe.steps.length > 0 ? (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>作り方</Text>
-            {repo.steps.map((step, index) => (
+            {recipe.steps.map((step, index) => (
               <View key={index} style={styles.stepRow}>
                 <View style={styles.stepNumberCircle}>
                   <Text style={styles.stepNumberText}>{index + 1}</Text>

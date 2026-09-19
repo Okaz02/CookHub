@@ -33,11 +33,11 @@ export type MergePullRequestInput = {
 };
 
 export async function createPullRequest(
-    forkRepoId: number,
+    forkRecipeId: number,
     input: CreatePullRequestInput,
     token: string
 ): Promise<PullRequestResponse> {
-    return request<PullRequestResponse>(`/api/repos/${forkRepoId}/pull-request/create`, {
+    return request<PullRequestResponse>(`/api/repos/${forkRecipeId}/pull-request/create`, {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify(input),

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Text, TextInput, View, StyleSheet, ScrollView, Image, Pressable, ActivityIndicator } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
-import { getTrend, type Repository } from "../../lib/api-repo";
+import { getTrend, type Recipe } from "../../lib/api-recipe";
 import { useAuth } from "../../context/AuthContext";
 import { colors, textStyles } from "../../theme";
 
@@ -9,29 +9,29 @@ export default function Search() {
   const router = useRouter();
   const { token } = useAuth();
   const [query, setQuery] = useState("");
-  const [repos, setRepos] = useState<Repository[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
       setIsLoading(true);
       getTrend(token)
-        .then((res) => setRepos(res.data))
-        .catch(() => setRepos([]))
+        .then((res) => setRecipes(res.data))
+        .catch(() => setRecipes([]))
         .finally(() => setIsLoading(false));
     }, [token])
   );
 
-  const filteredRepos = useMemo(() => {
+  const filteredRecipes = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    if (!normalized) return repos;
-    return repos.filter(
-      (repo) =>
-        repo.name.toLowerCase().includes(normalized) ||
-        repo.description?.toLowerCase().includes(normalized) ||
-        repo.owner.username.toLowerCase().includes(normalized)
+    if (!normalized) return recipes;
+    return recipes.filter(
+      (recipe) =>
+        recipe.name.toLowerCase().includes(normalized) ||
+        recipe.description?.toLowerCase().includes(normalized) ||
+        recipe.owner.username.toLowerCase().includes(normalized)
     );
-  }, [repos, query]);
+  }, [recipes, query]);
 
   return (
     <View style={styles.screen}>
@@ -45,20 +45,20 @@ export default function Search() {
         <ActivityIndicator color={colors.primary} />
       ) : (
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
-          {filteredRepos.map((repo) => (
-            <Pressable key={repo.id} style={styles.recipe} onPress={() => router.push(`/tabs/repo/${repo.id}`)}>
-              {repo.thumbnail ? (
-                <Image style={styles.recipeImage} source={{ uri: repo.thumbnail }} />
+          {filteredRecipes.map((recipe) => (
+            <Pressable key={recipe.id} style={styles.recipe} onPress={() => router.push(`/tabs/recipe/${recipe.id}`)}>
+              {recipe.thumbnail ? (
+                <Image style={styles.recipeImage} source={{ uri: recipe.thumbnail }} />
               ) : (
                 <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
               )}
               <View style={styles.recipeExplain}>
-                <Text style={textStyles.h3Text}>{repo.name}</Text>
-                <Text style={textStyles.text}>{repo.owner.username}</Text>
+                <Text style={textStyles.h3Text}>{recipe.name}</Text>
+                <Text style={textStyles.text}>{recipe.owner.username}</Text>
               </View>
             </Pressable>
           ))}
-          {filteredRepos.length === 0 ? <Text style={textStyles.text}>該当するレシピが見つかりませんでした。</Text> : null}
+          {filteredRecipes.length === 0 ? <Text style={textStyles.text}>該当するレシピが見つかりませんでした。</Text> : null}
         </ScrollView>
       )}
     </View>

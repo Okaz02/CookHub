@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import { colors } from "../../../theme";
 
-export default function RepoLayout() {
+export default function RecipeLayout() {
   return (
     <Stack
       screenOptions={{

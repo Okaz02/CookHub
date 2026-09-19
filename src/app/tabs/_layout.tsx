@@ -39,7 +39,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="repo"
+        name="recipe"
         options={{
           href: null,
         }}

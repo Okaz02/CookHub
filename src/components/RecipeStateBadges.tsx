@@ -1,24 +1,24 @@
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../theme";
-import { getRepoStateBadges, type Repository, type RepoStateTone } from "../lib/api-repo";
+import { getRecipeStateBadges, type Recipe, type RecipeStateTone } from "../lib/api-recipe";
 
 type Props = {
-  repo: Pick<Repository, "draft" | "private" | "fork" | "fork_type">;
+  recipe: Pick<Recipe, "draft" | "private" | "fork" | "fork_type">;
   showFork?: boolean;
 };
 
 // 下書きかどうか（状態）と公開範囲（誰が見られるか）を、常に別々のバッジとして並べる。
-export function RepoStateBadges({ repo, showFork = false }: Props) {
+export function RecipeStateBadges({ recipe, showFork = false }: Props) {
   return (
     <View style={styles.row}>
-      {getRepoStateBadges(repo).map((badge) => (
+      {getRecipeStateBadges(recipe).map((badge) => (
         <View key={badge.key} style={[styles.badge, toneStyles[badge.tone]]}>
           <Text style={styles.badgeText}>{badge.label}</Text>
         </View>
       ))}
-      {showFork && repo.fork ? (
+      {showFork && recipe.fork ? (
         <View style={[styles.badge, toneStyles.neutral]}>
-          <Text style={styles.badgeText}>{repo.fork_type === 2 ? "移植" : "アレンジ"}</Text>
+          <Text style={styles.badgeText}>{recipe.fork_type === 2 ? "移植" : "アレンジ"}</Text>
         </View>
       ) : null}
     </View>
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const toneStyles: Record<RepoStateTone | "neutral", { backgroundColor: string; borderColor: string }> = {
+const toneStyles: Record<RecipeStateTone | "neutral", { backgroundColor: string; borderColor: string }> = {
   draft: {
     backgroundColor: colors.surfaceContainerHigh,
     borderColor: colors.dustyRose,

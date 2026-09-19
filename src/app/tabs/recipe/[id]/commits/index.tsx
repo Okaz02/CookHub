@@ -4,11 +4,11 @@ import { useFocusEffect, useLocalSearchParams, useRouter, Stack } from "expo-rou
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../../../theme";
 import { useAuth } from "../../../../../context/AuthContext";
-import { formatCommitDate, getCommitAuthorName, getRepoCommits, type Commit } from "../../../../../lib/api-repo";
+import { formatCommitDate, getCommitAuthorName, getRecipeCommits, type Commit } from "../../../../../lib/api-recipe";
 
-export default function RepoCommits() {
+export default function RecipeCommits() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const repoId = Number(id);
+  const recipeId = Number(id);
   const router = useRouter();
   const { token } = useAuth();
 
@@ -20,7 +20,7 @@ export default function RepoCommits() {
     useCallback(() => {
       let cancelled = false;
       setIsLoading(true);
-      getRepoCommits(repoId, token)
+      getRecipeCommits(recipeId, token)
         .then((res) => {
           if (!cancelled) setCommits(res.data);
         })
@@ -33,7 +33,7 @@ export default function RepoCommits() {
       return () => {
         cancelled = true;
       };
-    }, [repoId, token])
+    }, [recipeId, token])
   );
 
   if (isLoading) {
@@ -56,7 +56,7 @@ export default function RepoCommits() {
         renderItem={({ item }) => (
           <Pressable
             style={styles.commitRow}
-            onPress={() => router.push(`/tabs/repo/${repoId}/commits/${item.sha}`)}
+            onPress={() => router.push(`/tabs/recipe/${recipeId}/commits/${item.sha}`)}
           >
             <MaterialIcons name="commit" size={18} color={colors.mutedForest} />
             <View style={styles.commitInfo}>

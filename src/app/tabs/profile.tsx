@@ -3,29 +3,29 @@ import { Text, View, Image, StyleSheet, ScrollView, Pressable, ActivityIndicator
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
-import { getUserRepo, type Repository } from "../../lib/api-repo";
-import { RepoStateBadges } from "../../components/RepoStateBadges";
+import { getUserRecipe, type Recipe } from "../../lib/api-recipe";
+import { RecipeStateBadges } from "../../components/RecipeStateBadges";
 import { colors, textStyles } from "../../theme";
 
-function RepoListRoute({ repos, emptyText }: { repos: Repository[]; emptyText: string }) {
+function RecipeListRoute({ recipes, emptyText }: { recipes: Recipe[]; emptyText: string }) {
   const router = useRouter();
 
   return (
     <ScrollView contentContainerStyle={styles.tabContent}>
-      {repos.map((repo) => (
-        <Pressable key={repo.id} style={styles.recipe} onPress={() => router.push(`/tabs/repo/${repo.id}`)}>
-          {repo.thumbnail ? (
-            <Image style={styles.recipeImage} source={{ uri: repo.thumbnail }} />
+      {recipes.map((recipe) => (
+        <Pressable key={recipe.id} style={styles.recipe} onPress={() => router.push(`/tabs/recipe/${recipe.id}`)}>
+          {recipe.thumbnail ? (
+            <Image style={styles.recipeImage} source={{ uri: recipe.thumbnail }} />
           ) : (
             <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
           )}
           <View style={styles.recipeExplain}>
-            <Text style={textStyles.h3Text}>{repo.name}</Text>
-            <RepoStateBadges repo={repo} />
+            <Text style={textStyles.h3Text}>{recipe.name}</Text>
+            <RecipeStateBadges recipe={recipe} />
           </View>
         </Pressable>
       ))}
-      {repos.length === 0 ? <Text style={styles.emptyText}>{emptyText}</Text> : null}
+      {recipes.length === 0 ? <Text style={styles.emptyText}>{emptyText}</Text> : null}
     </ScrollView>
   );
 }
@@ -49,24 +49,24 @@ export default function Profile() {
     { key: "proposals", title: "採択提案" },
   ]);
 
-  const [repos, setRepos] = useState<Repository[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
       if (!token) {
-        setRepos([]);
+        setRecipes([]);
         setIsLoading(false);
         return;
       }
       let cancelled = false;
       setIsLoading(true);
-      getUserRepo(token)
+      getUserRecipe(token)
         .then((res) => {
-          if (!cancelled) setRepos(res.data);
+          if (!cancelled) setRecipes(res.data);
         })
         .catch(() => {
-          if (!cancelled) setRepos([]);
+          if (!cancelled) setRecipes([]);
         })
         .finally(() => {
           if (!cancelled) setIsLoading(false);
@@ -77,8 +77,8 @@ export default function Profile() {
     }, [token])
   );
 
-  const ownRepos = useMemo(() => repos.filter((repo) => !repo.fork), [repos]);
-  const forkedRepos = useMemo(() => repos.filter((repo) => repo.fork), [repos]);
+  const ownRecipes = useMemo(() => recipes.filter((recipe) => !recipe.fork), [recipes]);
+  const forkedRecipes = useMemo(() => recipes.filter((recipe) => recipe.fork), [recipes]);
 
   async function handleSignOut() {
     await signOut();
@@ -86,8 +86,8 @@ export default function Profile() {
   }
 
   const renderScene = SceneMap({
-    recipes: () => <RepoListRoute repos={ownRepos} emptyText="まだレシピがありません。" />,
-    arrangements: () => <RepoListRoute repos={forkedRepos} emptyText="まだアレンジしたレシピがありません。" />,
+    recipes: () => <RecipeListRoute recipes={ownRecipes} emptyText="まだレシピがありません。" />,
+    arrangements: () => <RecipeListRoute recipes={forkedRecipes} emptyText="まだアレンジしたレシピがありません。" />,
     proposals: ProposalsRoute,
   });
 
@@ -109,12 +109,12 @@ export default function Profile() {
         ) : (
           <View style={styles.profileStatus}>
             <View style={styles.profileStatusItem}>
-              <Text style={textStyles.h2Text}>{ownRepos.length}</Text>
+              <Text style={textStyles.h2Text}>{ownRecipes.length}</Text>
               <Text style={textStyles.text}>レシピ</Text>
             </View>
             <View style={styles.lineHorizontal} />
             <View style={styles.profileStatusItem}>
-              <Text style={textStyles.h2Text}>{forkedRepos.length}</Text>
+              <Text style={textStyles.h2Text}>{forkedRecipes.length}</Text>
               <Text style={styles.statusLabel}>アレンジ</Text>
             </View>
           </View>

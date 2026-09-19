@@ -6,13 +6,13 @@ import { colors } from "../../../theme";
 import { useAuth } from "../../../context/AuthContext";
 import { ApiError } from "../../../lib/api";
 import {
-  createRepo,
-  getRepo,
-  updateRepo,
+  createRecipe,
+  getRecipe,
+  updateRecipe,
   type Environment,
   type Ingredient,
   type Step,
-} from "../../../lib/api-repo";
+} from "../../../lib/api-recipe";
 
 const SERVING_PRESETS = ["1人分", "2人分", "3〜4人"];
 const SERVING_CUSTOM = "その他";
@@ -28,11 +28,11 @@ function nextKey() {
 
 export default function Write() {
   const router = useRouter();
-  const { id: repoIdParam } = useLocalSearchParams<{ id?: string }>();
-  const editingRepoId = repoIdParam ? Number(repoIdParam) : null;
+  const { id: recipeIdParam } = useLocalSearchParams<{ id?: string }>();
+  const editingRecipeId = recipeIdParam ? Number(recipeIdParam) : null;
   const { token } = useAuth();
 
-  const [isLoading, setIsLoading] = useState(Boolean(editingRepoId));
+  const [isLoading, setIsLoading] = useState(Boolean(editingRecipeId));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -53,31 +53,31 @@ export default function Write() {
 
   useFocusEffect(
     useCallback(() => {
-      if (!editingRepoId) return;
+      if (!editingRecipeId) return;
       let cancelled = false;
       setIsLoading(true);
-      getRepo(editingRepoId, token)
+      getRecipe(editingRecipeId, token)
         .then((res) => {
           if (cancelled) return;
-          const repo = res.data;
-          setTitle(repo.name);
-          setDescription(repo.description ?? "");
-          setThumbnail(repo.thumbnail ?? "");
-          setIsDraft(repo.draft);
-          setIsPrivate(repo.private);
-          const servingEnv = repo.environment.find((env) => env.key_name === "人数");
+          const recipe = res.data;
+          setTitle(recipe.name);
+          setDescription(recipe.description ?? "");
+          setThumbnail(recipe.thumbnail ?? "");
+          setIsDraft(recipe.draft);
+          setIsPrivate(recipe.private);
+          const servingEnv = recipe.environment.find((env) => env.key_name === "人数");
           if (servingEnv) {
             setServing(servingEnv.value);
             setIsCustomServing(!SERVING_PRESETS.includes(servingEnv.value));
           }
           setIngredients(
-            repo.ingredients.length > 0
-              ? repo.ingredients.map((item) => ({ ...item, key: nextKey() }))
+            recipe.ingredients.length > 0
+              ? recipe.ingredients.map((item) => ({ ...item, key: nextKey() }))
               : [{ key: nextKey(), name: "", amount: "", unit: "" }]
           );
           setSteps(
-            repo.steps.length > 0
-              ? repo.steps.map((item) => ({ ...item, key: nextKey() }))
+            recipe.steps.length > 0
+              ? recipe.steps.map((item) => ({ ...item, key: nextKey() }))
               : [{ key: nextKey(), body: "", image_url: null }]
           );
         })
@@ -90,7 +90,7 @@ export default function Write() {
       return () => {
         cancelled = true;
       };
-    }, [editingRepoId, token])
+    }, [editingRecipeId, token])
   );
 
   function updateIngredient(key: string, patch: Partial<Ingredient>) {
@@ -148,11 +148,11 @@ export default function Write() {
         commit_message: commitMessage || undefined,
       };
 
-      const res = editingRepoId
-        ? await updateRepo(editingRepoId, input, token)
-        : await createRepo(input, token);
+      const res = editingRecipeId
+        ? await updateRecipe(editingRecipeId, input, token)
+        : await createRecipe(input, token);
 
-      router.replace(`/tabs/repo/${res.data.id}`);
+      router.replace(`/tabs/recipe/${res.data.id}`);
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         setErrorMessage("同じ名前のレシピを既に持っています。");
@@ -180,7 +180,7 @@ export default function Write() {
           <Text style={styles.discardText}>破棄</Text>
         </Pressable>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>{editingRepoId ? "レシピを編集" : "レシピを書く"}</Text>
+          <Text style={styles.headerTitle}>{editingRecipeId ? "レシピを編集" : "レシピを書く"}</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
@@ -367,7 +367,7 @@ export default function Write() {
             style={styles.titleInput}
             value={commitMessage}
             onChangeText={setCommitMessage}
-            placeholder={editingRepoId ? "例: 材料の分量を調整" : `例: レシピ作成: ${title || "..."}`}
+            placeholder={editingRecipeId ? "例: 材料の分量を調整" : `例: レシピ作成: ${title || "..."}`}
           />
         </View>
 

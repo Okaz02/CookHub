@@ -6,10 +6,10 @@ import { useAuth } from "../../../../../context/AuthContext";
 import {
   formatCommitDate,
   getCommitAuthorName,
-  getRepoCommit,
+  getRecipeCommit,
   type CommitDetail,
   type DiffRow,
-} from "../../../../../lib/api-repo";
+} from "../../../../../lib/api-recipe";
 
 const DIFF_LABEL: Record<DiffRow["diff_type"], string> = {
   added: "追加",
@@ -85,7 +85,7 @@ function DiffRowView({ row }: { row: DiffRow }) {
 
 export default function CommitDetailScreen() {
   const { id, commitId } = useLocalSearchParams<{ id: string; commitId: string }>();
-  const repoId = Number(id);
+  const recipeId = Number(id);
   const { token } = useAuth();
 
   const [commit, setCommit] = useState<CommitDetail | null>(null);
@@ -96,7 +96,7 @@ export default function CommitDetailScreen() {
     useCallback(() => {
       let cancelled = false;
       setIsLoading(true);
-      getRepoCommit(repoId, commitId, token)
+      getRecipeCommit(recipeId, commitId, token)
         .then((res) => {
           if (!cancelled) setCommit(res.data);
         })
@@ -109,7 +109,7 @@ export default function CommitDetailScreen() {
       return () => {
         cancelled = true;
       };
-    }, [repoId, commitId, token])
+    }, [recipeId, commitId, token])
   );
 
   if (isLoading) {

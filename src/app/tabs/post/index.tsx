@@ -4,31 +4,31 @@ import { useFocusEffect, useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../theme";
 import { useAuth } from "../../../context/AuthContext";
-import { getUserRepo, type Repository } from "../../../lib/api-repo";
-import { RepoStateBadges } from "../../../components/RepoStateBadges";
+import { getUserRecipe, type Recipe } from "../../../lib/api-recipe";
+import { RecipeStateBadges } from "../../../components/RecipeStateBadges";
 
 
 export default function PostList() {
   const router = useRouter();
   const { token } = useAuth();
-  const [repos, setRepos] = useState<Repository[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
       if (!token) {
-        setRepos([]);
+        setRecipes([]);
         setIsLoading(false);
         return;
       }
       let cancelled = false;
       setIsLoading(true);
-      getUserRepo(token)
+      getUserRecipe(token)
         .then((res) => {
-          if (!cancelled) setRepos(res.data);
+          if (!cancelled) setRecipes(res.data);
         })
         .catch(() => {
-          if (!cancelled) setRepos([]);
+          if (!cancelled) setRecipes([]);
         })
         .finally(() => {
           if (!cancelled) setIsLoading(false);
@@ -57,28 +57,28 @@ export default function PostList() {
           <ActivityIndicator color={colors.roastedBean} />
         ) : (
           <View style={styles.draftList}>
-            {repos.map((repo) => (
+            {recipes.map((recipe) => (
               <Pressable
-                key={repo.id}
+                key={recipe.id}
                 style={styles.draftCard}
-                onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(repo.id) } })}
+                onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(recipe.id) } })}
               >
-                {repo.thumbnail ? (
-                  <Image style={styles.draftThumbnail} source={{ uri: repo.thumbnail }} />
+                {recipe.thumbnail ? (
+                  <Image style={styles.draftThumbnail} source={{ uri: recipe.thumbnail }} />
                 ) : (
                   <View style={styles.draftThumbnail} />
                 )}
                 <View style={styles.draftInfo}>
-                  <Text style={styles.draftTitle}>{repo.name}</Text>
-                  <RepoStateBadges repo={repo} showFork />
+                  <Text style={styles.draftTitle}>{recipe.name}</Text>
+                  <RecipeStateBadges recipe={recipe} showFork />
                   <Text style={styles.draftMeta}>
-                    最終更新: {new Date(repo.updated_at).toLocaleDateString("ja-JP")}
+                    最終更新: {new Date(recipe.updated_at).toLocaleDateString("ja-JP")}
                   </Text>
                 </View>
                 <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
               </Pressable>
             ))}
-            {repos.length === 0 ? <Text style={styles.emptyText}>まだレシピがありません。</Text> : null}
+            {recipes.length === 0 ? <Text style={styles.emptyText}>まだレシピがありません。</Text> : null}
           </View>
         )}
       </ScrollView>

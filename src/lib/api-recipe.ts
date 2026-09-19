@@ -11,7 +11,7 @@ export type Permissions = {
     pull: boolean;
 };
 
-export type Repository = {
+export type Recipe = {
     id: number;
     name: string;
     full_name: string;
@@ -33,40 +33,40 @@ export type Repository = {
 // 下書き(draft)と公開範囲(private)は独立した2つの軸として扱う。
 //   draft   : 執筆中かどうか。下書きの間は公開範囲に関わらず他人には表示されない。
 //   private : 公開済みになったときに誰が見られるか（自分のみ / 全体）。
-export type RepoStateTone = "draft" | "private" | "public";
+export type RecipeStateTone = "draft" | "private" | "public";
 
-export type RepoStateBadge = {
+export type RecipeStateBadge = {
     key: "status" | "visibility";
     label: string;
-    tone: RepoStateTone;
+    tone: RecipeStateTone;
 };
 
-export type RepoState = Pick<Repository, "draft" | "private">;
+export type RecipeState = Pick<Recipe, "draft" | "private">;
 
-export function getRepoStatusLabel(repo: RepoState): string {
-    return repo.draft ? "下書き" : "公開済み";
+export function getRecipeStatusLabel(recipe: RecipeState): string {
+    return recipe.draft ? "下書き" : "公開済み";
 }
 
-export function getRepoVisibilityLabel(repo: RepoState): string {
-    return repo.private ? "自分のみ" : "全体公開";
+export function getRecipeVisibilityLabel(recipe: RecipeState): string {
+    return recipe.private ? "自分のみ" : "全体公開";
 }
 
-export function getRepoStateBadges(repo: RepoState): RepoStateBadge[] {
+export function getRecipeStateBadges(recipe: RecipeState): RecipeStateBadge[] {
     return [
-        { key: "status", label: getRepoStatusLabel(repo), tone: repo.draft ? "draft" : "public" },
-        { key: "visibility", label: getRepoVisibilityLabel(repo), tone: repo.private ? "private" : "public" },
+        { key: "status", label: getRecipeStatusLabel(recipe), tone: recipe.draft ? "draft" : "public" },
+        { key: "visibility", label: getRecipeVisibilityLabel(recipe), tone: recipe.private ? "private" : "public" },
     ];
 }
 
 // 2つの軸の組み合わせを、閲覧できる相手の観点で説明する。
-export function getRepoStateNotice(repo: RepoState): string | null {
-    if (repo.draft && repo.private) {
+export function getRecipeStateNotice(recipe: RecipeState): string | null {
+    if (recipe.draft && recipe.private) {
         return "下書きです。公開範囲も「自分のみ」なので、自分だけが閲覧できます。";
     }
-    if (repo.draft) {
+    if (recipe.draft) {
         return "下書きです。公開範囲は「全体公開」ですが、公開するまで他の人には表示されません。";
     }
-    if (repo.private) {
+    if (recipe.private) {
         return "公開済みですが、公開範囲が「自分のみ」のため他の人には表示されません。";
     }
     return null;
@@ -127,22 +127,22 @@ export type CommitDetail = Commit & {
     };
 };
 
-export type RepositoryDetail = Repository & {
+export type RecipeDetail = Recipe & {
     environment: Environment[];
     ingredients: Ingredient[];
     steps: Step[];
     latest_commit: Commit | null;
 };
 
-export type ReposResponse = {
+export type RecipesResponse = {
     ok: boolean;
-    data: Repository[];
+    data: Recipe[];
 };
 
-export type RepoResponse = {
+export type RecipeResponse = {
     ok: boolean;
     commit?: string | null;
-    data: RepositoryDetail;
+    data: RecipeDetail;
 };
 
 export type CommitsResponse = {
@@ -155,7 +155,7 @@ export type CommitResponse = {
     data: CommitDetail;
 };
 
-export type RepoInput = {
+export type RecipeInput = {
     title?: string;
     name?: string;
     description?: string;
@@ -168,70 +168,71 @@ export type RepoInput = {
     commit_message?: string;
 };
 
-export type ForkInput = RepoInput & {
+export type ForkInput = RecipeInput & {
     fork_type?: 1 | 2;
 };
 
-export async function getTrend(token?: string | null): Promise<ReposResponse> {
-    return request<ReposResponse>("/api/repos/trend", {
+// バックエンドのエンドポイントは /api/repos のままなので、URL だけは repos を使う。
+export async function getTrend(token?: string | null): Promise<RecipesResponse> {
+    return request<RecipesResponse>("/api/repos/trend", {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
-export async function getUserRepo(token: string): Promise<ReposResponse> {
-    return request<ReposResponse>("/api/repos/mine", {
+export async function getUserRecipe(token: string): Promise<RecipesResponse> {
+    return request<RecipesResponse>("/api/repos/mine", {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
-export async function getRepo(id: number, token?: string | null): Promise<RepoResponse> {
-    return request<RepoResponse>(`/api/repos/${id}`, {
+export async function getRecipe(id: number, token?: string | null): Promise<RecipeResponse> {
+    return request<RecipeResponse>(`/api/repos/${id}`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
-export async function getRepoCommits(id: number, token?: string | null): Promise<CommitsResponse> {
+export async function getRecipeCommits(id: number, token?: string | null): Promise<CommitsResponse> {
     return request<CommitsResponse>(`/api/repos/${id}/commits`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
-export async function getRepoCommit(id: number, commitId: string, token?: string | null): Promise<CommitResponse> {
+export async function getRecipeCommit(id: number, commitId: string, token?: string | null): Promise<CommitResponse> {
     return request<CommitResponse>(`/api/repos/${id}/commits/${commitId}`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
-export async function createRepo(input: RepoInput, token: string): Promise<RepoResponse> {
-    return request<RepoResponse>("/api/repos", {
+export async function createRecipe(input: RecipeInput, token: string): Promise<RecipeResponse> {
+    return request<RecipeResponse>("/api/repos", {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify(input),
     });
 }
 
-export async function updateRepo(id: number, input: RepoInput, token: string): Promise<RepoResponse> {
-    return request<RepoResponse>(`/api/repos/${id}`, {
+export async function updateRecipe(id: number, input: RecipeInput, token: string): Promise<RecipeResponse> {
+    return request<RecipeResponse>(`/api/repos/${id}`, {
         method: "PATCH",
         headers: authHeaders(token),
         body: JSON.stringify(input),
     });
 }
 
-export async function deleteRepo(id: number, token: string): Promise<{ ok: boolean; commit?: string | null; data: { id: number } }> {
+export async function deleteRecipe(id: number, token: string): Promise<{ ok: boolean; commit?: string | null; data: { id: number } }> {
     return request(`/api/repos/${id}`, {
         method: "DELETE",
         headers: authHeaders(token),
     });
 }
 
-export async function forkRepo(id: number, input: ForkInput, token: string): Promise<RepoResponse> {
-    return request<RepoResponse>(`/api/repos/${id}/fork`, {
+export async function forkRecipe(id: number, input: ForkInput, token: string): Promise<RecipeResponse> {
+    return request<RecipeResponse>(`/api/repos/${id}/fork`, {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify(input),
