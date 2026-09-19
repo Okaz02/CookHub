@@ -15,6 +15,7 @@ import {
 } from "../../../lib/api-repo";
 
 const SERVING_PRESETS = ["1人分", "2人分", "3〜4人"];
+const SERVING_CUSTOM = "その他";
 
 type IngredientDraft = Ingredient & { key: string };
 type StepDraft = Step & { key: string };
@@ -42,6 +43,8 @@ export default function Write() {
   const [isDraft, setIsDraft] = useState(true);
   const [isPrivate, setIsPrivate] = useState(false);
   const [serving, setServing] = useState("2人分");
+  // プリセットと自由入力はどちらか一方だけを使う。自由入力モードのときだけ入力欄を表示する。
+  const [isCustomServing, setIsCustomServing] = useState(false);
   const [commitMessage, setCommitMessage] = useState("");
   const [ingredients, setIngredients] = useState<IngredientDraft[]>([
     { key: nextKey(), name: "", amount: "", unit: "" },
@@ -63,7 +66,10 @@ export default function Write() {
           setIsDraft(repo.draft);
           setIsPrivate(repo.private);
           const servingEnv = repo.environment.find((env) => env.key_name === "人数");
-          if (servingEnv) setServing(servingEnv.value);
+          if (servingEnv) {
+            setServing(servingEnv.value);
+            setIsCustomServing(!SERVING_PRESETS.includes(servingEnv.value));
+          }
           setIngredients(
             repo.ingredients.length > 0
               ? repo.ingredients.map((item) => ({ ...item, key: nextKey() }))
@@ -113,7 +119,12 @@ export default function Write() {
       return;
     }
 
-    const environment: Environment[] = [{ key_name: "人数", value: serving }];
+    if (!serving.trim()) {
+      setErrorMessage("分量を選択または入力してください。");
+      return;
+    }
+
+    const environment: Environment[] = [{ key_name: "人数", value: serving.trim() }];
     const cleanedIngredients = ingredients
       .filter((item) => item.name.trim())
       .map(({ name, amount, unit }) => ({ name, amount, unit }));
@@ -220,27 +231,46 @@ export default function Write() {
               <MaterialIcons name="restaurant" size={16} color={colors.mutedForest} />
               <Text style={styles.presetsHeaderLabel}>分量</Text>
             </View>
-            <Text style={styles.presetsHeaderValue}>現在: {serving}</Text>
+            <Text style={styles.presetsHeaderValue}>現在: {serving.trim() || "未入力"}</Text>
           </View>
           <View style={styles.servingPillRow}>
-            {SERVING_PRESETS.map((preset) => (
-              <Pressable
-                key={preset}
-                style={[styles.servingPill, serving === preset && styles.servingPillActive]}
-                onPress={() => setServing(preset)}
-              >
-                <Text style={serving === preset ? styles.servingPillActiveText : styles.servingPillText}>
-                  {preset}
-                </Text>
-              </Pressable>
-            ))}
+            {SERVING_PRESETS.map((preset) => {
+              const isActive = !isCustomServing && serving === preset;
+              return (
+                <Pressable
+                  key={preset}
+                  style={[styles.servingPill, isActive && styles.servingPillActive]}
+                  onPress={() => {
+                    setIsCustomServing(false);
+                    setServing(preset);
+                  }}
+                >
+                  <Text style={isActive ? styles.servingPillActiveText : styles.servingPillText}>
+                    {preset}
+                  </Text>
+                </Pressable>
+              );
+            })}
+            <Pressable
+              style={[styles.servingPill, isCustomServing && styles.servingPillActive]}
+              onPress={() => {
+                setIsCustomServing(true);
+                setServing("");
+              }}
+            >
+              <Text style={isCustomServing ? styles.servingPillActiveText : styles.servingPillText}>
+                {SERVING_CUSTOM}
+              </Text>
+            </Pressable>
           </View>
-          <TextInput
-            style={styles.titleInput}
-            value={SERVING_PRESETS.includes(serving) ? "" : serving}
-            onChangeText={setServing}
-            placeholder="自由入力（例: 4〜6人分）"
-          />
+          {isCustomServing ? (
+            <TextInput
+              style={styles.titleInput}
+              value={serving}
+              onChangeText={setServing}
+              placeholder="自由入力（例: 4〜6人分）"
+            />
+          ) : null}
         </View>
 
         <View style={styles.section}>
