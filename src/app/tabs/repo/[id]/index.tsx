@@ -209,19 +209,18 @@ export default function RepoDetail() {
             <MaterialIcons name="history" size={16} color={colors.roastedBean} />
             <Text style={styles.actionButtonText}>更新履歴</Text>
           </Pressable>
+          {/* 編集できるかどうかの判定はバックエンドに任せ、フロントは編集画面へ遷移するだけにする。 */}
+          <Pressable
+            style={styles.forkButton}
+            onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(repo.id) } })}
+          >
+            <MaterialIcons name="edit" size={16} color={colors.linenCream} />
+            <Text style={styles.forkButtonText}>編集する</Text>
+          </Pressable>
           {isOwner ? (
-            <>
-              <Pressable
-                style={styles.forkButton}
-                onPress={() => router.push({ pathname: "/tabs/post/write", params: { id: String(repo.id) } })}
-              >
-                <MaterialIcons name="edit" size={16} color={colors.linenCream} />
-                <Text style={styles.forkButtonText}>編集する</Text>
-              </Pressable>
-              <Pressable style={styles.deleteButton} onPress={handleDelete}>
-                <MaterialIcons name="delete-outline" size={16} color={colors.error} />
-              </Pressable>
-            </>
+            <Pressable style={styles.deleteButton} onPress={handleDelete}>
+              <MaterialIcons name="delete-outline" size={16} color={colors.error} />
+            </Pressable>
           ) : (
             <Pressable style={styles.forkButton} onPress={handleFork} disabled={isForking}>
               {isForking ? (
