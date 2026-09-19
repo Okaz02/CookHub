@@ -87,7 +87,7 @@ export default function RepoDetail() {
     }
     setIsForking(true);
     try {
-      const res = await forkRepo(repo.id, {}, token);
+      const res = await forkRepo(repo.id, { title: repo.name + " (forked)" }, token);
       router.replace(`/tabs/repo/${res.data.id}`);
     } catch {
       setErrorMessage("フォークに失敗しました。");
