@@ -3,7 +3,7 @@ import { Text, View, ScrollView, ActivityIndicator, StyleSheet } from "react-nat
 import { useFocusEffect, useLocalSearchParams, Stack } from "expo-router";
 import { colors } from "../../../../../theme";
 import { useAuth } from "../../../../../context/AuthContext";
-import { getRepoCommit, type CommitDetail, type DiffRow } from "../../../../../lib/api-repo";
+import { getCommitAuthorName, getRepoCommit, type CommitDetail, type DiffRow } from "../../../../../lib/api-repo";
 
 const DIFF_LABEL: Record<DiffRow["diff_type"], string> = {
   added: "追加",
@@ -106,7 +106,7 @@ export default function CommitDetailScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.message}>{commit.message}</Text>
         <Text style={styles.meta}>
-          {commit.author} ・ {new Date(commit.date).toLocaleString("ja-JP")}
+          {getCommitAuthorName(commit.author)} ・ {new Date(commit.date).toLocaleString("ja-JP")}
         </Text>
 
         {sections.length === 0 ? (

@@ -146,9 +146,10 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
   },
   userIcon: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
+    height: 35,
+    width: 35,
+    borderRadius: 17.5,
+    marginRight: 10,
     backgroundColor: colors.outline,
   },
   recipe: {

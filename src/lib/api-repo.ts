@@ -46,13 +46,23 @@ export type Step = {
     image_url: string | null;
 };
 
+export type CommitAuthor = string | { username?: string; email?: string } | null;
+
 export type Commit = {
     sha: string;
     message: string;
-    author: string;
+    author: CommitAuthor;
     date: string;
     [key: string]: unknown;
 };
+
+export function getCommitAuthorName(author: CommitAuthor): string {
+    if (!author) return "unknown";
+    if (typeof author === "string") return author;
+    if (author.username) return author.username;
+    if (author.email) return author.email;
+    return "unknown";
+}
 
 export type DiffRow = {
     diff_type: "added" | "modified" | "removed";
