@@ -17,3 +17,26 @@ export const colors = {
   onSurfaceVariant: "#504442",
   error: "#ba1a1a",
 };
+
+export const textStyles = {
+h1Text: {
+    fontSize: 40,
+    color: colors.onSurface,
+  },
+  h2Text: {
+    fontSize: 20,
+    color: colors.onSurface,
+  },
+  h3Text: {
+    fontSize: 15,
+    color: colors.onSurface,
+  },
+  h4Text: {
+    fontSize: 13,
+    color: colors.onSurface,
+  },
+  text: {
+    fontSize: 10,
+    color: colors.onSurfaceVariant,
+  }
+}

@@ -4,6 +4,7 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
 import { getUserRepo, type Repository } from "../../lib/api-repo";
+import { colors, textStyles } from "../../theme";
 
 function RepoListRoute({ repos, emptyText }: { repos: Repository[]; emptyText: string }) {
   const router = useRouter();
@@ -18,8 +19,8 @@ function RepoListRoute({ repos, emptyText }: { repos: Repository[]; emptyText: s
             <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
           )}
           <View style={styles.recipeExplain}>
-            <Text style={styles.h3Text}>{repo.name}</Text>
-            {repo.private ? <Text style={styles.text}>非公開</Text> : null}
+            <Text style={textStyles.h3Text}>{repo.name}</Text>
+            {repo.private ? <Text style={textStyles.text}>非公開</Text> : null}
           </View>
         </Pressable>
       ))}
@@ -95,25 +96,25 @@ export default function Profile() {
         <View style={styles.profileMain}>
           <Image style={styles.profileIcon}></Image>
           <View style={styles.profileName}>
-            <Text style={styles.h2Text}>{account?.username ?? "ゲスト"}</Text>
-            <Text style={styles.h4Text}>{account?.email ?? ""}</Text>
+            <Text style={textStyles.h2Text}>{account?.username ?? "ゲスト"}</Text>
+            <Text style={textStyles.h4Text}>{account?.email ?? ""}</Text>
           </View>
           <Pressable onPress={handleSignOut}>
             <Text style={styles.signOutText}>ログアウト</Text>
           </Pressable>
         </View>
         {isLoading ? (
-          <ActivityIndicator color="#1b110f" />
+          <ActivityIndicator color={colors.primary} />
         ) : (
           <View style={styles.profileStatus}>
             <View style={styles.profileStatusItem}>
-              <Text>{ownRepos.length}</Text>
-              <Text>レシピ</Text>
+              <Text style={textStyles.h2Text}>{ownRepos.length}</Text>
+              <Text style={textStyles.text}>レシピ</Text>
             </View>
             <View style={styles.lineHorizontal} />
             <View style={styles.profileStatusItem}>
-              <Text>{forkedRepos.length}</Text>
-              <Text>アレンジ</Text>
+              <Text style={textStyles.h2Text}>{forkedRepos.length}</Text>
+              <Text style={styles.statusLabel}>アレンジ</Text>
             </View>
           </View>
         )}
@@ -130,8 +131,8 @@ export default function Profile() {
             {...props}
             style={styles.tabBar}
             indicatorStyle={styles.tabIndicator}
-            activeColor="#1b110f"
-            inactiveColor="#8a8a8a"
+            activeColor={colors.primary}
+            inactiveColor={colors.outline}
           />
         )}
       />
@@ -142,71 +143,63 @@ export default function Profile() {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
+    backgroundColor: colors.surface,
   },
   container: {
     alignContent: "center",
     gap: 20,
-    padding: 20
+    padding: 20,
   },
   lineVertical: {
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1
+    borderBottomColor: colors.outlineVariant,
+    borderBottomWidth: 1,
   },
   lineHorizontal: {
-    borderLeftColor: '#ccc',
+    borderLeftColor: colors.outlineVariant,
     borderLeftWidth: 1,
-    height: '100%'
+    height: "100%",
   },
   profile: {
-    backgroundColor: "white",
+    backgroundColor: colors.surfaceContainerLowest,
     padding: 20,
     borderRadius: 20,
-    gap: 20
+    gap: 20,
   },
   profileMain: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   profileStatus: {
     justifyContent: "center",
     flexDirection: "row",
-    gap: 10
+    gap: 10,
   },
   profileStatusItem: {
-    alignItems: "center"
+    alignItems: "center",
   },
   profileName: {
-    flex: 1
+    flex: 1,
   },
   profileIcon: {
-    backgroundColor: "black",
+    backgroundColor: colors.primary,
     width: 70,
     height: 70,
     marginRight: 20,
-    borderRadius: "50%"
+    borderRadius: 35,
   },
-  h1Text: {
-    fontSize: 40,
+  statusText: {
+    color: colors.onSurface,
   },
-  h2Text: {
-    fontSize: 20,
-  },
-  h3Text: {
-    fontSize: 15,
-  },
-  h4Text: {
-    fontSize: 13,
-  },
-  text: {
-    fontSize: 10
+  statusLabel: {
+    color: colors.onSurfaceVariant,
   },
   signOutText: {
     fontSize: 12,
-    color: "#ba1a1a",
+    color: colors.error,
   },
   emptyText: {
     fontSize: 12,
-    color: "#8a8a8a",
+    color: colors.onSurfaceVariant,
     textAlign: "center",
     padding: 20,
   },
@@ -218,26 +211,26 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   tabBar: {
-    backgroundColor: "white",
+    backgroundColor: colors.surfaceContainerLowest,
     elevation: 0,
     shadowOpacity: 0,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: colors.outlineVariant,
   },
   tabIndicator: {
-    backgroundColor: "#1b110f",
+    backgroundColor: colors.primary,
   },
   tabContent: {
     gap: 20,
     padding: 20,
   },
   listItem: {
-    backgroundColor: "#dbdbdb",
+    backgroundColor: colors.surfaceContainerLow,
     padding: 20,
     borderRadius: 20,
   },
   recipe: {
-    backgroundColor: "black",
+    backgroundColor: colors.primary,
     height: 350,
     overflow: "hidden",
     borderRadius: 20,
@@ -246,11 +239,11 @@ const styles = StyleSheet.create({
     height: 200,
   },
   recipeImagePlaceholder: {
-    backgroundColor: "#3a3a3a",
+    backgroundColor: colors.surfaceContainerHigh,
   },
   recipeExplain: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#dbdbdb"
-  }
+    backgroundColor: colors.surfaceContainerLow,
+  },
 });

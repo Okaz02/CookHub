@@ -3,6 +3,7 @@ import { Text, TextInput, View, StyleSheet, ScrollView, Image, Pressable, Activi
 import { useFocusEffect, useRouter } from "expo-router";
 import { getTrend, type Repository } from "../../lib/api-repo";
 import { useAuth } from "../../context/AuthContext";
+import { colors, textStyles } from "../../theme";
 
 export default function Search() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function Search() {
         onChangeText={setQuery}
       />
       {isLoading ? (
-        <ActivityIndicator color="#1b110f" />
+        <ActivityIndicator color={colors.primary} />
       ) : (
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
           {filteredRepos.map((repo) => (
@@ -52,12 +53,12 @@ export default function Search() {
                 <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
               )}
               <View style={styles.recipeExplain}>
-                <Text style={styles.h3Text}>{repo.name}</Text>
-                <Text style={styles.text}>{repo.owner.username}</Text>
+                <Text style={textStyles.h3Text}>{repo.name}</Text>
+                <Text style={textStyles.text}>{repo.owner.username}</Text>
               </View>
             </Pressable>
           ))}
-          {filteredRepos.length === 0 ? <Text style={styles.text}>該当するレシピが見つかりませんでした。</Text> : null}
+          {filteredRepos.length === 0 ? <Text style={textStyles.text}>該当するレシピが見つかりませんでした。</Text> : null}
         </ScrollView>
       )}
     </View>
@@ -68,10 +69,11 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     padding: 20,
-    gap: 20
+    gap: 20,
+    backgroundColor: colors.surface,
   },
   scrollView: {
-    flex: 1
+    flex: 1,
   },
   container: {
     alignContent: "center",
@@ -84,11 +86,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "#b1b1b1",
-    backgroundColor: "#dbdbdb"
+    borderColor: colors.outlineVariant,
+    backgroundColor: colors.surfaceContainerLow,
+    color: colors.onSurface,
   },
   recipe: {
-    backgroundColor: "black",
+    backgroundColor: colors.primary,
     height: 350,
     overflow: "hidden",
     borderRadius: 20,
@@ -97,17 +100,11 @@ const styles = StyleSheet.create({
     height: 200,
   },
   recipeImagePlaceholder: {
-    backgroundColor: "#3a3a3a",
+    backgroundColor: colors.surfaceContainerHigh,
   },
   recipeExplain: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#dbdbdb"
-  },
-  h3Text: {
-    fontSize: 15,
-  },
-  text: {
-    fontSize: 10,
+    backgroundColor: colors.surfaceContainerLow,
   }
 });
