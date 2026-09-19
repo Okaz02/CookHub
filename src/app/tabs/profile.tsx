@@ -6,6 +6,23 @@ import { useAuth } from "../../context/AuthContext";
 import { getUserRepo, type Repository } from "../../lib/api-repo";
 import { colors, textStyles } from "../../theme";
 
+function RepoBadges({ repo }: { repo: Repository }) {
+  const labels: string[] = [];
+  if (repo.draft) labels.push("下書き");
+  if (repo.private) labels.push("非公開");
+  if (labels.length === 0) labels.push("公開中");
+
+  return (
+    <View style={styles.badgeRow}>
+      {labels.map((label) => (
+        <View key={label} style={styles.badge}>
+          <Text style={styles.badgeText}>{label}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 function RepoListRoute({ repos, emptyText }: { repos: Repository[]; emptyText: string }) {
   const router = useRouter();
 
@@ -20,7 +37,7 @@ function RepoListRoute({ repos, emptyText }: { repos: Repository[]; emptyText: s
           )}
           <View style={styles.recipeExplain}>
             <Text style={textStyles.h3Text}>{repo.name}</Text>
-            {repo.private ? <Text style={textStyles.text}>非公開</Text> : null}
+            <RepoBadges repo={repo} />
           </View>
         </Pressable>
       ))}
@@ -243,7 +260,23 @@ const styles = StyleSheet.create({
   },
   recipeExplain: {
     flex: 1,
+    gap: 6,
     padding: 20,
     backgroundColor: colors.surfaceContainerLow,
+  },
+  badgeRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+    backgroundColor: colors.surfaceContainerHigh,
+  },
+  badgeText: {
+    fontSize: 11,
+    color: colors.onSurfaceVariant,
   },
 });

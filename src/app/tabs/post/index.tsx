@@ -6,16 +6,34 @@ import { colors } from "../../../theme";
 import { useAuth } from "../../../context/AuthContext";
 import { getUserRepo, type Repository } from "../../../lib/api-repo";
 
+function RepoBadges({ repo }: { repo: Repository }) {
+  const labels: string[] = [];
+  if (repo.draft) labels.push("下書き");
+  if (repo.private) labels.push("非公開");
+  if (repo.fork) labels.push(repo.fork_type === 2 ? "移植" : "アレンジ");
+  if (labels.length === 0) labels.push("公開中");
+
+  return (
+    <View style={styles.badgeRow}>
+      {labels.map((label) => (
+        <View key={label} style={styles.badge}>
+          <Text style={styles.badgeText}>{label}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export default function PostList() {
   const router = useRouter();
   const { token } = useAuth();
-  const [drafts, setDrafts] = useState<Repository[]>([]);
+  const [repos, setRepos] = useState<Repository[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
       if (!token) {
-        setDrafts([]);
+        setRepos([]);
         setIsLoading(false);
         return;
       }
@@ -23,10 +41,10 @@ export default function PostList() {
       setIsLoading(true);
       getUserRepo(token)
         .then((res) => {
-          if (!cancelled) setDrafts(res.data.filter((repo) => repo.draft));
+          if (!cancelled) setRepos(res.data);
         })
         .catch(() => {
-          if (!cancelled) setDrafts([]);
+          if (!cancelled) setRepos([]);
         })
         .finally(() => {
           if (!cancelled) setIsLoading(false);
@@ -49,13 +67,13 @@ export default function PostList() {
           <Text style={styles.newButtonText}>新規レシピを作成</Text>
         </Pressable>
 
-        <Text style={styles.sectionLabel}>下書き</Text>
+        <Text style={styles.sectionLabel}>自分のレシピ</Text>
 
         {isLoading ? (
           <ActivityIndicator color={colors.roastedBean} />
         ) : (
           <View style={styles.draftList}>
-            {drafts.map((repo) => (
+            {repos.map((repo) => (
               <Pressable
                 key={repo.id}
                 style={styles.draftCard}
@@ -68,6 +86,7 @@ export default function PostList() {
                 )}
                 <View style={styles.draftInfo}>
                   <Text style={styles.draftTitle}>{repo.name}</Text>
+                  <RepoBadges repo={repo} />
                   <Text style={styles.draftMeta}>
                     最終更新: {new Date(repo.updated_at).toLocaleDateString("ja-JP")}
                   </Text>
@@ -75,7 +94,7 @@ export default function PostList() {
                 <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
               </Pressable>
             ))}
-            {drafts.length === 0 ? <Text style={styles.emptyText}>下書きはありません。</Text> : null}
+            {repos.length === 0 ? <Text style={styles.emptyText}>まだレシピがありません。</Text> : null}
           </View>
         )}
       </ScrollView>
@@ -162,6 +181,21 @@ const styles = StyleSheet.create({
   },
   draftMeta: {
     fontSize: 11,
+    color: colors.onSurfaceVariant,
+  },
+  badgeRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+  },
+  badge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 999,
+    backgroundColor: colors.surfaceContainerHigh,
+  },
+  badgeText: {
+    fontSize: 10,
     color: colors.onSurfaceVariant,
   },
 });

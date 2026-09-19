@@ -110,6 +110,9 @@ export default function Write() {
       return;
     }
 
+    // 「公開する」は文言どおり必ず公開にする。公開範囲スイッチが効くのは下書き保存のときだけ。
+    const willBePrivate = isDraft ? isPrivate : false;
+
     const environment: Environment[] = [{ key_name: "人数", value: serving }];
     const cleanedIngredients = ingredients
       .filter((item) => item.name.trim())
@@ -125,7 +128,7 @@ export default function Write() {
         title,
         description,
         thumbnail: thumbnail || null,
-        is_private: isPrivate,
+        is_private: willBePrivate,
         is_draft: isDraft,
         environment,
         ingredients: cleanedIngredients,
@@ -345,6 +348,9 @@ export default function Write() {
               <Text style={styles.visibilitySubtitle}>
                 {isPrivate ? "非公開（自分のみ閲覧可能）" : "全体に公開（CookHubタイムライン）"}
               </Text>
+              {isPrivate ? (
+                <Text style={styles.visibilityHint}>「公開する」を押すと全体に公開されます。</Text>
+              ) : null}
             </View>
           </View>
           <Switch value={!isPrivate} onValueChange={(value) => setIsPrivate(!value)} />
@@ -655,6 +661,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     color: colors.roastedBean,
+  },
+  visibilityHint: {
+    fontSize: 11,
+    color: colors.error,
   },
   visibilitySubtitle: {
     fontSize: 11,
