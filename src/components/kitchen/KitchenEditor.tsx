@@ -332,7 +332,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
                   onDragStart={() => setDragging({ kind: "tool", id: tool.id })}
                   onDragEnd={() => setDragging(null)}
                 >
-                  <View style={{ opacity: isCuttingKnife ? 0.25 : 1 }}>
+                  <View style={{ opacity: isCuttingKnife ? 0.25 : 1 }} pointerEvents="none">
                     <ToolSprite
                       tool={tool}
                       size={rect.w}
