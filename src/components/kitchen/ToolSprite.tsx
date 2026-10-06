@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Animated, {
@@ -275,12 +275,17 @@ function Sizzle({ size }: { size: number }) {
 export function CuttingKnife({ size, onDone }: { size: number; onDone: () => void }) {
   const chop = useSharedValue(0);
   const sweep = useSharedValue(0);
+  // 親の再描画でタイマーが作り直されないよう、最新のコールバックだけ ref に持つ
+  const onDoneRef = useRef(onDone);
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  });
   useEffect(() => {
     chop.set(withRepeat(withSequence(withTiming(1, { duration: 110 }), withTiming(0, { duration: 110 })), 7));
     sweep.set(withTiming(1, { duration: 1540, easing: Easing.linear }));
-    const timer = setTimeout(onDone, 1600);
+    const timer = setTimeout(() => onDoneRef.current(), 1600);
     return () => clearTimeout(timer);
-  }, [chop, sweep, onDone]);
+  }, [chop, sweep]);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: -size * 0.45 + sweep.get() * size * 0.9 },
