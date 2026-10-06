@@ -70,7 +70,8 @@ export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, ch
       }
       if (settleTimer.current) clearTimeout(settleTimer.current);
       settleTimer.current = setTimeout(() => {
-        if (rectRef.current === droppedRect) springBack();
+        // レイアウトは毎回計算し直されるので、オブジェクトではなく座標で比較する。
+        if (rectRef.current.x === droppedRect.x && rectRef.current.y === droppedRect.y) springBack();
       }, SETTLE_TIMEOUT_MS);
     })
     .onFinalize(() => {
