@@ -31,10 +31,10 @@ export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, ch
     previousRect.current = rect;
     rectRef.current = rect;
     if (previous.x === rect.x && previous.y === rect.y) return;
-    translateX.value = translateX.value + (previous.x - rect.x);
-    translateY.value = translateY.value + (previous.y - rect.y);
-    translateX.value = withSpring(0, SPRING);
-    translateY.value = withSpring(0, SPRING);
+    translateX.set(translateX.get() + (previous.x - rect.x));
+    translateY.set(translateY.get() + (previous.y - rect.y));
+    translateX.set(withSpring(0, SPRING));
+    translateY.set(withSpring(0, SPRING));
   }, [rect, translateX, translateY]);
 
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -43,8 +43,8 @@ export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, ch
   }, []);
 
   const springBack = () => {
-    translateX.value = withSpring(0, SPRING);
-    translateY.value = withSpring(0, SPRING);
+    translateX.set(withSpring(0, SPRING));
+    translateY.set(withSpring(0, SPRING));
   };
 
   const pan = Gesture.Pan()
@@ -53,12 +53,12 @@ export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, ch
     .minDistance(4)
     .onStart(() => {
       setIsDragging(true);
-      scale.value = withSpring(1.12, SPRING);
+      scale.set(withSpring(1.12, SPRING));
       onDragStart?.();
     })
     .onUpdate((event) => {
-      translateX.value = event.translationX;
-      translateY.value = event.translationY;
+      translateX.set(event.translationX);
+      translateY.set(event.translationY);
     })
     .onEnd((event) => {
       const center = rectCenter(rectRef.current);
@@ -75,7 +75,7 @@ export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, ch
     })
     .onFinalize(() => {
       setIsDragging(false);
-      scale.value = withSpring(1, SPRING);
+      scale.set(withSpring(1, SPRING));
     });
 
   const tap = Gesture.Tap()
@@ -85,7 +85,7 @@ export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, ch
     });
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: scale.value }],
+    transform: [{ translateX: translateX.get() }, { translateY: translateY.get() }, { scale: scale.get() }],
   }));
 
   return (
