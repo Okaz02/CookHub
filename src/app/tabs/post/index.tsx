@@ -51,6 +51,15 @@ export default function PostList() {
           <Text style={styles.newButtonText}>新規レシピを作成</Text>
         </Pressable>
 
+        <Pressable style={styles.kitchenButton} onPress={() => router.push("/tabs/post/kitchen")}>
+          <MaterialIcons name="soup-kitchen" size={20} color={colors.roastedBean} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.kitchenButtonText}>キッチンで作ってレシピにする</Text>
+            <Text style={styles.kitchenButtonHint}>材料や器具を動かすと、手順が自動で書き出されます</Text>
+          </View>
+          <MaterialIcons name="chevron-right" size={20} color={colors.outline} />
+        </Pressable>
+
         <Text style={styles.sectionLabel}>自分のレシピ</Text>
 
         {isLoading ? (
@@ -123,6 +132,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: colors.linenCream,
+  },
+  kitchenButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.roastedBean,
+    backgroundColor: colors.surfaceContainerLowest,
+  },
+  kitchenButtonText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.roastedBean,
+  },
+  kitchenButtonHint: {
+    fontSize: 11,
+    color: colors.onSurfaceVariant,
   },
   sectionLabel: {
     fontSize: 14,
