@@ -10,6 +10,7 @@ type Props = {
   onDrop: (center: Point) => boolean;
   onTap?: () => void;
   onDragStart?: () => void;
+  onDragEnd?: () => void;
   children: ReactNode;
 };
 
@@ -17,11 +18,13 @@ const SPRING = { damping: 18, stiffness: 180 };
 // 置き場所が変わるはずなのに位置が変わらなかった（操作が却下された）ときに元へ戻すまでの猶予。
 const SETTLE_TIMEOUT_MS = 250;
 
-export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, children }: Props) {
+export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, onDragEnd, children }: Props) {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);
   const [isDragging, setIsDragging] = useState(false);
+  // ジェスチャーのコールバックから参照するので state ではなく ref で持つ
+  const activeRef = useRef(false);
   const rectRef = useRef(rect);
   const previousRect = useRef(rect);
 
@@ -52,6 +55,7 @@ export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, ch
     .enabled(enabled)
     .minDistance(4)
     .onStart(() => {
+      activeRef.current = true;
       setIsDragging(true);
       scale.set(withSpring(1.12, SPRING));
       onDragStart?.();
@@ -75,7 +79,11 @@ export function Draggable({ rect, enabled = true, onDrop, onTap, onDragStart, ch
       }, SETTLE_TIMEOUT_MS);
     })
     .onFinalize(() => {
+      // タップだけで終わった場合（パンが始まっていない）は何もしない
+      if (!activeRef.current) return;
+      activeRef.current = false;
       setIsDragging(false);
+      onDragEnd?.();
       scale.set(withSpring(1, SPRING));
     });
 
