@@ -87,7 +87,7 @@ function FastForwardBadge({ rect, level, minutes, onDone }: { rect: Rect; level:
   const mm = Math.floor(remaining / 60);
   const ss = String(remaining % 60).padStart(2, "0");
   return (
-    <View pointerEvents="none" style={[styles.fastForward, { left: rect.x + rect.w / 2 - 60, top: rect.y - 6 }]}>
+    <View style={[styles.fastForward, { pointerEvents: "none", left: rect.x + rect.w / 2 - 60, top: rect.y - 6 }]}>
       <MaterialIcons name="fast-forward" size={14} color="#fff" />
       <Text style={styles.fastForwardText}>
         {getHeatLevel(level).label} {mm}:{ss}
@@ -332,7 +332,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
                   onDragStart={() => setDragging({ kind: "tool", id: tool.id })}
                   onDragEnd={() => setDragging(null)}
                 >
-                  <View style={{ opacity: isCuttingKnife ? 0.25 : 1 }} pointerEvents="none">
+                  <View style={{ opacity: isCuttingKnife ? 0.25 : 1, pointerEvents: "none" }}>
                     <ToolSprite
                       tool={tool}
                       size={rect.w}
@@ -394,7 +394,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
       </ScrollView>
 
       {toast ? (
-        <View pointerEvents="none" style={styles.toast}>
+        <View style={[styles.toast, { pointerEvents: "none" }]}>
           <Text style={styles.toastText}>{toast}</Text>
         </View>
       ) : null}

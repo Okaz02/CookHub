@@ -43,10 +43,10 @@ function Flame({ burner, heat }: { burner: Circle; heat: ActiveHeat }) {
   }));
   return (
     <Animated.View
-      pointerEvents="none"
       style={[
         styles.flame,
         {
+          pointerEvents: "none",
           left: burner.cx - radius,
           top: burner.cy - radius,
           width: radius * 2,

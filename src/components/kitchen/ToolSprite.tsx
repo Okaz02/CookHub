@@ -248,7 +248,7 @@ function Bubble({ size, index }: { size: number; index: number }) {
 
 function BoilingBubbles({ size }: { size: number }) {
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <View style={[StyleSheet.absoluteFill, { pointerEvents: "none" }]}>
       {Array.from({ length: 7 }, (_, index) => (
         <Bubble key={index} size={size} index={index} />
       ))}
@@ -265,8 +265,7 @@ function Sizzle({ size }: { size: number }) {
   const animatedStyle = useAnimatedStyle(() => ({ opacity: 0.15 + progress.get() * 0.25 }));
   return (
     <Animated.View
-      pointerEvents="none"
-      style={[StyleSheet.absoluteFill, { backgroundColor: "#ffb347", borderRadius: size / 2 }, animatedStyle]}
+      style={[StyleSheet.absoluteFill, { pointerEvents: "none", backgroundColor: "#ffb347", borderRadius: size / 2 }, animatedStyle]}
     />
   );
 }
@@ -294,7 +293,7 @@ export function CuttingKnife({ size, onDone }: { size: number; onDone: () => voi
     ],
   }));
   return (
-    <Animated.View pointerEvents="none" style={[styles.cuttingKnife, { left: size / 2 - 6, top: -size * 0.1 }, animatedStyle]}>
+    <Animated.View style={[styles.cuttingKnife, { pointerEvents: "none", left: size / 2 - 6, top: -size * 0.1 }, animatedStyle]}>
       <View style={[styles.knifeBlade, { width: 12, height: size * 0.75 }]} />
       <View style={[styles.knifeHandle, { width: 10, height: size * 0.4 }]} />
     </Animated.View>
