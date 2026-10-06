@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
@@ -88,7 +88,7 @@ function buildPieces(style: CutStyle["pieces"], size: number, widthCm: number | 
   return pieces;
 }
 
-function PieceView({ piece, progress, children, size }: { piece: Piece; progress: SharedValue<number>; children: React.ReactNode; size: number }) {
+function PieceView({ piece, progress, children, size }: { piece: Piece; progress: SharedValue<number>; children: ReactNode; size: number }) {
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: piece.dx * progress.get() },
@@ -106,7 +106,7 @@ function PieceView({ piece, progress, children, size }: { piece: Piece; progress
 }
 
 // 切った材料。元の絵を細かく切り分けて少しずつ散らす。
-export function CutPieces({ cut, size, seedKey, children }: { cut: CutResult; size: number; seedKey: string; children: React.ReactNode }) {
+export function CutPieces({ cut, size, seedKey, children }: { cut: CutResult; size: number; seedKey: string; children: ReactNode }) {
   const progress = useSharedValue(0);
   useEffect(() => {
     progress.set(0);
