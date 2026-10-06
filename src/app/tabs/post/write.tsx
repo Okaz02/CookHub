@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Text, View, TextInput, Pressable, ScrollView, ActivityIndicator, StyleSheet, Switch } from "react-native";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -13,6 +13,7 @@ import {
   type Ingredient,
   type Step,
 } from "../../../lib/api-recipe";
+import { takeKitchenDraft } from "../../../lib/kitchen/kitchenDraft";
 
 const SERVING_PRESETS = ["1人分", "2人分", "3〜4人"];
 const SERVING_CUSTOM = "その他";
@@ -28,7 +29,7 @@ function nextKey() {
 
 export default function Write() {
   const router = useRouter();
-  const { id: recipeIdParam } = useLocalSearchParams<{ id?: string }>();
+  const { id: recipeIdParam, from } = useLocalSearchParams<{ id?: string; from?: string }>();
   const editingRecipeId = recipeIdParam ? Number(recipeIdParam) : null;
   const { token } = useAuth();
 
@@ -50,6 +51,20 @@ export default function Write() {
     { key: nextKey(), name: "", amount: "", unit: "" },
   ]);
   const [steps, setSteps] = useState<StepDraft[]>([{ key: nextKey(), body: "", image_url: null }]);
+
+  // キッチンで作ったレシピの材料と手順を受け取る（1回だけ）。
+  useEffect(() => {
+    if (from !== "kitchen") return;
+    const draft = takeKitchenDraft();
+    if (!draft) return;
+    if (draft.ingredients.length > 0) {
+      setIngredients(draft.ingredients.map((item) => ({ ...item, key: nextKey() })));
+    }
+    if (draft.steps.length > 0) {
+      setSteps(draft.steps.map((item) => ({ ...item, key: nextKey() })));
+    }
+    setCommitMessage("キッチンで作成");
+  }, [from]);
 
   useFocusEffect(
     useCallback(() => {
