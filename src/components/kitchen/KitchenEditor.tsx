@@ -1,6 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../theme";
 import { BURNER_COUNT, getHeatLevel } from "../../lib/kitchen/constants";
@@ -298,6 +297,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
         <Text style={styles.hintText}>{nextHint(snapshot)}</Text>
       </View>
 
+      {/* gesture-handler の ScrollView だと材料・器具のドラッグを横取りすることがあるので、RN 標準のものを使う */}
       <ScrollView
         style={{ flex: 1 }}
         scrollEnabled={!dragging}
@@ -584,7 +584,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 24,
     right: 24,
-    bottom: 90,
+    // 下のレシピパネルを広げても隠れないよう、案内バーのすぐ下に出す
+    top: 96,
     padding: 12,
     borderRadius: 12,
     backgroundColor: "rgba(39,19,16,0.92)",

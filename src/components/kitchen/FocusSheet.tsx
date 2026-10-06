@@ -38,7 +38,7 @@ export function FocusSheet({ snapshot, target, onClose, onFocus, onToolAction }:
     if (!ingredient) return null;
     const history = getIngredientHistory(snapshot, ingredient.id);
     return (
-      <BottomSheet visible title={ingredient.name} subtitle={`${ingredient.amount}${ingredient.unit}・いま: ${locationLabel(snapshot, ingredient.id)}`} onClose={onClose}>
+      <BottomSheet visible title={ingredient.name} subtitle={[`${ingredient.amount}${ingredient.unit}`, `いま: ${locationLabel(snapshot, ingredient.id)}`].filter(Boolean).join("・")} onClose={onClose}>
         <View style={styles.summaryRow}>
           <IngredientArt image={ingredient.image} name={ingredient.name} size={56} />
           <View style={{ flex: 1, gap: 2 }}>
