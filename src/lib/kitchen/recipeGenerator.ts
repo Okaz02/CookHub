@@ -155,7 +155,7 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
         if (event.withWater && event.boiled && event.ingredientIds.length === 0) {
           pending.push({ te: `${fire}${heat}加熱して沸騰させ`, end: `${fire}${heat}加熱して沸騰させる` });
         } else if (event.withWater) {
-          pending.push({ te: `${fire}${heat}煮`, end: `${fire}${heat}煮る` });
+          pending.push({ te: `${fire}${heat}煮て`, end: `${fire}${heat}煮る` });
         } else {
           pending.push({ te: `${fire}${heat}加熱し`, end: `${fire}${heat}加熱する` });
         }
