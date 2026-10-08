@@ -1,16 +1,15 @@
-import { Image, View, type ImageRequireSource } from 'react-native';
-
+import { Asset } from 'expo-asset';
+import { useState } from 'react';
+import { Image, StyleSheet, View, type ImageRequireSource, type LayoutChangeEvent, type ViewProps } from 'react-native';
 
 export type Segment = { percent: number; stretch: boolean };
 
-type Props = {
+type Props = ViewProps & {
   source: ImageRequireSource;
   cols: Segment[];
   rows: Segment[];
-  width: number;
-  height: number;
   scale: number;
-};
+}
 
 function layout(percents: Segment[], imageSize: number, total: number, scale: number) {
   const segments = percents.map((s) => ({ px: (s.percent / 100) * imageSize, stretch: s.stretch }));
@@ -25,33 +24,46 @@ function layout(percents: Segment[], imageSize: number, total: number, scale: nu
   });
 }
 
-export function SlicedImage({ source, cols, rows, width, height, scale }: Props) {
-  const asset = Image.resolveAssetSource(source)!;
+
+export function SlicedImage({ source, cols, rows, scale, onLayout, children, ...viewProps }: Props) {
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+
+  const handleLayout = (e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout;
+    setSize({ width, height });
+    onLayout?.(e);
+  };
+
+  const asset = Asset.fromModule(source);
   const sourceW = asset.width!;
   const sourceH = asset.height!;
-  const colLayout = layout(cols, sourceW, width, scale);
-  const rowLayout = layout(rows, sourceH, height, scale);
+  const colLayout = size ? layout(cols, sourceW, size.width, scale) : [];
+  const rowLayout = size ? layout(rows, sourceH, size.height, scale) : [];
+
   return (
-    <View style={{ width, height }}>
-      {rowLayout.map((r) => (
-        <View key={r.src} style={{ flexDirection: 'row', height: r.dp }}>
-          {colLayout.map((c) => (
-            <View key={c.src} style={{ width: c.dp, height: r.dp, overflow: 'hidden' }}>
-              <Image
-                source={source}
-                resizeMode="stretch"
-                style={{
-                  position: 'absolute',
-                  width: (sourceW * c.dp) / c.px,
-                  height: (sourceH * r.dp) / r.px,
-                  left: (-c.src * c.dp) / c.px,
-                  top: (-r.src * r.dp) / r.px,
-                }}
-              />
-            </View>
-          ))}
-        </View>
-      ))}
+    <View {...viewProps} onLayout={handleLayout}>
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        {rowLayout.map((r) => (
+          <View key={r.src} style={{ flexDirection: 'row', height: r.dp }}>
+            {colLayout.map((c) => (
+              <View key={c.src} style={{ width: c.dp, height: r.dp, overflow: 'hidden' }}>
+                <Image
+                  source={source}
+                  resizeMode="stretch"
+                  style={{
+                    position: 'absolute',
+                    width: (sourceW * c.dp) / c.px,
+                    height: (sourceH * r.dp) / r.px,
+                    left: (-c.src * c.dp) / c.px,
+                    top: (-r.src * r.dp) / r.px,
+                  }}
+                />
+              </View>
+            ))}
+          </View>
+        ))}
+      </View>
+      {children}
     </View>
   );
 }

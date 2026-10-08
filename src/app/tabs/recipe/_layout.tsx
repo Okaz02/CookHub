@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack } from "expo-router/stack";
 import { colors } from "../../../theme";
 
 export default function RecipeLayout() {

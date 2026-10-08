@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Text, View, ScrollView, ActivityIndicator, StyleSheet } from "react-native";
-import { useFocusEffect, useLocalSearchParams, Stack } from "expo-router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { Stack } from "expo-router/stack";
 import { colors } from "../../../../../theme";
 import { useAuth } from "../../../../../context/AuthContext";
 import {
