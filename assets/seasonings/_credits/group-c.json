@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ponzu",
+    "name_ja": "ポン酢",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "No qualifying image found. Searched Openverse (ponzu, ponzu sauce, ponzu bottle, yuzu ponzu) and Wikimedia Commons (ponzu, ポン酢). Almost every result shows ponzu poured over a dish (sashimi, beef, etc.). The few seasoning-only shots were rejected: 'Ponzu (75cb5ffe, Flickr BY-SA 2.0)' has three bottles on a wooden table with a blurred room behind; 'ponzu sauce flavored yuzu citron' is a tilted bottle on a cluttered surface; 'Ponzu sauce ポン酢3.jpg' is a buffet pot with a PONZU sign and other dishes around it; 'ぽん酢.jpg' is clear liquid in a patterned dish on a floral cloth; 'Ponzu kabosu vert.jpg' is too small (321x400)."
+  },
+  {
+    "id": "dashi-powder",
+    "name_ja": "顆粒だし",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "No qualifying image found. Searched Openverse (dashi powder, hondashi, dashi granules, bonito powder, dashi no moto) and Wikimedia Commons (dashi powder, hondashi, Category:Dashi). Rejected: 'Hon Dashi fish broth powder' (a hand holds the jar in front of a kitchen pot); 'Dashipackages.JPG' (several branded packages on a black velvet cloth, with a price sticker); 'Powdered Bonito' (a hand holds a bowl over a cluttered kitchen counter); 'JapaneseBouillon Dashi.jpg' (liquid dashi in a metal bowl, not the granules); the Hondashi logo images are tiny (113-596 px)."
+  },
+  {
+    "id": "consomme",
+    "name_ja": "コンソメ",
+    "file": "consomme.jpg",
+    "title": "File:Brühwürfel-1.jpg",
+    "creator": "Rainer Z ...",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Br%C3%BChw%C3%BCrfel-1.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Br%C3%BChw%C3%BCrfel-1.jpg",
+    "width": 2550,
+    "height": 2097,
+    "notes": "Five unwrapped bouillon (stock) cubes in opened foil wrappers on a plain white/light-grey studio background. No watermark. Small partial brand prints on some foil wrappers (e.g. part of a 'Maggi' logo) are visible but minor. Creator credit is given exactly as the author requests on Commons (Rainer Z ...). Under CC BY-SA, derivatives (background-removed versions) must be shared under the same license."
+  },
+  {
+    "id": "chicken-bouillon",
+    "name_ja": "鶏がらスープの素",
+    "file": "chicken-bouillon.jpg",
+    "title": "File:Granulated chicken bouillon 1.jpg",
+    "creator": "Anna Frodesiak",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Granulated_chicken_bouillon_1.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Granulated_chicken_bouillon_1.jpg",
+    "width": 1145,
+    "height": 859,
+    "notes": "A small pile of pale-yellow granulated chicken bouillon on a plain white/light-grey surface. Unbranded, no container, no watermark. These are Western-style granules, slightly yellower than typical Japanese 鶏がらスープの素, but they are clearly the same kind of product."
+  },
+  {
+    "id": "doubanjiang",
+    "name_ja": "豆板醤",
+    "file": "doubanjiang.jpg",
+    "title": "File:Doubanjiang.jpg",
+    "creator": "Badagnani",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Doubanjiang.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Doubanjiang.jpg",
+    "width": 2560,
+    "height": 1920,
+    "notes": "A mound of doubanjiang paste in a plain white bowl, shot from above. The white bowl fills almost the whole frame. Unbranded, no watermark. Minor concern: a small sliver of pale teal tabletop shows in the bottom-right and bottom-left corners. Rejected alternatives: Lee Kum Kee Toban Djan (CC0, a hand holds the jar against a textured wall); Juan-cheng jars (branded, kitchen background); Pixian Doubanjiang.png (a collage)."
+  }
+]
