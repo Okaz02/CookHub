@@ -86,6 +86,23 @@ export const TOOL_CATALOG = {
     actions: ["炒める", "揚げる"],
     heatable: true,
   },
+  donabe: {
+    name: "土鍋",
+    kind: "vessel",
+    image: require("./images/donabe.png"),
+    body: { x: 0.05, y: 0.25, w: 0.9, h: 0.75 },
+    round: true,
+    actions: ["煮る", "炊く"],
+    heatable: true,
+  },
+  riceCooker: {
+    name: "炊飯器",
+    kind: "vessel",
+    image: require("./images/rice-cooker.png"),
+    body: { x: 0.08, y: 0, w: 0.78, h: 0.55 },
+    round: true,
+    actions: ["炊く"],
+  },
   steamer: {
     name: "蒸し器",
     kind: "vessel",

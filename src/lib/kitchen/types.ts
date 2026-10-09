@@ -47,6 +47,8 @@ export type KitchenIngredient = {
   image: IngredientImage | null;
   location: IngredientLocation;
   cut: CutResult | null;
+  // 卵を器に割り入れたあと（殻のない白身と黄身で描く）
+  cracked?: boolean;
 };
 
 export type HeatLevel = "low" | "mediumLow" | "medium" | "high";
@@ -116,6 +118,8 @@ export type CookEvent = EventBase &
     | { type: "placeOnBurner"; toolId: string; burner: number }
     | { type: "addWater"; toolId: string; ml: number }
     | { type: "addIngredient"; toolId: string; ingredientId: string; intoBoiling: boolean }
+    // 卵を器に割り入れる
+    | { type: "crackEgg"; toolId: string; ingredientId: string }
     // 器具の中の材料をまな板に取り出す
     | { type: "takeOut"; toolId: string; ingredientId: string }
     | {

@@ -51,6 +51,7 @@ function eventToolId(event: CookEvent): string | null {
     case "placeOnBurner":
     case "addWater":
     case "addIngredient":
+    case "crackEgg":
     case "takeOut":
     case "heat":
     case "turnOff":
@@ -165,6 +166,13 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
           te: `${lead}${joinNames(names)}を入れ`,
           end: `${lead}${joinNames(names)}を入れる`,
         });
+        mentionedTool = true;
+        break;
+      }
+      case "crackEgg": {
+        const lead = prefix ? `${prefix}に` : "";
+        const name = lookup.ingredientName(event.ingredientId);
+        pending.push({ te: `${lead}${name}を割り入れ`, end: `${lead}${name}を割り入れる` });
         mentionedTool = true;
         break;
       }
@@ -289,6 +297,11 @@ export function getIngredientHistory(snapshot: KitchenSnapshot, ingredientId: st
             icon: "input",
             text: `${toolName(event.toolId)}に入れた${event.intoBoiling ? "（沸騰したお湯）" : ""}`,
           });
+        }
+        break;
+      case "crackEgg":
+        if (event.ingredientId === ingredientId) {
+          entries.push({ id: event.id, icon: "egg", text: `${toolName(event.toolId)}に割り入れた` });
         }
         break;
       case "takeOut":

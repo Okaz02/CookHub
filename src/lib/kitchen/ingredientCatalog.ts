@@ -327,6 +327,13 @@ export function suggestIngredients(query: string, limit = 24): CatalogIngredient
     .map(({ item }) => item);
 }
 
+// 卵かどうか（器に入れるとき「割り入れる」を選べるようにする）
+export function isEgg(name: string) {
+  const q = normalizeIngredientName(name);
+  const egg = INGREDIENT_CATALOG.find((item) => item.id === "egg");
+  return Boolean(egg && [egg.name, ...egg.aliases].some((alias) => normalizeIngredientName(alias) === q));
+}
+
 // 候補の材料の画像。写真が無ければ絵文字
 export function catalogImage(item: CatalogIngredient): IngredientImage {
   // 背景を消せなかった写真は、表示側で丸く切り抜く（transparent: false）

@@ -1,6 +1,6 @@
 # 器具の写真の出典
 
-アプリの器具画像（src/lib/kitchen/images）のうち、下の写真は背景を消して作ったものです。
+アプリの器具画像（src/lib/kitchen/images）のうち、下の写真は背景を消して作ったものです（機械学習モデル @imgly/background-removal-node で処理）。
 CC BY / CC BY-SA の写真は、アプリ内で作者名・ライセンスの表記が必要です。CC BY-SA の写真は、背景を消した画像も CC BY-SA で公開する必要があります。
 
 | 器具 | 元の写真 | 作者 | ライセンス | 出典 |
@@ -22,5 +22,7 @@ CC BY / CC BY-SA の写真は、アプリ内で作者名・ライセンスの表
 | キッチンバサミ | kitchen-scissors.jpg | Doggerelblogger | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | [File:Kitchen scissors.jpg](https://commons.wikimedia.org/wiki/File:Kitchen_scissors.jpg) |
 | 木べら | wooden-spatula.jpg | Clément Bucco-Lechat | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [File:Spatule en bois - dessus.jpg](https://commons.wikimedia.org/wiki/File:Spatule_en_bois_-_dessus.jpg) |
 | 麺棒 | rolling-pin.jpg | Peter Kammer | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | [File:Rollingpin.jpg](https://commons.wikimedia.org/wiki/File:Rollingpin.jpg) |
+| 土鍋 | donabe.jpg | Qurren | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [Cainz Donabe Hakusen-nagashi 19cm 1](https://commons.wikimedia.org/wiki/File:Cainz_Donabe_Hakusen-nagashi_19cm_1.jpg) |
+| 炊飯器 | rice-cooker.jpg | Hans Olav Lien | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [File:Hanabishi HRC-10WS 20130912 Rice cooker.jpg](https://commons.wikimedia.org/wiki/File:Hanabishi_HRC-10WS_20130912_Rice_cooker.jpg) |
 
-使っていない器具: 土鍋（背景をうまく消せなかった）、天ぷら鍋（写真が見つからなかった）、すり鉢（写真が見つからなかった）、炊飯器（背景をうまく消せなかった）、泡立て器（写真が見つからなかった）、菜箸（写真が見つからなかった）、ゴムベラ（写真が見つからなかった）
+使っていない器具: 天ぷら鍋（写真が見つからなかった）、すり鉢（写真が見つからなかった）、泡立て器（写真が見つからなかった）、菜箸（写真が見つからなかった）、ゴムベラ（写真が見つからなかった）

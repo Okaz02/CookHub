@@ -38,6 +38,7 @@ export type KitchenAction =
   | { type: "placeInSink"; toolId: string }
   | { type: "addWater"; toolId: string; ml: number }
   | { type: "addIngredientToTool"; toolId: string; ingredientId: string }
+  | { type: "crackEgg"; toolId: string; ingredientId: string }
   | { type: "heat"; toolId: string; level: HeatLevel; minutes: number; action?: string }
   | { type: "turnOff"; toolId: string }
   | { type: "addBurner" }
@@ -278,6 +279,18 @@ function apply(snapshot: KitchenSnapshot, action: Exclude<KitchenAction, { type:
           ingredientId: ingredient.id,
           intoBoiling: tool.boiling,
         }),
+      };
+    }
+    case "crackEgg": {
+      const tool = snapshot.tools.find((item) => item.id === action.toolId);
+      const ingredient = snapshot.ingredients.find((item) => item.id === action.ingredientId);
+      if (!tool || !ingredient || !isContainer(tool) || ingredient.cracked) return null;
+      return {
+        ...snapshot,
+        ingredients: snapshot.ingredients.map((item) =>
+          item.id === ingredient.id ? { ...item, location: { area: "tool", toolId: tool.id }, cracked: true } : item
+        ),
+        events: withEvent(snapshot, { type: "crackEgg", toolId: tool.id, ingredientId: ingredient.id }),
       };
     }
     case "heat": {
