@@ -1,0 +1,72 @@
+[
+  {
+    "id": "sugar",
+    "name_ja": "砂糖",
+    "file": "sugar.jpg",
+    "title": "Bowl of white sugar without background",
+    "creator": "Douglas P Perkins",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Bowl_of_white_sugar_without_background.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Bowl_of_white_sugar_without_background.jpg",
+    "width": 2015,
+    "height": 2035,
+    "notes": "上から撮った白い器入りのグラニュー糖。背景は作者がすでに切り抜いて白にしている。透かしなし。表示義務あり（CC BY）。"
+  },
+  {
+    "id": "vinegar",
+    "name_ja": "酢",
+    "file": "vinegar.jpg",
+    "title": "Rice vinegar",
+    "creator": "Sotaque",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Rice_vinegar.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Rice_vinegar.jpg",
+    "width": 3120,
+    "height": 3120,
+    "notes": "淡い青磁色の小皿に入った米酢を真上から撮影。背景は無地の淡いグレー（わずかにラベンダー寄り）。ブランドなし・透かしなし。液体が淡色なので、皿だけの写真に見えやすい。"
+  },
+  {
+    "id": "mirin",
+    "name_ja": "みりん",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "条件をすべて満たす候補なし。確認した候補: 'Mirin (Japanese sweet rice wine for cooking).jpg'（CC BY-SA 4.0、タカラ本みりん。白い壁と木のテーブルで2色の背景）、'Japanese Mirin.JPG'（パブリックドメイン、Yutaka。白い壁と濃い茶色の台）、'Mirinbowl.jpg'（CC BY 3.0、背景に別の物体と壁が写っている）、Flickr 'mirin'（CC BY-SA 2.0、散らかった食卓）、'Kokonoe Mirin 2024-09'（店の棚）。どれも単色背景の条件を満たさない。"
+  },
+  {
+    "id": "cooking-sake",
+    "name_ja": "料理酒",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "条件をすべて満たす候補なし。料理酒そのものの自由ライセンス写真は見つからなかった。代わりに日本酒の瓶も確認: '純米辛口 盛升.jpg'（CC BY 4.0、白い壁と木の机で2色の背景）、'Kamotsuru Joutou.jpg'（CC BY-SA 4.0、カーテンと木の机）、'Sake bottle.jpg'（CC BY-SA 3.0、壁と台の段差、暗い）、桃色にごり酒（CC BY 4.0、壁・箱・青い布で背景が雑多）。Flickr の LACMA 所蔵の徳利は美術品で調味料の写真ではない。"
+  },
+  {
+    "id": "miso",
+    "name_ja": "味噌",
+    "file": "miso.jpg",
+    "title": "Miso 001",
+    "creator": "publicdomainq.net (https://publicdomainq.net/miso-0018849/)",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Miso_001.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Miso_001.jpg",
+    "width": 5616,
+    "height": 3744,
+    "notes": "白い器に盛った淡色味噌の寄り写真。背景は白一色（ハイキー）。ブランドなし・透かしなし。器の縁が画面の端で切れている。"
+  }
+]
