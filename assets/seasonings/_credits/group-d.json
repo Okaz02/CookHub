@@ -1,0 +1,72 @@
+[
+  {
+    "id": "karashi",
+    "name_ja": "からし",
+    "file": "karashi.jpg",
+    "title": "File:겨자만.jpg",
+    "creator": "Hj03064",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:%EA%B2%A8%EC%9E%90%EB%A7%8C.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/64/%EA%B2%A8%EC%9E%90%EB%A7%8C.jpg",
+    "width": 4288,
+    "height": 2848,
+    "notes": "Yellow hot-mustard paste (Korean gyeoja, visually the same as Japanese neri-karashi) swirled in a small white square dish. Plain white/light-grey background, no watermark or text. Unbranded."
+  },
+  {
+    "id": "wasabi",
+    "name_ja": "わさび",
+    "file": "wasabi.jpg",
+    "title": "File:Wasabi 002.jpg",
+    "creator": "publicdomainq.net (https://publicdomainq.net/wasabi-japanese-horseradish-0000353/)",
+    "license": "CC0 1.0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Wasabi_002.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/26/Wasabi_002.jpg",
+    "width": 4348,
+    "height": 3018,
+    "notes": "Freshly grated wasabi on a small dark ceramic dish, with a whole wasabi rhizome blurred behind it. Plain white background, no watermark. Alternative: 'File:Wasabi paste.jpg' (Tiia Monto, CC BY-SA 4.0, 1099x1085) shows paste alone on white with no container."
+  },
+  {
+    "id": "garlic-paste",
+    "name_ja": "おろしにんにく",
+    "file": "garlic-paste.jpg",
+    "title": "File:Opened garlic bulb with garlic clove.jpg",
+    "creator": "Dubravko Sorić SoraZG on Flickr",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Opened_garlic_bulb_with_garlic_clove.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Opened_garlic_bulb_with_garlic_clove.jpg",
+    "width": 3648,
+    "height": 2736,
+    "notes": "FALLBACK: a whole raw garlic bulb (partly opened) plus one peeled clove. Not grated or paste. Pure white studio background, no watermark. No grated/paste-form candidate passed: they all had busy kitchen/table backgrounds, branded jars with text overlays, or collages. The closest was rawpixel 'Free minced garlic image' (CC0), but it shows a garlic press, peels and a bulb on a veined marble surface, so it was rejected."
+  },
+  {
+    "id": "ginger-paste",
+    "name_ja": "おろし生姜",
+    "file": "ginger-paste.jpg",
+    "title": "File:Ginger rhizome.jpg",
+    "creator": "Mk2010",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ginger_rhizome.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Ginger_rhizome.jpg",
+    "width": 3343,
+    "height": 1880,
+    "notes": "FALLBACK: whole raw ginger rhizomes, not grated. Plain light-grey/white surface, no watermark. No grated-ginger candidate passed: they had busy backgrounds (red tablecloth, wooden table, hands, cutting board with knife) or showed branded ginger-garlic jars on a store shelf or with text overlays. 'Ginger Root (179871501)' on black was rejected because of a photographer signature in the corner."
+  },
+  {
+    "id": "white-sesame",
+    "name_ja": "白ごま",
+    "file": "white-sesame.jpg",
+    "title": "Sesame seeds",
+    "creator": "Simoubuntu",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "source_url": "https://www.flickr.com/photos/54094993@N06/5777262943",
+    "image_url": "https://live.staticflickr.com/5229/5777262943_f63b92aab5_b.jpg",
+    "width": 1024,
+    "height": 768,
+    "notes": "White sesame seeds spilled on a plain white surface, next to a small unbranded steel spice tin with a window lid. Seamless white-to-grey gradient backdrop, no watermark. The largest size Openverse offers is 1024 px. Alternative: 'File:Sesame-Seeds.jpg' (Commons, public domain, 948x735), a pile of seeds on a black plate."
+  }
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ketchup",
+    "name_ja": "ケチャップ",
+    "file": "ketchup.jpg",
+    "title": "Cup of ketchup at Roy Rogers",
+    "creator": "Ser Amantio di Nicolao",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Cup_of_ketchup_at_Roy_Rogers.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Cup_of_ketchup_at_Roy_Rogers.jpg",
+    "width": 1909,
+    "height": 2037,
+    "notes": "Unbranded white plastic portion cup of ketchup on a plain cream/off-white table surface. Minor specks on the table and a soft cast shadow; ketchup looks somewhat dark. Alternative (branded, pure white studio background, Public domain): File:Heinz_Tomato_Ketchup,_Canada_(front),_2026-02-19.jpg by Chris Woodrich."
+  },
+  {
+    "id": "mayonnaise",
+    "name_ja": "マヨネーズ",
+    "file": "mayonnaise.jpg",
+    "title": "Mayonnaise - Japan",
+    "creator": "Susan Slater",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Mayonnaise_-_Japan.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Mayonnaise_-_Japan.jpg",
+    "width": 1689,
+    "height": 3100,
+    "notes": "Japanese-style squeeze bottle (red lattice pattern, 'MAYONNAISE 220g', red cap) on a plain light grey/white background, shot from above. Brand marks appear to have been blurred out by the uploader, leaving a few faint red smudges on the bottle; no overlay text or watermark."
+  },
+  {
+    "id": "worcestershire-sauce",
+    "name_ja": "ウスターソース",
+    "file": "worcestershire-sauce.jpg",
+    "title": "Worcester Sauce 001",
+    "creator": "Ocdp",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Worcester_Sauce_001.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Worcester_Sauce_001.jpg",
+    "width": 3216,
+    "height": 2136,
+    "notes": "Japanese Worcester sauce in a small clear glass dish on a plain white, slightly textured surface. Unbranded. In Commons category Japanese Worcester sauce."
+  },
+  {
+    "id": "oyster-sauce",
+    "name_ja": "オイスターソース",
+    "file": "oyster-sauce.jpg",
+    "title": "OysterSauce2",
+    "creator": "Gossipguy",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:OysterSauce2.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/7/78/OysterSauce2.jpg",
+    "width": 2560,
+    "height": 1920,
+    "notes": "Oyster sauce pouring from a dark bottle (label not visible) onto a metal spoon, on a white background. Unbranded. The bottle is cropped at the top-left edge of the frame."
+  },
+  {
+    "id": "mentsuyu",
+    "name_ja": "めんつゆ",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "Not found. Searched Openverse (mentsuyu, tsuyu, soba tsuyu, noodle soup base, めんつゆ, そばつゆ, 麺つゆ, つゆ, tsuyu sauce, soba sauce) and Wikimedia Commons (same terms plus categories). All usable-license candidates had busy backgrounds or were not the subject: supermarket shelves (Fundokin-Shoyu-1, Teraoka-Yuki-Jozo-1), a cup held in hand outdoors (Tempura sauce Tentsuyu 3), a gingham tablecloth (天かす入りめんつゆ), dining-table scenes (Somen with dipping sauce bottle by shibainu, Soba Tsuyu), with the dish full of toppings, or showing only a label close-up."
+  }
+]
