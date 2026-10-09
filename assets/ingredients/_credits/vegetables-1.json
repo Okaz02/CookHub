@@ -1,0 +1,72 @@
+[
+  {
+    "id": "onion",
+    "name_ja": "玉ねぎ",
+    "file": "onion.jpg",
+    "title": "Onion on White.JPG",
+    "creator": "Colin",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Onion_on_White.JPG",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Onion_on_White.JPG/960px-Onion_on_White.JPG",
+    "width": 960,
+    "height": 960,
+    "notes": "白背景。黄玉ねぎ（茶色い皮付き）1個。右下に薄い影あり。"
+  },
+  {
+    "id": "carrot",
+    "name_ja": "にんじん",
+    "file": "carrot.jpg",
+    "title": "Curved carrot 2017 A.jpg",
+    "creator": "Fructibus",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Curved_carrot_2017_A.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Curved_carrot_2017_A.jpg/960px-Curved_carrot_2017_A.jpg",
+    "width": 960,
+    "height": 720,
+    "notes": "白〜薄いグレーの背景。オレンジ色のにんじん1本（葉なし）を横から。やや湾曲している。"
+  },
+  {
+    "id": "potato",
+    "name_ja": "じゃがいも",
+    "file": "potato.jpg",
+    "title": "Potato cv Dejima (cropped).jpg",
+    "creator": "Fk",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Potato_cv_Dejima_(cropped).jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Potato_cv_Dejima_%28cropped%29.jpg/960px-Potato_cv_Dejima_%28cropped%29.jpg",
+    "width": 960,
+    "height": 852,
+    "notes": "白背景。じゃがいも（品種デジマ）丸ごと1個のアップ。被写体が画面いっぱい。"
+  },
+  {
+    "id": "cabbage",
+    "name_ja": "キャベツ",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "見つからず。Wikimedia/Openverseで7クエリ検索。白背景の丸ごとキャベツはGFDLのみ(fir0002)で許可ライセンス外。他は畑・市場・木製台など背景が不可、またはブロッコリー等との集合写真のみ。"
+  },
+  {
+    "id": "napa-cabbage",
+    "name_ja": "白菜",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "見つからず。Wikimedia/Openverseで6クエリ検索。丸ごとの白菜写真は畑・金属トレー＋暗い周囲・木目テーブル上のみで、単色背景の許可ライセンス写真なし。"
+  }
+]

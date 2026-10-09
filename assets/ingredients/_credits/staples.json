@@ -1,0 +1,72 @@
+[
+  {
+    "id": "rice",
+    "name_ja": "米",
+    "file": "rice.jpg",
+    "title": "File:Koshihikari.jpg",
+    "creator": "Emran Kassim from Nagoya, Aichi, Japan",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Koshihikari.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Koshihikari.jpg/960px-Koshihikari.jpg",
+    "width": 960,
+    "height": 1280,
+    "notes": "黒の無地背景。黒いスクープから落ちるコシヒカリ（日本の短粒米）の生米。スクープも黒色。"
+  },
+  {
+    "id": "bread",
+    "name_ja": "食パン",
+    "file": "bread.jpg",
+    "title": "Three slices",
+    "creator": "Nick Saltmarsh",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "source_url": "https://www.flickr.com/photos/7554150@N05/3116061949",
+    "image_url": "https://live.staticflickr.com/3102/3116061949_af2181804f_b.jpg",
+    "width": 1024,
+    "height": 767,
+    "notes": "無地の木製テーブル面（茶色、木目あり）の上に重ねた食パン3枚。他の物なし。背景は単色ではなく木目がある点が懸念。白背景の理想的な候補 File:Shokupan.jpg (CC BY-SA 3.0) は 640x304 で短辺不足のため不採用。"
+  },
+  {
+    "id": "udon",
+    "name_ja": "うどん",
+    "file": "udon.jpg",
+    "title": "Udon noodles",
+    "creator": "joyosity",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "source_url": "https://www.flickr.com/photos/33993074@N00/8151625299",
+    "image_url": "https://live.staticflickr.com/8201/8151625299_54b105530d_b.jpg",
+    "width": 799,
+    "height": 800,
+    "notes": "赤の無地背景（まな板/トレー状の平面）に生のうどん（平たい手打ち麺）をひとまとめに置いた写真。平麺のため、きしめん/パスタ寄りに見える可能性あり。"
+  },
+  {
+    "id": "soba",
+    "name_ja": "そば",
+    "file": "soba.jpg",
+    "title": "File:Dried soba noodles by FotoosVanRobin.jpg",
+    "creator": "FotoosVanRobin",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Dried_soba_noodles_by_FotoosVanRobin.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Dried_soba_noodles_by_FotoosVanRobin.jpg",
+    "width": 1200,
+    "height": 725,
+    "notes": "オフホワイト〜薄ベージュの無地背景。束ねた乾麺のそば3束を断面側から撮影。"
+  },
+  {
+    "id": "somen",
+    "name_ja": "そうめん",
+    "file": "somen.jpg",
+    "title": "File:Somen 001.jpg",
+    "creator": "Kropsoq",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Somen_001.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Somen_001.jpg/1280px-Somen_001.jpg",
+    "width": 1280,
+    "height": 791,
+    "notes": "薄いグレーの無地背景。赤い帯で束ねた乾麺のそうめん1束。帯に小さな文字あり（商品ラベル程度）。"
+  }
+]

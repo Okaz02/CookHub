@@ -10,13 +10,14 @@ type ArtProps = { image: IngredientImage | null; name: string; size: number };
 
 // 材料そのものの絵。透過済みならそのまま、透過されていない写真は丸く切り抜いて「シール」風にする。
 export function IngredientArt({ image, name, size }: ArtProps) {
-  if (image?.uri) {
+  const source = image?.asset ?? (image?.uri ? { uri: image.uri } : null);
+  if (image && source) {
     if (image.transparent) {
-      return <Image source={{ uri: image.uri }} style={{ width: size, height: size }} contentFit="contain" />;
+      return <Image source={source} style={{ width: size, height: size }} contentFit="contain" />;
     }
     return (
       <View style={[styles.sticker, { width: size, height: size, borderRadius: size / 2 }]}>
-        <Image source={{ uri: image.uri }} style={{ width: "100%", height: "100%" }} contentFit="cover" />
+        <Image source={source} style={{ width: "100%", height: "100%" }} contentFit="cover" />
       </View>
     );
   }

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "beef-steak",
+    "name_ja": "牛ステーキ肉",
+    "file": "beef-steak.jpg",
+    "title": "Raw beef steak, 2011",
+    "creator": "Jellaluna",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "source_url": "https://commons.wikimedia.org/w/index.php?curid=59142864",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Raw_beef_steak%2C_2011.jpg/960px-Raw_beef_steak%2C_2011.jpg",
+    "width": 960,
+    "height": 640,
+    "notes": "生のリブロース/サーロイン系ステーキ肉1枚。背景は無地の緑色まな板（単色）。透かしなし。原典はFlickr (Jellaluna)。"
+  },
+  {
+    "id": "lamb",
+    "name_ja": "ラム肉",
+    "file": "lamb.jpg",
+    "title": "Lamb Chops in a bowl",
+    "creator": "StuartWebster",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "source_url": "https://www.flickr.com/photos/34883952@N02/4853535661",
+    "image_url": "https://live.staticflickr.com/4095/4853535661_1c3c3a4e55_b.jpg",
+    "width": 1024,
+    "height": 681,
+    "notes": "生のラムチョップ（骨付き）数枚を白い無地の器に入れたクローズアップ。背景は白い器のみ。透かしなし。被写体が器いっぱいでやや寄りすぎ。"
+  },
+  {
+    "id": "liver",
+    "name_ja": "レバー",
+    "file": "liver.jpg",
+    "title": "Preparing Chicken Liver 01",
+    "creator": "Poupou l'quourouce",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Preparing_Chicken_Liver_01.JPG",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Preparing_Chicken_Liver_01.JPG/960px-Preparing_Chicken_Liver_01.JPG",
+    "width": 960,
+    "height": 720,
+    "notes": "生の鶏レバー数個。背景は明るい木の無地まな板（他の物なし、左下に小さな緑のくず1つ）。透かしなし。木目はあるがほぼ単色。CC0表記の Beef+Liver.jpg (白背景) は出典が商用サイトで作者不明のため不採用。"
+  }
+]

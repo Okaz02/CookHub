@@ -1,0 +1,58 @@
+[
+  {
+    "id": "pork-belly",
+    "name_ja": "豚バラ肉",
+    "file": "pork-belly.jpg",
+    "title": "Schweinebauch-2.jpg",
+    "creator": "Rainer Zenz",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Schweinebauch-2.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Schweinebauch-2.jpg/960px-Schweinebauch-2.jpg",
+    "width": 960,
+    "height": 639,
+    "notes": "Grey plain studio background; raw pork belly block (not slices) placed alone on a wooden cutting board. Concern: block form rather than thin slices typical for 豚バラ薄切り; board will need background removal."
+  },
+  {
+    "id": "pork-loin",
+    "name_ja": "豚ロース",
+    "file": "pork-loin.jpg",
+    "title": "Pork Chops (RAW)",
+    "creator": "StuartWebster",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "source_url": "https://www.flickr.com/photos/34883952@N02/5829527553",
+    "image_url": "https://live.staticflickr.com/3434/5829527553_ceed478456_b.jpg",
+    "width": 1024,
+    "height": 681,
+    "notes": "Plain white background; three raw bone-in pork loin chops on a wooden board (board only as surface). Thick chop cut rather than boneless slices, but clearly 豚ロース."
+  },
+  {
+    "id": "pork-komagire",
+    "name_ja": "豚こま切れ肉",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "Not found: ~6 queries (Wikimedia/Openverse: sliced pork, thinly sliced pork, 豚肉 薄切り, 豚こま, shabu-shabu pork). Only restaurant/yakiniku/shabu-shabu scenes with busy backgrounds or mixed meats; no plain-background raw sliced pork with an allowed license."
+  },
+  {
+    "id": "ground-beef",
+    "name_ja": "合いびき肉",
+    "file": "ground-beef.jpg",
+    "title": "Фарш.jpg",
+    "creator": "Pannet",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:%D0%A4%D0%B0%D1%80%D1%88.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/%D0%A4%D0%B0%D1%80%D1%88.jpg/960px-%D0%A4%D0%B0%D1%80%D1%88.jpg",
+    "width": 960,
+    "height": 581,
+    "notes": "Raw pork-beef mixed mince (description: Свино-говяжий фарш = 合いびき) as a rectangular block on a plain dark slate/black surface; meat fills most of the frame."
+  }
+]

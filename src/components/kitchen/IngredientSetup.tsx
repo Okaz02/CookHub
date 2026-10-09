@@ -9,6 +9,12 @@ import {
   removeBackground,
   searchIngredientImages,
 } from "../../lib/kitchen/imageSearch";
+import {
+  catalogImage,
+  findCatalogIngredient,
+  suggestIngredients,
+  type CatalogIngredient,
+} from "../../lib/kitchen/ingredientCatalog";
 import type { IngredientSeed } from "../../lib/kitchen/reducer";
 import type { IngredientImage } from "../../lib/kitchen/types";
 import { IngredientArt } from "./IngredientSprite";
@@ -32,6 +38,7 @@ function emptyRow(): Row {
 }
 
 const SOURCE_LABEL: Record<IngredientImage["source"], string> = {
+  catalog: "収録済みの写真",
   google: "Google・透過",
   removebg: "背景透過済み",
   wikimedia: "Wikimedia",
@@ -45,6 +52,8 @@ type Props = {
 
 export function IngredientSetup({ onStart }: Props) {
   const [rows, setRows] = useState<Row[]>([emptyRow()]);
+  // 入力中の行（その行の下に、近い名前の材料を候補として出す）
+  const [focusedKey, setFocusedKey] = useState<string | null>(null);
   // 検索中に名前が書き換えられた場合、古い結果で上書きしないための番号
   const requestIds = useRef<Record<string, number>>({});
 
@@ -57,15 +66,32 @@ export function IngredientSetup({ onStart }: Props) {
     if (!name || name === row.searchedName) return;
     const requestId = (requestIds.current[row.key] ?? 0) + 1;
     requestIds.current[row.key] = requestId;
-    patchRow(row.key, { status: "searching", searchedName: name });
-    let candidates: IngredientImage[];
+    // 一覧にある材料なら、収録済みの写真を先頭にする
+    const known = findCatalogIngredient(name);
+    const knownImages = known ? [catalogImage(known)] : [];
+    patchRow(row.key, {
+      status: "searching",
+      searchedName: name,
+      candidates: knownImages,
+      image: knownImages[0] ?? null,
+    });
+    let found: IngredientImage[];
     try {
-      candidates = await searchIngredientImages(name);
+      found = await searchIngredientImages(name);
     } catch {
-      candidates = [emojiImage(name)];
+      found = [emojiImage(name)];
     }
     if (requestIds.current[row.key] !== requestId) return;
+    // 収録済みの写真があるときは、検索結果の最後の絵文字は要らない
+    const candidates = known ? [...knownImages, ...found.filter((image) => image.source !== "emoji")] : found;
     patchRow(row.key, { status: "idle", candidates, image: candidates[0] ?? null });
+  }
+
+  // 候補のタグを押したら、その材料の名前と写真を入れる
+  function pick(row: Row, item: CatalogIngredient) {
+    requestIds.current[row.key] = (requestIds.current[row.key] ?? 0) + 1;
+    const image = catalogImage(item);
+    patchRow(row.key, { name: item.name, searchedName: item.name, candidates: [image], image, status: "idle" });
   }
 
   async function cutOut(row: Row) {
@@ -114,6 +140,9 @@ export function IngredientSetup({ onStart }: Props) {
                 style={[styles.input, { flex: 1 }]}
                 value={row.name}
                 onChangeText={(name) => patchRow(row.key, { name })}
+                onFocus={() => setFocusedKey(row.key)}
+                // Web ではタグを押すと先に入力欄のフォーカスが外れるので、少し待ってから候補を消す（押した操作を受け取るため）
+                onBlur={() => setTimeout(() => setFocusedKey((key) => (key === row.key ? null : key)), 200)}
                 onEndEditing={() => search(row)}
                 onSubmitEditing={() => search(row)}
                 placeholder="材料名（例: にんじん）"
@@ -139,6 +168,8 @@ export function IngredientSetup({ onStart }: Props) {
               </Pressable>
             </View>
 
+            {focusedKey === row.key ? <Suggestions row={row} onPick={(item) => pick(row, item)} /> : null}
+
             {row.candidates.length > 0 ? (
               <>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.candidateRow}>
@@ -157,7 +188,7 @@ export function IngredientSetup({ onStart }: Props) {
                 </ScrollView>
                 <View style={styles.metaRow}>
                   <Text style={styles.meta}>{row.image ? SOURCE_LABEL[row.image.source] : ""}</Text>
-                  {row.image && !row.image.transparent && isBackgroundRemovalAvailable() ? (
+                  {row.image?.uri && !row.image.transparent && isBackgroundRemovalAvailable() ? (
                     <Pressable style={styles.smallButton} onPress={() => cutOut(row)} disabled={row.status !== "idle"}>
                       {row.status === "removing" ? (
                         <ActivityIndicator size="small" color={colors.linenCream} />
@@ -200,6 +231,23 @@ export function IngredientSetup({ onStart }: Props) {
           <Text style={styles.startButtonText}>キッチンへ（{filled.length}品）</Text>
         </Pressable>
       </View>
+    </View>
+  );
+}
+
+// 入力中の名前に近い材料をタグで並べる（「肉」「野菜」など分類名でも出る）。選び終わった名前には出さない
+function Suggestions({ row, onPick }: { row: Row; onPick: (item: CatalogIngredient) => void }) {
+  const query = row.name.trim();
+  const items = suggestIngredients(query);
+  if (items.length === 0 || (items[0].name === query && row.searchedName === query)) return null;
+  return (
+    <View style={styles.suggestions}>
+      {items.map((item) => (
+        <Pressable key={item.id} style={styles.suggestion} onPress={() => onPick(item)}>
+          <IngredientArt image={catalogImage(item)} name={item.name} size={26} />
+          <Text style={styles.suggestionText}>{item.name}</Text>
+        </Pressable>
+      ))}
     </View>
   );
 }
@@ -248,6 +296,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 8,
     fontSize: 13,
+    color: colors.onSurface,
+  },
+  suggestions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  suggestion: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingLeft: 3,
+    paddingRight: 10,
+    paddingVertical: 3,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
+    backgroundColor: colors.surfaceContainerLow,
+  },
+  suggestionText: {
+    fontSize: 12,
     color: colors.onSurface,
   },
   candidateRow: {

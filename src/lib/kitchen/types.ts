@@ -1,13 +1,16 @@
+import type { ImageRequireSource } from "react-native";
 import type { ToolCatalogId } from "./toolCatalog";
 
 // キッチンエディターで扱うデータの型。
 // 画面上の操作はすべて CookEvent として記録し、そこからレシピの手順文を生成する。
 
-export type ImageSource = "google" | "wikimedia" | "wikipedia" | "removebg" | "emoji";
+// catalog はアプリに入れてある材料の写真（ingredientCatalog）
+export type ImageSource = "catalog" | "google" | "wikimedia" | "wikipedia" | "removebg" | "emoji";
 
 export type IngredientImage = {
-  // emoji の場合は uri の代わりに emoji を使って描画する。
+  // emoji の場合は uri の代わりに emoji を使って描画する。catalog の場合は asset を使う。
   uri?: string;
+  asset?: ImageRequireSource;
   emoji?: string;
   // 背景が透過済み（または透過の可能性が高い）かどうか。false の場合は丸く切り抜いて表示する。
   transparent: boolean;

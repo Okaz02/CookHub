@@ -1,0 +1,30 @@
+[
+  {
+    "id": "mizuna",
+    "name_ja": "水菜",
+    "file": "mizuna.jpg",
+    "title": "Sensuji-mizuna.JPG",
+    "creator": "Uo3rt",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Sensuji-mizuna.JPG",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Sensuji-mizuna.JPG/960px-Sensuji-mizuna.JPG",
+    "width": 960,
+    "height": 720,
+    "notes": "薄グレーの無地背景。千筋水菜の株が竹ざるに載っている（ざるは素朴な無地の器として許容）。"
+  },
+  {
+    "id": "bok-choy",
+    "name_ja": "チンゲン菜",
+    "file": "bok-choy.jpg",
+    "title": "Baby Pak Choi (01).JPG",
+    "creator": "Karl-Heinz Wellmann",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Baby_Pak_Choi_(01).JPG",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Baby_Pak_Choi_%2801%29.JPG/960px-Baby_Pak_Choi_%2801%29.JPG",
+    "width": 960,
+    "height": 703,
+    "notes": "白〜薄グレーの無地背景。白い角皿に生のチンゲン菜3株。"
+  }
+]

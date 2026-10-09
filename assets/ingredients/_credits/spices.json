@@ -1,0 +1,44 @@
+[
+  {
+    "id": "basil",
+    "name_ja": "バジル",
+    "file": "basil.jpg",
+    "title": "basil herbs green mediterranean leaves plant (PxHere 767138)",
+    "creator": "CC0-Photographers (PxHere)",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://pxhere.com/en/photo/767138",
+    "image_url": "https://c.pxhere.com/photos/61/2d/basil_herbs_green_mediterranean_leaves_plant-767138.jpg!d",
+    "width": 1200,
+    "height": 807,
+    "notes": "生のスイートバジルの枝葉2束。背景は無地の白〜ごく薄いグレー。透かし・文字なし。Openverse で rawpixel (CC0) として見つけ、同一写真の PxHere 版（CC0、JPEG）を保存。葉が画面端で切れている。"
+  },
+  {
+    "id": "parsley",
+    "name_ja": "パセリ",
+    "file": "parsley.jpg",
+    "title": "parsley curled petroselinum crispum (PxHere 492889)",
+    "creator": "CC0-Photographers (PxHere)",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://pxhere.com/en/photo/492889",
+    "image_url": "https://c.pxhere.com/photos/22/8f/parsley_curled_petroselinum_crispum_hossein_peterle_padmanabha_peter_green_silk-492889.jpg!d",
+    "width": 1200,
+    "height": 800,
+    "notes": "縮れ葉のパセリ1束（日本の一般的なパセリ）。背景は無地の白。透かし・文字なし。rawpixel (CC0) と同一写真の PxHere 版。"
+  },
+  {
+    "id": "cilantro",
+    "name_ja": "パクチー",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "条件を満たす写真なし。Openverse/Wikimedia で約8クエリ検索。見つかったのは畑・市場・料理・チェック柄クロス上のまな板などで背景が無地でない。次点は Wikimedia『File:Coriander Leaves.jpg』(Rupeshm364, CC BY-SA 4.0) だが、木目のはっきりした焦げ茶のテーブル上・フラッシュ撮影・葉が端で切れているため不採用。"
+  }
+]

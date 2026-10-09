@@ -1,0 +1,16 @@
+[
+  {
+    "id": "soybeans",
+    "name_ja": "大豆",
+    "file": "soybeans.jpg",
+    "title": "Soybeans in Glass Jar",
+    "creator": "UnitedSoybeanBoard",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "source_url": "https://www.flickr.com/photos/95352257@N06/10059732883",
+    "image_url": "https://live.staticflickr.com/3828/10059732883_d8536d1160_b.jpg",
+    "width": 913,
+    "height": 1024,
+    "notes": "白背景のスタジオ写真。ガラス器に入った乾燥大豆と小鉢、スプーン。透過ガラスのため背景除去時は注意。"
+  }
+]
