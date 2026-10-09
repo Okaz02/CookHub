@@ -132,8 +132,43 @@ type SpriteProps = {
   showLabel?: boolean;
 };
 
+// 割った卵（殻のない白身と黄身）。写真が無いので図形で描く
+function CrackedEggArt({ size }: { size: number }) {
+  const white = size * 0.92;
+  const yolk = size * 0.42;
+  return (
+    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
+      <View
+        style={[
+          styles.eggWhite,
+          {
+            width: white,
+            height: white * 0.86,
+            borderTopLeftRadius: white * 0.5,
+            borderTopRightRadius: white * 0.42,
+            borderBottomLeftRadius: white * 0.4,
+            borderBottomRightRadius: white * 0.52,
+          },
+        ]}
+      />
+      <View style={[styles.eggYolk, { width: yolk, height: yolk, borderRadius: yolk / 2 }]}>
+        <View
+          style={[
+            styles.eggYolkShine,
+            { width: yolk * 0.28, height: yolk * 0.18, borderRadius: yolk * 0.1, top: yolk * 0.2, left: yolk * 0.22 },
+          ]}
+        />
+      </View>
+    </View>
+  );
+}
+
 export function IngredientSprite({ ingredient, size, focused, showLabel = true }: SpriteProps) {
-  const art = <IngredientArt image={ingredient.image} name={ingredient.name} size={size} />;
+  const art = ingredient.cracked ? (
+    <CrackedEggArt size={size} />
+  ) : (
+    <IngredientArt image={ingredient.image} name={ingredient.name} size={size} />
+  );
   return (
     // 画像がタッチを奪うと（Web では画像のドラッグが始まってしまう）ドラッグできないので、絵は操作対象から外す。
     <View style={{ width: size, height: size, alignItems: "center", pointerEvents: "none" }}>
@@ -158,6 +193,21 @@ export function IngredientSprite({ ingredient, size, focused, showLabel = true }
 }
 
 const styles = StyleSheet.create({
+  eggWhite: {
+    position: "absolute",
+    backgroundColor: "rgba(255,255,255,0.92)",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.08)",
+  },
+  eggYolk: {
+    backgroundColor: "#ffb300",
+    borderWidth: 1,
+    borderColor: "#f08c00",
+  },
+  eggYolkShine: {
+    position: "absolute",
+    backgroundColor: "rgba(255,255,255,0.7)",
+  },
   sticker: {
     overflow: "hidden",
     borderWidth: 3,

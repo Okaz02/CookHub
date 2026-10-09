@@ -26,11 +26,13 @@ import {
   type IngredientSeed,
   type KitchenSnapshot,
 } from "../../lib/kitchen/reducer";
+import { isEgg } from "../../lib/kitchen/ingredientCatalog";
 import { generateIngredients, generateSteps } from "../../lib/kitchen/recipeGenerator";
 import type { HeatLevel, KitchenIngredient, KitchenTool } from "../../lib/kitchen/types";
 import type { Ingredient, Step } from "../../lib/api-recipe";
 import { CustomToolSheet } from "./CustomToolSheet";
 import { CutSheet } from "./CutSheet";
+import { EggSheet } from "./EggSheet";
 import { Draggable } from "./Draggable";
 import { FocusSheet, type FocusTarget } from "./FocusSheet";
 import { HeatSheet } from "./HeatSheet";
@@ -44,6 +46,7 @@ import { WaterSheet } from "./WaterSheet";
 
 type Sheet =
   | { type: "cut"; ingredientId: string }
+  | { type: "egg"; ingredientId: string; toolId: string }
   // fromFaucet: シンクの蛇口から入れる（入れるときに蛇口から水を出す）
   | { type: "water"; toolId: string; fromFaucet?: boolean }
   | { type: "heat"; toolId: string }
@@ -297,6 +300,11 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
       // 鍋・フライパン・ボウルなどは、落とした材料をそのまま入れる。
       // 火を使う動作はコンロで、それ以外の動作は器具をタップして選ぶ
       if (isContainer(tool)) {
+        // 卵は、割り入れるか殻ごと入れるかを選ぶ
+        if (isEgg(ingredient.name) && !ingredient.cracked) {
+          setSheet({ type: "egg", ingredientId: ingredient.id, toolId: tool.id });
+          return false;
+        }
         dispatch({ type: "addIngredientToTool", toolId: tool.id, ingredientId: ingredient.id });
         return true;
       }
@@ -755,6 +763,22 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
           onSelect={(cut) => {
             setSheet(null);
             dispatch({ type: "cut", ingredientId: sheet.ingredientId, cut });
+          }}
+        />
+      ) : null}
+
+      {sheet?.type === "egg" ? (
+        <EggSheet
+          visible
+          toolName={findTool(sheet.toolId)?.name ?? ""}
+          onClose={() => setSheet(null)}
+          onSelect={(cracked) => {
+            dispatch(
+              cracked
+                ? { type: "crackEgg", toolId: sheet.toolId, ingredientId: sheet.ingredientId }
+                : { type: "addIngredientToTool", toolId: sheet.toolId, ingredientId: sheet.ingredientId }
+            );
+            setSheet(null);
           }}
         />
       ) : null}
