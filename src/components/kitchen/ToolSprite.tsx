@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, type ReactNode } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Animated, {
   Easing,
@@ -11,35 +11,62 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { colors } from "../../theme";
+import { getCatalogEntry, type ToolCatalogId } from "../../lib/kitchen/toolCatalog";
 import type { KitchenIngredient, KitchenTool, ToolAppearance } from "../../lib/kitchen/types";
+import { getImageSize } from "../imageSize";
 import { IngredientSprite } from "./IngredientSprite";
+import { contentSlots, placeToolImage, toolImageMode } from "./toolImages";
 
 type Props = {
   tool: KitchenTool;
+  // 枠の幅。height を省略すると正方形
   size: number;
+  height?: number;
   contents?: KitchenIngredient[];
   focused?: boolean;
 };
 
-export function ToolSprite({ tool, size, contents = [], focused }: Props) {
+export function ToolSprite({ tool, size, height = size, contents = [], focused }: Props) {
+  const box = { width: size, height };
+  // 写真の器具は枠いっぱいに描く。図形で描く器具は正方形なので、枠の中央に置く
+  const square = Math.min(size, height);
+  const centered = (art: ReactNode) => <View style={[styles.center, box]}>{art}</View>;
   switch (tool.kind) {
     case "knife":
-      return <KnifeArt size={size} />;
+      return tool.catalogId ? (
+        <ImageKnifeArt box={box} name={tool.name} catalogId={tool.catalogId} />
+      ) : (
+        centered(<KnifeArt size={square} />)
+      );
     case "water":
-      return <WaterArt size={size} />;
+      return tool.catalogId ? <GlassArt box={box} catalogId={tool.catalogId} /> : centered(<WaterArt size={square} />);
+    case "lid":
+      return <LidArt box={box} name={tool.name} focused={focused} covering={tool.location.area === "onTool"} />;
     case "pot":
-      return (
-        <VesselArt size={size} tool={tool} contents={contents} focused={focused} appearance={POT_APPEARANCE} withHandles />
+      if (tool.catalogId) {
+        return (
+          <ImageVesselArt box={box} tool={tool} catalogId={tool.catalogId} contents={contents} focused={focused} />
+        );
+      }
+      return centered(
+        <VesselArt size={square} tool={tool} contents={contents} focused={focused} appearance={POT_APPEARANCE} withHandles />
       );
     case "custom": {
       const appearance = tool.definition?.appearance ?? POT_APPEARANCE;
-      if (tool.definition?.container) {
-        return <VesselArt size={size} tool={tool} contents={contents} focused={focused} appearance={appearance} />;
+      if (tool.catalogId) {
+        return (
+          <ImageVesselArt box={box} tool={tool} catalogId={tool.catalogId} contents={contents} focused={focused} />
+        );
       }
-      return <GadgetArt size={size} name={tool.name} appearance={appearance} focused={focused} />;
+      if (tool.definition?.container) {
+        return centered(<VesselArt size={square} tool={tool} contents={contents} focused={focused} appearance={appearance} />);
+      }
+      return centered(<GadgetArt size={square} name={tool.name} appearance={appearance} focused={focused} />);
     }
   }
 }
+
+type Box = { width: number; height: number };
 
 const POT_APPEARANCE: ToolAppearance = { shape: "circle", color: "#5b5f66", icon: "soup-kitchen" };
 
@@ -54,6 +81,134 @@ export function KnifeArt({ size }: { size: number }) {
         <View style={[styles.knifeHandle, { width: size * 0.17, height: length * 0.34 }]} />
       </View>
       <Text style={styles.toolLabel}>包丁</Text>
+    </View>
+  );
+}
+
+// 写真の包丁。縦に置く
+function ImageKnifeArt({ box, name, catalogId }: { box: Box; name: string; catalogId: ToolCatalogId }) {
+  const { image: rect } = placeToolImage(catalogId, box.width, box.height, "contain");
+  return (
+    <View style={[styles.center, box]}>
+      <Image source={getCatalogEntry(catalogId).image} style={{ width: rect.w, height: rect.h }} />
+      <Text style={styles.toolLabel} numberOfLines={1}>
+        {name}
+      </Text>
+    </View>
+  );
+}
+
+function GlassArt({ box, catalogId }: { box: Box; catalogId: ToolCatalogId }) {
+  const { image: rect } = placeToolImage(catalogId, box.width * 0.85, box.height * 0.85, "contain");
+  return (
+    <View style={[styles.center, box]}>
+      <Image source={getCatalogEntry(catalogId).image} style={{ width: rect.w, height: rect.h }} />
+      <MaterialIcons name="water-drop" size={rect.w * 0.3} color="#3d8bd9" style={styles.glassDrop} />
+      <Text style={styles.toolLabel}>水</Text>
+    </View>
+  );
+}
+
+// 蓋。かぶせているときは器具の器の上に、器と同じ大きさで描かれる
+function LidArt({ box, name, focused, covering }: { box: Box; name: string; focused?: boolean; covering: boolean }) {
+  const { image } = placeToolImage("lid", box.width, box.height, "contain");
+  // かぶせているときは器の大きさの枠（正方形）いっぱいに描く
+  const width = covering ? box.width : image.w;
+  const height = covering ? box.height : image.h;
+  return (
+    <View style={[styles.center, box]}>
+      <Image source={getCatalogEntry("lid").image} style={{ width, height, borderRadius: width / 2 }} />
+      {/* 枠線で画像が縮まないよう、上に重ねて描く */}
+      {focused ? (
+        <View style={[styles.focusedRing, { position: "absolute", width, height, borderRadius: width / 2 }]} />
+      ) : null}
+      {covering ? null : (
+        <Text style={styles.toolLabel} numberOfLines={1}>
+          {name}
+        </Text>
+      )}
+    </View>
+  );
+}
+
+// 写真の鍋・フライパン・ボウルなど。材料や水は画像の器の部分に重ねて描く
+function ImageVesselArt({
+  box,
+  tool,
+  catalogId,
+  contents,
+  focused,
+}: {
+  box: Box;
+  tool: KitchenTool;
+  catalogId: ToolCatalogId;
+  contents: KitchenIngredient[];
+  focused?: boolean;
+}) {
+  const entry = getCatalogEntry(catalogId);
+  const { image: imageRect, body } = placeToolImage(catalogId, box.width, box.height, toolImageMode(tool));
+  // 縁の分だけ内側を器の中とする
+  const inset = Math.min(body.w, body.h) * 0.1;
+  const inner = { width: body.w - inset * 2, height: body.h - inset * 2 };
+  const innerSize = Math.min(inner.width, inner.height);
+  const radius = entry.round ? innerSize / 2 : innerSize * 0.08;
+  const waterRatio = Math.min(1, tool.waterMl / 1500);
+  // 中の材料は、キッチンで1つずつ動かせるように描くときと同じ位置・大きさにする
+  const slots = contentSlots(body, contents.length);
+  return (
+    <View style={[styles.center, box]}>
+      <Image
+        source={entry.image}
+        style={{ position: "absolute", left: imageRect.x, top: imageRect.y, width: imageRect.w, height: imageRect.h }}
+      />
+      <View
+        style={[
+          styles.center,
+          {
+            position: "absolute",
+            left: body.x + inset,
+            top: body.y + inset,
+            ...inner,
+            borderRadius: radius,
+            overflow: "hidden",
+          },
+        ]}
+      >
+        {tool.waterMl > 0 ? (
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: tool.boiling ? "#7fc4ff" : "#9fd3ff", opacity: 0.35 + waterRatio * 0.4 },
+            ]}
+          />
+        ) : null}
+        {tool.boiling ? <BoilingBubbles size={innerSize} /> : null}
+        {tool.heat && !tool.waterMl ? <Sizzle size={innerSize} /> : null}
+      </View>
+      {contents.map((item, index) => (
+        <View key={item.id} style={{ position: "absolute", left: slots[index].x, top: slots[index].y }}>
+          <IngredientSprite ingredient={item} size={slots[index].w} showLabel={false} />
+        </View>
+      ))}
+      {focused ? (
+        <View
+          style={[
+            styles.focusedRing,
+            {
+              position: "absolute",
+              left: body.x,
+              top: body.y,
+              width: body.w,
+              height: body.h,
+              borderRadius: entry.round ? body.w / 2 : body.w * 0.08,
+            },
+          ]}
+        />
+      ) : null}
+      <Text style={styles.toolLabel} numberOfLines={1}>
+        {tool.name}
+        {tool.waterMl > 0 ? ` 💧${tool.waterMl}ml` : ""}
+      </Text>
     </View>
   );
 }
@@ -270,36 +425,6 @@ function Sizzle({ size }: { size: number }) {
   );
 }
 
-// 材料の上で包丁を上下させながら左右に動かす。
-export function CuttingKnife({ size, onDone }: { size: number; onDone: () => void }) {
-  const chop = useSharedValue(0);
-  const sweep = useSharedValue(0);
-  // 親の再描画でタイマーが作り直されないよう、最新のコールバックだけ ref に持つ
-  const onDoneRef = useRef(onDone);
-  useEffect(() => {
-    onDoneRef.current = onDone;
-  });
-  useEffect(() => {
-    chop.set(withRepeat(withSequence(withTiming(1, { duration: 110 }), withTiming(0, { duration: 110 })), 7));
-    sweep.set(withTiming(1, { duration: 1540, easing: Easing.linear }));
-    const timer = setTimeout(() => onDoneRef.current(), 1600);
-    return () => clearTimeout(timer);
-  }, [chop, sweep]);
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: -size * 0.45 + sweep.get() * size * 0.9 },
-      { translateY: -size * 0.35 + chop.get() * size * 0.25 },
-      { rotate: "-12deg" },
-    ],
-  }));
-  return (
-    <Animated.View style={[styles.cuttingKnife, { pointerEvents: "none", left: size / 2 - 6, top: -size * 0.1 }, animatedStyle]}>
-      <View style={[styles.knifeBlade, { width: 12, height: size * 0.75 }]} />
-      <View style={[styles.knifeHandle, { width: 10, height: size * 0.4 }]} />
-    </Animated.View>
-  );
-}
-
 const styles = StyleSheet.create({
   center: {
     alignItems: "center",
@@ -332,6 +457,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#3E2723",
     borderBottomLeftRadius: 6,
     borderBottomRightRadius: 6,
+  },
+  glassDrop: {
+    position: "absolute",
   },
   waterCup: {
     alignItems: "center",
@@ -369,10 +497,5 @@ const styles = StyleSheet.create({
   focusedRing: {
     borderWidth: 3,
     borderColor: "#ffb300",
-  },
-  cuttingKnife: {
-    position: "absolute",
-    alignItems: "center",
-    zIndex: 5,
   },
 });

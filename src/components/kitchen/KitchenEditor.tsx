@@ -1,22 +1,33 @@
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { colors } from "../../theme";
-import { BURNER_COUNT, getHeatLevel } from "../../lib/kitchen/constants";
+import { getHeatLevel, MAX_BURNER_COUNT } from "../../lib/kitchen/constants";
 import { getSavedCustomTools, saveCustomTool } from "../../lib/kitchen/kitchenDraft";
-import { computeLayout, pointInRect, type Point, type Rect } from "../../lib/kitchen/layout";
 import {
+  computeLayout,
+  pointInRect,
+  type KitchenLayout,
+  type Point,
+  type Rect,
+  type ScrollArea,
+} from "../../lib/kitchen/layout";
+import {
+  acceptsLid,
   createInitialState,
   ingredientsInTool,
   isContainer,
   isHeatable,
   kitchenReducer,
+  lidOn,
+  toolInSink,
   toolOnBurner,
   type IngredientSeed,
   type KitchenSnapshot,
 } from "../../lib/kitchen/reducer";
 import { generateIngredients, generateSteps } from "../../lib/kitchen/recipeGenerator";
-import type { CutResult, HeatLevel, KitchenIngredient, KitchenTool } from "../../lib/kitchen/types";
+import type { HeatLevel, KitchenIngredient, KitchenTool } from "../../lib/kitchen/types";
 import type { Ingredient, Step } from "../../lib/api-recipe";
 import { CustomToolSheet } from "./CustomToolSheet";
 import { CutSheet } from "./CutSheet";
@@ -24,21 +35,48 @@ import { Draggable } from "./Draggable";
 import { FocusSheet, type FocusTarget } from "./FocusSheet";
 import { HeatSheet } from "./HeatSheet";
 import { IngredientSprite } from "./IngredientSprite";
-import { KitchenBackground } from "./KitchenBackground";
+import { DRAIN_DURATION_MS, KitchenBackground } from "./KitchenBackground";
 import { RecipePreview } from "./RecipePreview";
 import { ToolActionSheet } from "./ToolActionSheet";
-import { CuttingKnife, ToolSprite } from "./ToolSprite";
+import { contentSlots, toolBodyRect } from "./toolImages";
+import { ToolSprite } from "./ToolSprite";
 import { WaterSheet } from "./WaterSheet";
 
 type Sheet =
   | { type: "cut"; ingredientId: string }
-  | { type: "water"; toolId: string }
+  // fromFaucet: シンクの蛇口から入れる（入れるときに蛇口から水を出す）
+  | { type: "water"; toolId: string; fromFaucet?: boolean }
   | { type: "heat"; toolId: string }
   | { type: "toolAction"; toolId: string; ingredientId: string | null }
   | { type: "customTool" }
   | { type: "focus"; target: FocusTarget };
 
-type Dragging = { kind: "ingredient" | "tool"; id: string } | null;
+// スクロールする枠の中のものは、枠の外に出ると見えなくなるので、持ち上げた絵をキャンバスの一番上に描く。
+// lifted はその開始位置（キャンバスに直接置いてあるものは null）
+type Dragging = { kind: "ingredient" | "tool"; id: string; lifted: Rect | null } | null;
+
+type AreaId = "shelf" | "rack" | "counter" | "board";
+
+// 棚と器具置き場は1行で横に、調理台とまな板は縦にスクロールする
+function isHorizontal(area: AreaId) {
+  return area === "shelf" || area === "rack";
+}
+
+// area が null ならキャンバスに直接置く（rect はキャンバス座標）。そうでなければスクロールする枠の中身での位置
+type Place = { area: AreaId | null; rect: Rect };
+
+function scrollAreaOf(layout: KitchenLayout, area: AreaId): ScrollArea {
+  switch (area) {
+    case "shelf":
+      return layout.shelfView;
+    case "board":
+      return layout.boardView;
+    case "rack":
+      return layout.rackView;
+    case "counter":
+      return layout.counterView;
+  }
+}
 
 type Props = {
   seeds: IngredientSeed[];
@@ -98,12 +136,25 @@ function FastForwardBadge({ rect, level, minutes, onDone }: { rect: Rect; level:
 export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
   const [state, dispatch] = useReducer(kitchenReducer, seeds, (initial) => createInitialState(initial));
   const snapshot = state.present;
-  const [width, setWidth] = useState(0);
+  const [size, setSize] = useState({ width: 0, height: 0 });
   const [dragging, setDragging] = useState<Dragging>(null);
   const [sheet, setSheet] = useState<Sheet | null>(null);
-  const [cutting, setCutting] = useState<{ ingredientId: string; cut: CutResult } | null>(null);
   const [fastForward, setFastForward] = useState<{ toolId: string; level: HeatLevel; minutes: number } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // シンクの蛇口と、洗う・水を捨てるときに少しの間だけ出す演出
+  const [faucetOn, setFaucetOn] = useState(false);
+  // id は続けて同じ演出を出したときにアニメーションを最初からやり直すため
+  const [sinkEffect, setSinkEffect] = useState<{ type: "faucet" | "drain"; id: number } | null>(null);
+  const sinkEffectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (sinkEffectTimer.current) clearTimeout(sinkEffectTimer.current);
+  }, []);
+
+  function playSinkEffect(effect: "faucet" | "drain") {
+    setSinkEffect((previous) => ({ type: effect, id: (previous?.id ?? 0) + 1 }));
+    if (sinkEffectTimer.current) clearTimeout(sinkEffectTimer.current);
+    sinkEffectTimer.current = setTimeout(() => setSinkEffect(null), DRAIN_DURATION_MS);
+  }
 
   useEffect(() => {
     if (!toast) return;
@@ -114,31 +165,103 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
   const steps = generateSteps(snapshot);
 
   const boardIngredients = snapshot.ingredients.filter((item) => item.location.area === "board");
-  const layout = width
-    ? computeLayout(width, {
+  // 器具置き場と調理台は詰めて並べる（ほかへ移した器具の場所は空けない）
+  const rackTools = snapshot.tools.filter((tool) => tool.location.area === "rack");
+  const counterTools = snapshot.tools.filter((tool) => tool.location.area === "counter");
+  const layout = size.width
+    ? computeLayout(size.width, size.height, {
         shelf: snapshot.ingredients.length,
         board: boardIngredients.length,
-        rack: snapshot.tools.length,
+        rack: rackTools.length,
+        counter: counterTools.length,
+        burners: snapshot.burnerCount,
       })
     : null;
 
-  function ingredientRect(ingredient: KitchenIngredient): Rect | null {
+  // いまのスクロール量（ドロップ位置の計算に使うだけなので ref で持つ）
+  const scrollOffsets = useRef<Record<AreaId, number>>({ shelf: 0, rack: 0, counter: 0, board: 0 });
+
+  // スクロールする枠の中身の左上が、いまキャンバス上のどこにあるか
+  function scrollOrigin(area: AreaId): Point {
+    if (!layout) return { x: 0, y: 0 };
+    const { view } = scrollAreaOf(layout, area);
+    const offset = scrollOffsets.current[area];
+    return isHorizontal(area) ? { x: view.x - offset, y: view.y } : { x: view.x, y: view.y - offset };
+  }
+
+  function placeToCanvas(place: Place): Rect {
+    if (!place.area) return place.rect;
+    const origin = scrollOrigin(place.area);
+    return { ...place.rect, x: origin.x + place.rect.x, y: origin.y + place.rect.y };
+  }
+
+  // キャンバス上の位置。スクロールして枠の外に隠れているものは null（当たり判定に使う）
+  function visibleRect(place: Place | null): Rect | null {
+    if (!place || !layout) return null;
+    const rect = placeToCanvas(place);
+    if (!place.area) return rect;
+    const { view } = scrollAreaOf(layout, place.area);
+    const visible =
+      rect.x + rect.w > view.x && rect.x < view.x + view.w && rect.y + rect.h > view.y && rect.y < view.y + view.h;
+    return visible ? rect : null;
+  }
+
+  function ingredientPlace(ingredient: KitchenIngredient): Place | null {
     if (!layout) return null;
     switch (ingredient.location.area) {
       case "shelf":
         // 棚の位置は固定（取り出した場所は空いたままにする）
-        return layout.shelfSlot(snapshot.ingredients.indexOf(ingredient));
+        return { area: "shelf", rect: layout.shelfView.slot(snapshot.ingredients.indexOf(ingredient)) };
       case "board":
-        return layout.boardSlot(boardIngredients.indexOf(ingredient));
-      case "tool":
-        return null;
+        return { area: "board", rect: layout.boardView.slot(boardIngredients.indexOf(ingredient)) };
+      case "tool": {
+        // 器具の中の材料は、器具と同じ枠の中で器の部分に並べる
+        const hostId = ingredient.location.toolId;
+        const host = snapshot.tools.find((tool) => tool.id === hostId);
+        const hostPlace = host ? toolPlace(host) : null;
+        if (!host || !hostPlace) return null;
+        const contents = ingredientsInTool(snapshot, host.id);
+        const slots = contentSlots(toolBodyRect(host, hostPlace.rect), contents.length);
+        return { area: hostPlace.area, rect: slots[contents.indexOf(ingredient)] };
+      }
     }
   }
 
-  function toolRect(tool: KitchenTool): Rect | null {
+  function toolPlace(tool: KitchenTool): Place | null {
     if (!layout) return null;
-    if (tool.location.area === "burner") return layout.burnerToolRect(tool.location.index);
-    return layout.rackSlot(snapshot.tools.indexOf(tool));
+    switch (tool.location.area) {
+      case "burner":
+        return { area: null, rect: layout.burnerToolRect(tool.location.index) };
+      case "sink":
+        return { area: null, rect: layout.sinkToolRect };
+      case "rack":
+        return { area: "rack", rect: layout.rackView.slot(rackTools.indexOf(tool)) };
+      case "counter":
+        return { area: "counter", rect: layout.counterView.slot(counterTools.indexOf(tool)) };
+      case "onTool": {
+        // 蓋はかぶせた器具の器の部分に、少しだけ大きく重ねる（器具と同じ枠の中に置く）
+        const hostId = tool.location.toolId;
+        const host = snapshot.tools.find((item) => item.id === hostId);
+        const hostPlace = host ? toolPlace(host) : null;
+        if (!host || !hostPlace) return null;
+        const body = toolBodyRect(host, hostPlace.rect);
+        const size = Math.max(body.w, body.h) * 1.04;
+        return {
+          area: hostPlace.area,
+          rect: { x: body.x + body.w / 2 - size / 2, y: body.y + body.h / 2 - size / 2, w: size, h: size },
+        };
+      }
+    }
+  }
+
+  const ingredientRect = (ingredient: KitchenIngredient) => visibleRect(ingredientPlace(ingredient));
+  const toolRect = (tool: KitchenTool) => visibleRect(toolPlace(tool));
+
+  // かぶせてある蓋の上に落としたときは、下の器具に落としたことにする
+  function underLid(tool: KitchenTool) {
+    if (tool.location.area !== "onTool") return tool;
+    const hostId = tool.location.toolId;
+    return snapshot.tools.find((item) => item.id === hostId) ?? tool;
   }
 
   function hitIngredient(point: Point, excludeId?: string) {
@@ -164,12 +287,20 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
 
   function dropIngredient(ingredient: KitchenIngredient, point: Point): boolean {
     if (!layout) return false;
-    const tool = hitTool(point);
+    const hit = hitTool(point);
+    const tool = hit ? underLid(hit) : undefined;
+    if (tool && lidOn(snapshot, tool.id)) {
+      setToast("蓋を外してから入れましょう。");
+      return false;
+    }
     if (tool) {
-      if (tool.kind === "pot") {
+      // 鍋・フライパン・ボウルなどは、落とした材料をそのまま入れる。
+      // 火を使う動作はコンロで、それ以外の動作は器具をタップして選ぶ
+      if (isContainer(tool)) {
         dispatch({ type: "addIngredientToTool", toolId: tool.id, ingredientId: ingredient.id });
         return true;
       }
+      // ピーラーなど中に入れられない器具は、その材料に対して動作を選ぶ
       if (tool.kind === "custom") {
         setSheet({ type: "toolAction", toolId: tool.id, ingredientId: ingredient.id });
         return false;
@@ -177,9 +308,20 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
       if (tool.kind === "knife") setToast("包丁を材料の上へドラッグすると切れます。");
       return false;
     }
+    const inTool = ingredient.location.area === "tool";
+    if (pointInRect(point, layout.sink) && !inTool) {
+      dispatch({ type: "wash", ingredientId: ingredient.id });
+      playSinkEffect("faucet");
+      // 洗ったら元の場所に戻す
+      return false;
+    }
     if (pointInRect(point, layout.board) && ingredient.location.area !== "board") {
       dispatch({ type: "moveIngredient", ingredientId: ingredient.id, to: "board" });
       return true;
+    }
+    if (pointInRect(point, layout.shelf) && inTool) {
+      setToast("器具から出した材料は、まな板に置きましょう。");
+      return false;
     }
     if (pointInRect(point, layout.shelf) && ingredient.location.area !== "shelf") {
       dispatch({ type: "moveIngredient", ingredientId: ingredient.id, to: "shelf" });
@@ -192,26 +334,63 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
   function dropTool(tool: KitchenTool, point: Point): boolean {
     if (!layout) return false;
 
+    // 包丁を材料の上に落とすと切る（材料が無ければ下の「置く」へ）
     if (tool.kind === "knife") {
       const target = hitIngredient(point);
-      if (!target) return false;
-      if (target.location.area !== "board") {
-        setToast("まな板の上に置いてから切りましょう。");
+      if (target) {
+        if (target.location.area !== "board") {
+          setToast("まな板の上に置いてから切りましょう。");
+          return false;
+        }
+        setSheet({ type: "cut", ingredientId: target.id });
         return false;
       }
-      setSheet({ type: "cut", ingredientId: target.id });
+    }
+
+    if (tool.kind === "lid") {
+      const burner = hitBurner(point);
+      const hit = hitTool(point, tool.id) ?? (burner >= 0 ? toolOnBurner(snapshot, burner) : undefined);
+      const target = hit ? underLid(hit) : undefined;
+      if (target && acceptsLid(target)) {
+        if (tool.location.area === "onTool" && tool.location.toolId === target.id) return false;
+        if (lidOn(snapshot, target.id)) return false;
+        dispatch({ type: "putLid", lidId: tool.id, toolId: target.id });
+        return true;
+      }
+      if (target) {
+        setToast("この蓋はフライパン用です。");
+        return false;
+      }
+    }
+
+    if (isContainer(tool) && pointInRect(point, layout.sink)) {
+      if (tool.location.area === "sink") return false;
+      const occupant = toolInSink(snapshot);
+      if (tool.heat) {
+        setToast("火を止めてからシンクへ運びましょう。");
+      } else if (occupant) {
+        setToast(`シンクには${occupant.name}が置いてあります。`);
+      } else {
+        dispatch({ type: "placeInSink", toolId: tool.id });
+        return true;
+      }
       return false;
     }
 
     if (tool.kind === "water") {
       const burner = hitBurner(point);
-      const target = hitTool(point, tool.id) ?? (burner >= 0 ? toolOnBurner(snapshot, burner) : undefined);
-      if (target && isContainer(target)) {
-        setSheet({ type: "water", toolId: target.id });
-      } else if (target || burner >= 0) {
-        setToast("水は鍋など、中に入れられる器具へドラッグしましょう。");
+      const hit = hitTool(point, tool.id) ?? (burner >= 0 ? toolOnBurner(snapshot, burner) : undefined);
+      const target = hit ? underLid(hit) : undefined;
+      if (target || burner >= 0) {
+        if (target && lidOn(snapshot, target.id)) {
+          setToast("蓋を外してから水を入れましょう。");
+        } else if (target && isContainer(target)) {
+          setSheet({ type: "water", toolId: target.id });
+        } else {
+          setToast("水は鍋など、中に入れられる器具へドラッグしましょう。");
+        }
+        return false;
       }
-      return false;
     }
 
     if (isHeatable(tool)) {
@@ -236,8 +415,15 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
       }
     }
 
-    if (tool.location.area === "burner" && pointInRect(point, layout.rack)) {
-      dispatch({ type: "returnToRack", toolId: tool.id });
+    // 器具置き場か調理台に置く
+    const to = pointInRect(point, layout.rack) ? "rack" : pointInRect(point, layout.counter) ? "counter" : null;
+    if (to && tool.location.area !== to) {
+      dispatch({ type: "putDownTool", toolId: tool.id, to });
+      return true;
+    }
+    // かぶせてあった蓋は、ほかの場所に落とすと外れて器具置き場に戻る
+    if (tool.location.area === "onTool") {
+      dispatch({ type: "putDownTool", toolId: tool.id, to: "rack" });
       return true;
     }
     return false;
@@ -266,7 +452,161 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
   const draggedTool = dragging?.kind === "tool" ? findTool(dragging.id) : null;
   const draggedIngredient = dragging?.kind === "ingredient" ? findIngredient(dragging.id) : null;
 
-  const burnerHeat = Array.from({ length: BURNER_COUNT }, (_, index) => toolOnBurner(snapshot, index)?.heat ?? null);
+  const sinkTool = toolInSink(snapshot);
+  const burnerHeat = Array.from({ length: snapshot.burnerCount }, (_, index) => toolOnBurner(snapshot, index)?.heat ?? null);
+
+  // 持ち上げ中の材料の動いた量（Draggable が書き込む）
+  const liftX = useSharedValue(0);
+  const liftY = useSharedValue(0);
+  const liftStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: liftX.get() }, { translateY: liftY.get() }, { scale: 1.12 }],
+  }));
+
+  // スクロールする枠の中のものは、スクロールと違う向きに動かすか、長押ししてからドラッグする。
+  // 枠の外に出ると見えなくなるので、ドラッグ中はキャンバスの一番上に持ち上げた絵を出す
+  function renderDraggable(
+    item: { kind: "ingredient" | "tool"; id: string },
+    place: Place,
+    handlers: { onDrop: (point: Point) => boolean; onTap: () => void },
+    sprite: ReactNode
+  ) {
+    const { area } = place;
+    return (
+      <Draggable
+        key={item.id}
+        rect={place.rect}
+        origin={area ? () => scrollOrigin(area) : undefined}
+        scrollAxis={area ? (isHorizontal(area) ? "x" : "y") : undefined}
+        lift={area ? { x: liftX, y: liftY } : undefined}
+        onDrop={(point) => {
+          // 置き場所が変わって別の枠へ移ると、この Draggable は消えてドラッグ終了が呼ばれないのでここで終える
+          setDragging(null);
+          return handlers.onDrop(point);
+        }}
+        onTap={handlers.onTap}
+        onDragStart={() => setDragging({ ...item, lifted: area ? placeToCanvas(place) : null })}
+        onDragEnd={() => setDragging(null)}
+      >
+        {sprite}
+      </Draggable>
+    );
+  }
+
+  function ingredientSprite(ingredient: KitchenIngredient, size: number, focusable = true) {
+    return (
+      <IngredientSprite
+        ingredient={ingredient}
+        size={size}
+        // 器具の中では小さいので名前は出さない
+        showLabel={ingredient.location.area !== "tool"}
+        focused={focusable && focusTarget?.kind === "ingredient" && focusTarget.id === ingredient.id}
+      />
+    );
+  }
+
+  // 中の材料はふだんは別にドラッグできるように描くので、器具の絵には含めない。
+  // 器具ごと動かしている間だけ、器具の絵の中に描いて一緒に動かす
+  function toolSprite(tool: KitchenTool, rect: Rect, focusable = true, withContents = false) {
+    return (
+      <View style={{ pointerEvents: "none" }}>
+        <ToolSprite
+          tool={tool}
+          size={rect.w}
+          height={rect.h}
+          contents={withContents ? ingredientsInTool(snapshot, tool.id) : []}
+          focused={focusable && focusTarget?.kind === "tool" && focusTarget.id === tool.id}
+        />
+      </View>
+    );
+  }
+
+  function renderIngredient(ingredient: KitchenIngredient) {
+    const place = ingredientPlace(ingredient);
+    if (!place) return null;
+    return renderDraggable(
+      { kind: "ingredient", id: ingredient.id },
+      place,
+      {
+        onDrop: (point) => dropIngredient(ingredient, point),
+        onTap: () => setSheet({ type: "focus", target: { kind: "ingredient", id: ingredient.id } }),
+      },
+      ingredientSprite(ingredient, place.rect.w)
+    );
+  }
+
+  function renderTool(tool: KitchenTool) {
+    const place = toolPlace(tool);
+    if (!place) return null;
+    const covering = tool.location.area === "onTool";
+    return renderDraggable(
+      { kind: "tool", id: tool.id },
+      place,
+      {
+        onDrop: (point) => dropTool(tool, point),
+        // かぶせてある蓋はタップで外す
+        onTap: () =>
+          covering
+            ? dispatch({ type: "putDownTool", toolId: tool.id, to: "rack" })
+            : setSheet({ type: "focus", target: { kind: "tool", id: tool.id } }),
+      },
+      toolSprite(tool, place.rect, true, isDraggingTool(tool.id))
+    );
+  }
+
+  function renderScrollArea(area: AreaId, children: ReactNode) {
+    if (!layout) return null;
+    const { view, contentWidth, contentHeight } = scrollAreaOf(layout, area);
+    const horizontal = isHorizontal(area);
+    return (
+      <ScrollView
+        horizontal={horizontal}
+        style={{ position: "absolute", left: view.x, top: view.y, width: view.w, height: view.h }}
+        scrollEnabled={!dragging}
+        nestedScrollEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={(event) => {
+          const offset = event.nativeEvent.contentOffset;
+          scrollOffsets.current[area] = horizontal ? offset.x : offset.y;
+        }}
+      >
+        <View
+          style={{
+            width: horizontal ? Math.max(contentWidth, view.w) : view.w,
+            height: horizontal ? view.h : Math.max(contentHeight, view.h),
+          }}
+        >
+          {children}
+        </View>
+      </ScrollView>
+    );
+  }
+
+  function isDraggingTool(toolId: string) {
+    return dragging?.kind === "tool" && dragging.id === toolId;
+  }
+
+  // 器具の中の材料（器具ごと動かしている間は器具の絵の中に描くので除く）
+  function contentsIn(area: AreaId | null) {
+    return snapshot.ingredients.filter(
+      (item) =>
+        item.location.area === "tool" &&
+        !isDraggingTool(item.location.toolId) &&
+        ingredientPlace(item)?.area === area
+    );
+  }
+
+  // 置き場所ごとに分ける。器具 → 中の材料 → かぶせてある蓋の順に、手前へ重ねて描く
+  const toolsOnCanvas = snapshot.tools.filter((tool) => toolPlace(tool)?.area === null);
+  // 器具置き場・調理台の中身：器具 → 中の材料 → かぶせてある蓋の順に重ねる
+  function toolsArea(area: "rack" | "counter", tools: KitchenTool[]) {
+    const lids = snapshot.tools.filter((tool) => tool.location.area === "onTool" && toolPlace(tool)?.area === area);
+    return renderScrollArea(area, [
+      ...tools.map(renderTool),
+      ...contentsIn(area).map(renderIngredient),
+      ...lids.map(renderTool),
+    ]);
+  }
 
   return (
     <View style={styles.screen}>
@@ -301,7 +641,10 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
       <ScrollView
         style={{ flex: 1 }}
         scrollEnabled={!dragging}
-        onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+        onLayout={(event) => {
+          const { width, height } = event.nativeEvent.layout;
+          setSize({ width, height });
+        }}
       >
         {layout ? (
           <View style={{ width: layout.width, height: layout.height }}>
@@ -309,71 +652,74 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
               layout={layout}
               burnerHeat={burnerHeat}
               onPressKnob={pressKnob}
+              onAddBurner={
+                snapshot.burnerCount < MAX_BURNER_COUNT ? () => dispatch({ type: "addBurner" }) : null
+              }
+              faucetOn={faucetOn}
+              faucetBurst={sinkEffect?.type === "faucet"}
+              drainingId={sinkEffect?.type === "drain" ? sinkEffect.id : null}
+              onToggleFaucet={() => setFaucetOn((on) => !on)}
+              sinkTool={
+                sinkTool
+                  ? {
+                      hasWater: sinkTool.waterMl > 0,
+                      withIngredients: ingredientsInTool(snapshot, sinkTool.id).length > 0,
+                    }
+                  : null
+              }
+              onFillSinkTool={() => {
+                if (!sinkTool) return;
+                if (lidOn(snapshot, sinkTool.id)) {
+                  setToast("蓋を外してから水を入れましょう。");
+                  return;
+                }
+                setSheet({ type: "water", toolId: sinkTool.id, fromFaucet: true });
+              }}
+              onDrainSinkTool={() => {
+                if (!sinkTool) return;
+                dispatch({ type: "drain", toolId: sinkTool.id });
+                playSinkEffect("drain");
+              }}
               highlight={{
-                board: draggedIngredient?.location.area === "shelf",
+                board: Boolean(draggedIngredient && draggedIngredient.location.area !== "board"),
                 shelf: draggedIngredient?.location.area === "board",
+                sink:
+                  Boolean(draggedIngredient && draggedIngredient.location.area !== "tool") ||
+                  Boolean(draggedTool && isContainer(draggedTool) && !sinkTool && !draggedTool.heat),
                 burners: draggedTool && isHeatable(draggedTool)
-                  ? Array.from({ length: BURNER_COUNT }, (_, index) => !toolOnBurner(snapshot, index))
+                  ? Array.from({ length: snapshot.burnerCount }, (_, index) => !toolOnBurner(snapshot, index))
                   : undefined,
               }}
             />
 
-            {snapshot.tools.map((tool) => {
-              const rect = toolRect(tool);
-              if (!rect) return null;
-              const isCuttingKnife = tool.kind === "knife" && cutting;
-              return (
-                <Draggable
-                  key={tool.id}
-                  rect={rect}
-                  enabled={!cutting}
-                  onDrop={(point) => dropTool(tool, point)}
-                  onTap={() => setSheet({ type: "focus", target: { kind: "tool", id: tool.id } })}
-                  onDragStart={() => setDragging({ kind: "tool", id: tool.id })}
-                  onDragEnd={() => setDragging(null)}
-                >
-                  <View style={{ opacity: isCuttingKnife ? 0.25 : 1, pointerEvents: "none" }}>
-                    <ToolSprite
-                      tool={tool}
-                      size={rect.w}
-                      contents={ingredientsInTool(snapshot, tool.id)}
-                      focused={focusTarget?.kind === "tool" && focusTarget.id === tool.id}
-                    />
-                  </View>
-                </Draggable>
-              );
-            })}
+            {toolsOnCanvas.filter((tool) => tool.location.area !== "onTool").map(renderTool)}
 
-            {snapshot.ingredients.map((ingredient) => {
-              const rect = ingredientRect(ingredient);
-              if (!rect) return null;
-              return (
-                <Draggable
-                  key={ingredient.id}
-                  rect={rect}
-                  enabled={cutting?.ingredientId !== ingredient.id}
-                  onDrop={(point) => dropIngredient(ingredient, point)}
-                  onTap={() => setSheet({ type: "focus", target: { kind: "ingredient", id: ingredient.id } })}
-                  onDragStart={() => setDragging({ kind: "ingredient", id: ingredient.id })}
-                  onDragEnd={() => setDragging(null)}
-                >
-                  <IngredientSprite
-                    ingredient={ingredient}
-                    size={rect.w}
-                    focused={focusTarget?.kind === "ingredient" && focusTarget.id === ingredient.id}
-                  />
-                  {cutting?.ingredientId === ingredient.id ? (
-                    <CuttingKnife
-                      size={rect.w}
-                      onDone={() => {
-                        dispatch({ type: "cut", ingredientId: cutting.ingredientId, cut: cutting.cut });
-                        setCutting(null);
-                      }}
-                    />
-                  ) : null}
-                </Draggable>
-              );
-            })}
+            {renderScrollArea("shelf", snapshot.ingredients.filter((item) => item.location.area === "shelf").map(renderIngredient))}
+            {renderScrollArea("board", boardIngredients.map(renderIngredient))}
+            {toolsArea("rack", rackTools)}
+            {toolsArea("counter", counterTools)}
+            {contentsIn(null).map(renderIngredient)}
+
+            {/* かぶせてある蓋は材料より手前に描く */}
+            {toolsOnCanvas.filter((tool) => tool.location.area === "onTool").map(renderTool)}
+
+            {dragging?.lifted ? (
+              <Animated.View
+                style={[
+                  styles.lifted,
+                  {
+                    left: dragging.lifted.x,
+                    top: dragging.lifted.y,
+                    width: dragging.lifted.w,
+                    height: dragging.lifted.h,
+                  },
+                  liftStyle,
+                ]}
+              >
+                {draggedIngredient ? ingredientSprite(draggedIngredient, dragging.lifted.w, false) : null}
+                {draggedTool ? toolSprite(draggedTool, dragging.lifted, false, true) : null}
+              </Animated.View>
+            ) : null}
 
             {fastForward
               ? (() => {
@@ -408,7 +754,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
           onClose={() => setSheet(null)}
           onSelect={(cut) => {
             setSheet(null);
-            setCutting({ ingredientId: sheet.ingredientId, cut });
+            dispatch({ type: "cut", ingredientId: sheet.ingredientId, cut });
           }}
         />
       ) : null}
@@ -420,6 +766,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
           onClose={() => setSheet(null)}
           onSelect={(ml) => {
             dispatch({ type: "addWater", toolId: sheet.toolId, ml });
+            if (sheet.fromFaucet) playSinkEffect("faucet");
             setSheet(null);
           }}
         />
@@ -430,8 +777,8 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
           visible
           tool={findTool(sheet.toolId)}
           onClose={() => setSheet(null)}
-          onHeat={(level, minutes) => {
-            dispatch({ type: "heat", toolId: sheet.toolId, level, minutes });
+          onHeat={(level, minutes, action) => {
+            dispatch({ type: "heat", toolId: sheet.toolId, level, minutes, action });
             setFastForward({ toolId: sheet.toolId, level, minutes });
             setSheet(null);
           }}
@@ -460,12 +807,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
                 ingredientId: sheet.ingredientId ?? undefined,
                 action: choice.action,
                 putInside: choice.putInside,
-                level: choice.level,
-                minutes: choice.minutes,
               });
-              if (choice.level && choice.minutes) {
-                setFastForward({ toolId: sheet.toolId, level: choice.level, minutes: choice.minutes });
-              }
             }
             setSheet(null);
           }}
@@ -480,7 +822,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
           onCreate={(definition) => {
             saveCustomTool(definition);
             dispatch({ type: "addCustomTool", definition });
-            setToast(`${definition.name}を調理台に追加しました。`);
+            setToast(`${definition.name}を器具置き場に追加しました。`);
             setSheet(null);
           }}
         />
@@ -561,6 +903,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     color: colors.secondary,
+  },
+  lifted: {
+    position: "absolute",
+    zIndex: 3000,
+    elevation: 14,
+    pointerEvents: "none",
   },
   fastForward: {
     position: "absolute",

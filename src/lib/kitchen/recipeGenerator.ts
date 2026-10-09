@@ -1,5 +1,5 @@
 import type { Ingredient, Step } from "../api-recipe";
-import { getCutStyle, getHeatLevel } from "./constants";
+import { getCutStyle, getHeatLevel, HEAT_ACTIONS } from "./constants";
 import type { KitchenSnapshot } from "./reducer";
 import type { CookEvent, CutResult, HeatLevel, KitchenTool } from "./types";
 
@@ -51,8 +51,12 @@ function eventToolId(event: CookEvent): string | null {
     case "placeOnBurner":
     case "addWater":
     case "addIngredient":
+    case "takeOut":
     case "heat":
     case "turnOff":
+    case "drain":
+    case "putLid":
+    case "removeLid":
     case "toolAction":
       return event.toolId;
     default:
@@ -70,6 +74,7 @@ function toolLabel(tool: KitchenTool | undefined) {
 }
 
 // 手順の生成ルール
+//   - 連続した「洗う」は1つの手順にまとめる（「玉ねぎ、にんじんを水で洗う。」）
 //   - 連続した「切る」は1つの手順にまとめる（「玉ねぎは千切りにし、にんじんは乱切りにする。」）
 //   - 同じ器具への操作（水を入れる・材料を入れる・加熱）は加熱が終わるまで1つの手順にまとめる
 //   - 器具を使った動作（炒める・混ぜるなど）はそれぞれ1つの手順にする
@@ -81,7 +86,7 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
 
   const bodies: string[] = [];
   let pending: Clause[] = [];
-  let pendingKind: "cut" | "tool" | null = null;
+  let pendingKind: "wash" | "cut" | "tool" | null = null;
   let pendingToolId: string | null = null;
   // 器具ごとに、手順文の中でまだ名前を出していないかどうか。
   let mentionedTool = false;
@@ -99,6 +104,20 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
     const event = events[index];
 
     if (event.type === "moveToBoard") continue;
+
+    if (event.type === "wash") {
+      flush();
+      const names = [lookup.ingredientName(event.ingredientId)];
+      while (index + 1 < events.length) {
+        const next = events[index + 1];
+        if (next.type !== "wash") break;
+        names.push(lookup.ingredientName(next.ingredientId));
+        index += 1;
+      }
+      pendingKind = "wash";
+      pending.push({ te: `${joinNames(names)}を水で洗い`, end: `${joinNames(names)}を水で洗う` });
+      continue;
+    }
 
     if (event.type === "cut") {
       if (pendingKind !== "cut") flush();
@@ -149,10 +168,27 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
         mentionedTool = true;
         break;
       }
+      case "takeOut": {
+        // 同じ器具から続けて取り出した場合はまとめる。
+        const names = [lookup.ingredientName(event.ingredientId)];
+        while (index + 1 < events.length) {
+          const next = events[index + 1];
+          if (next.type !== "takeOut" || next.toolId !== event.toolId) break;
+          names.push(lookup.ingredientName(next.ingredientId));
+          index += 1;
+        }
+        const lead = prefix ? `${prefix}から` : "";
+        pending.push({ te: `${lead}${joinNames(names)}を取り出し`, end: `${lead}${joinNames(names)}を取り出す` });
+        mentionedTool = true;
+        break;
+      }
       case "heat": {
         const heat = heatPhrase(event.level, event.minutes);
         const fire = prefix ? `${prefix}を火にかけ、` : "";
-        if (event.withWater && event.boiled && event.ingredientIds.length === 0) {
+        const heatAction = HEAT_ACTIONS.find((item) => item.verb === event.action);
+        if (heatAction) {
+          pending.push({ te: `${fire}${heat}${heatAction.te}`, end: `${fire}${heat}${heatAction.verb}` });
+        } else if (event.withWater && event.boiled && event.ingredientIds.length === 0) {
           pending.push({ te: `${fire}${heat}加熱して沸騰させ`, end: `${fire}${heat}加熱して沸騰させる` });
         } else if (event.withWater) {
           pending.push({ te: `${fire}${heat}煮て`, end: `${fire}${heat}煮る` });
@@ -172,11 +208,31 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
         pending.push({ te: "火を止め", end: "火を止める" });
         flush();
         break;
+      case "drain": {
+        const clause = event.withIngredients
+          ? { te: "湯を切り", end: "湯を切る" }
+          : { te: "水を捨て", end: "水を捨てる" };
+        const lead = prefix ? `${prefix}の` : "";
+        pending.push({ te: `${lead}${clause.te}`, end: `${lead}${clause.end}` });
+        mentionedTool = true;
+        break;
+      }
+      case "putLid": {
+        const lead = prefix ? `${prefix}に` : "";
+        pending.push({ te: `${lead}蓋をし`, end: `${lead}蓋をする` });
+        mentionedTool = true;
+        break;
+      }
+      case "removeLid": {
+        const lead = prefix ? `${prefix}の` : "";
+        pending.push({ te: `${lead}蓋を取り`, end: `${lead}蓋を取る` });
+        mentionedTool = true;
+        break;
+      }
       case "toolAction": {
         const names = event.ingredientIds.map(lookup.ingredientName);
         const target = names.length > 0 ? `${joinNames(names)}を` : "";
-        const heat = event.level && event.minutes ? `${heatPhrase(event.level, event.minutes)}` : "";
-        const sentence = `${toolLabel(tool)}で${target}${heat}${event.action}`;
+        const sentence = `${toolLabel(tool)}で${target}${event.action}`;
         pending.push({ te: sentence, end: sentence });
         flush();
         break;
@@ -199,6 +255,13 @@ export type IngredientHistoryEntry = {
   text: string;
 };
 
+// 選んだ動作が無ければ水の有無で決める
+function heatHistoryVerb(event: Extract<CookEvent, { type: "heat" }>) {
+  const heatAction = HEAT_ACTIONS.find((item) => item.verb === event.action);
+  if (heatAction) return heatAction.past;
+  return event.withWater ? "煮た" : "加熱した";
+}
+
 export function getIngredientHistory(snapshot: KitchenSnapshot, ingredientId: string): IngredientHistoryEntry[] {
   const toolName = (id: string) => toolLabel(snapshot.tools.find((tool) => tool.id === id));
   const entries: IngredientHistoryEntry[] = [];
@@ -214,6 +277,11 @@ export function getIngredientHistory(snapshot: KitchenSnapshot, ingredientId: st
           entries.push({ id: event.id, icon: "content-cut", text: toPast(describeCut(event.cut).end) });
         }
         break;
+      case "wash":
+        if (event.ingredientId === ingredientId) {
+          entries.push({ id: event.id, icon: "water-drop", text: "水で洗った" });
+        }
+        break;
       case "addIngredient":
         if (event.ingredientId === ingredientId) {
           entries.push({
@@ -223,23 +291,23 @@ export function getIngredientHistory(snapshot: KitchenSnapshot, ingredientId: st
           });
         }
         break;
+      case "takeOut":
+        if (event.ingredientId === ingredientId) {
+          entries.push({ id: event.id, icon: "output", text: `${toolName(event.toolId)}から取り出した` });
+        }
+        break;
       case "heat":
         if (event.ingredientIds.includes(ingredientId)) {
           entries.push({
             id: event.id,
             icon: "local-fire-department",
-            text: `${toolName(event.toolId)}で${heatPhrase(event.level, event.minutes)}${event.withWater ? "煮た" : "加熱した"}`,
+            text: `${toolName(event.toolId)}で${heatPhrase(event.level, event.minutes)}${heatHistoryVerb(event)}`,
           });
         }
         break;
       case "toolAction":
         if (event.ingredientIds.includes(ingredientId)) {
-          const heat = event.level && event.minutes ? `（${heatPhrase(event.level, event.minutes)}）` : "";
-          entries.push({
-            id: event.id,
-            icon: "build",
-            text: `${toolName(event.toolId)}で「${event.action}」${heat}`,
-          });
+          entries.push({ id: event.id, icon: "build", text: `${toolName(event.toolId)}で「${event.action}」` });
         }
         break;
       default:

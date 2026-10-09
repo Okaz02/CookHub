@@ -1,3 +1,5 @@
+import type { ToolCatalogId } from "./toolCatalog";
+
 // キッチンエディターで扱うデータの型。
 // 画面上の操作はすべて CookEvent として記録し、そこからレシピの手順文を生成する。
 
@@ -68,9 +70,18 @@ export type CustomToolDefinition = {
   heatable: boolean;
 };
 
-export type ToolKind = "knife" | "water" | "pot" | "custom";
+export type ToolKind = "knife" | "water" | "pot" | "lid" | "custom";
 
-export type ToolLocation = { area: "rack" } | { area: "burner"; index: number };
+export type ToolLocation =
+  // 器具置き場（上の段）
+  | { area: "rack" }
+  // 調理台（器具を置いて作業する場所）
+  | { area: "counter" }
+  | { area: "burner"; index: number }
+  // シンクの蛇口の下に置いているとき（1つまで）
+  | { area: "sink" }
+  // 蓋をフライパンなどにかぶせているとき
+  | { area: "onTool"; toolId: string };
 
 export type ActiveHeat = {
   level: HeatLevel;
@@ -83,6 +94,9 @@ export type KitchenTool = {
   name: string;
   location: ToolLocation;
   definition?: CustomToolDefinition;
+  // 最初から置いてある器具（toolCatalog）なら、その項目。写真で描く。
+  // ユーザーが追加した器具には無く、図形で描く。
+  catalogId?: ToolCatalogId;
   // 中に入っている水の量（ml）。
   waterMl: number;
   // コンロの火がついているときの火加減。
@@ -99,24 +113,32 @@ export type CookEvent = EventBase &
     | { type: "placeOnBurner"; toolId: string; burner: number }
     | { type: "addWater"; toolId: string; ml: number }
     | { type: "addIngredient"; toolId: string; ingredientId: string; intoBoiling: boolean }
+    // 器具の中の材料をまな板に取り出す
+    | { type: "takeOut"; toolId: string; ingredientId: string }
     | {
         type: "heat";
         toolId: string;
         level: HeatLevel;
         minutes: number;
+        // 加熱シートで選んだ動作（「炒める」など）。無ければ水の有無から「煮る」「加熱する」にする
+        action?: string;
         // 加熱した時点で中に入っていた材料
         ingredientIds: string[];
         withWater: boolean;
         boiled: boolean;
       }
     | { type: "turnOff"; toolId: string }
+    | { type: "wash"; ingredientId: string }
+    // 器具の水（お湯）をシンクに捨てる。材料が入っていれば「湯を切る」扱い
+    | { type: "drain"; toolId: string; withIngredients: boolean }
+    // toolId は蓋をかぶせた（外した）器具
+    | { type: "putLid"; toolId: string; lidId: string }
+    | { type: "removeLid"; toolId: string; lidId: string }
     | {
         type: "toolAction";
         toolId: string;
         ingredientIds: string[];
         action: string;
-        level?: HeatLevel;
-        minutes?: number;
       }
   );
 

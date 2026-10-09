@@ -41,10 +41,27 @@ export function getHeatLevel(id: HeatLevel) {
   return HEAT_LEVELS.find((level) => level.id === id) ?? HEAT_LEVELS[2];
 }
 
+// 火を使う動作。器具の動作のうちこれらはコンロの加熱シートで選び、それ以外は器具の動作シートで選ぶ。
+// te は手順文をつなぐときの形（「中火で3分炒め、」）、past は材料の履歴に出す形
+export const HEAT_ACTIONS: { verb: string; te: string; past: string }[] = [
+  { verb: "炒める", te: "炒め", past: "炒めた" },
+  { verb: "焼く", te: "焼き", past: "焼いた" },
+  { verb: "茹でる", te: "茹で", past: "茹でた" },
+  { verb: "煮る", te: "煮て", past: "煮た" },
+  { verb: "蒸す", te: "蒸し", past: "蒸した" },
+  { verb: "揚げる", te: "揚げ", past: "揚げた" },
+];
+
+export function isHeatAction(verb: string) {
+  return HEAT_ACTIONS.some((item) => item.verb === verb);
+}
+
 export const HEAT_MINUTE_PRESETS = [1, 3, 5, 10, 15];
 export const WATER_PRESETS_ML = [300, 500, 1000, 1500, 2000];
 
-export const BURNER_COUNT = 2;
+export const INITIAL_BURNER_COUNT = 2;
+// コンロは＋ボタンでここまで増やせる（3口以上は2段に並べる）
+export const MAX_BURNER_COUNT = 6;
 
 // 器具追加シートの選択肢
 export const TOOL_ACTION_PRESETS = [

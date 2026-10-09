@@ -1,3 +1,5 @@
+import { INITIAL_BURNER_COUNT, isHeatAction, MAX_BURNER_COUNT } from "./constants";
+import { getCatalogEntry, TOOL_CATALOG, type ToolCatalogId } from "./toolCatalog";
 import type {
   CookEvent,
   CustomToolDefinition,
@@ -12,6 +14,7 @@ export type KitchenSnapshot = {
   ingredients: KitchenIngredient[];
   tools: KitchenTool[];
   events: CookEvent[];
+  burnerCount: number;
 };
 
 export type KitchenState = {
@@ -30,19 +33,23 @@ export type KitchenAction =
   | { type: "moveIngredient"; ingredientId: string; to: "shelf" | "board" }
   | { type: "cut"; ingredientId: string; cut: CutResult }
   | { type: "placeOnBurner"; toolId: string; burner: number }
-  | { type: "returnToRack"; toolId: string }
+  // 器具を器具置き場か調理台に置く（コンロやシンクから下ろす・蓋を外すときも）
+  | { type: "putDownTool"; toolId: string; to: "rack" | "counter" }
+  | { type: "placeInSink"; toolId: string }
   | { type: "addWater"; toolId: string; ml: number }
   | { type: "addIngredientToTool"; toolId: string; ingredientId: string }
-  | { type: "heat"; toolId: string; level: HeatLevel; minutes: number }
+  | { type: "heat"; toolId: string; level: HeatLevel; minutes: number; action?: string }
   | { type: "turnOff"; toolId: string }
+  | { type: "addBurner" }
+  | { type: "wash"; ingredientId: string }
+  | { type: "drain"; toolId: string }
+  | { type: "putLid"; lidId: string; toolId: string }
   | {
       type: "toolAction";
       toolId: string;
       ingredientId?: string;
       action: string;
       putInside: boolean;
-      level?: HeatLevel;
-      minutes?: number;
     }
   | { type: "addCustomTool"; definition: CustomToolDefinition }
   | { type: "undo" };
@@ -58,12 +65,32 @@ export function createId(prefix: string) {
 }
 
 export function createBaseTools(): KitchenTool[] {
-  const base = { location: { area: "rack" } as const, waterMl: 0, heat: null, boiling: false };
-  return [
-    { ...base, id: "knife", kind: "knife", name: "包丁" },
-    { ...base, id: "water", kind: "water", name: "水" },
-    { ...base, id: "pot", kind: "pot", name: "鍋" },
-  ];
+  return (Object.keys(TOOL_CATALOG) as ToolCatalogId[]).map((id) => {
+    const entry = getCatalogEntry(id);
+    const tool = {
+      id,
+      catalogId: id,
+      name: entry.name,
+      location: { area: "rack" } as const,
+      waterMl: 0,
+      heat: null,
+      boiling: false,
+    };
+    if (entry.kind !== "vessel") return { ...tool, kind: entry.kind };
+    return {
+      ...tool,
+      kind: "custom",
+      definition: {
+        id,
+        name: entry.name,
+        actions: entry.actions ?? [],
+        // 写真で描くので見た目の設定は使わない
+        appearance: { shape: "circle", color: "#3a3a3a", icon: "outdoor-grill" },
+        container: true,
+        heatable: Boolean(entry.heatable),
+      },
+    };
+  });
 }
 
 export function customToolFromDefinition(definition: CustomToolDefinition): KitchenTool {
@@ -94,6 +121,7 @@ export function createInitialState(
       })),
       tools: [...createBaseTools(), ...customTools.map(customToolFromDefinition)],
       events: [],
+      burnerCount: INITIAL_BURNER_COUNT,
     },
   };
 }
@@ -103,9 +131,34 @@ export function isContainer(tool: KitchenTool) {
   return tool.kind === "pot" || (tool.kind === "custom" && Boolean(tool.definition?.container));
 }
 
+// 器具の動作のうち、コンロの火で行うもの（加熱シートで選ぶ）
+export function heatActionsOf(tool: KitchenTool) {
+  return (tool.definition?.actions ?? []).filter(isHeatAction);
+}
+
+// 器具の動作のうち、火を使わないもの（器具の動作シートで選ぶ）
+export function handActionsOf(tool: KitchenTool) {
+  return (tool.definition?.actions ?? []).filter((action) => !isHeatAction(action));
+}
+
 // コンロに乗せられる器具か。
 export function isHeatable(tool: KitchenTool) {
   return tool.kind === "pot" || (tool.kind === "custom" && Boolean(tool.definition?.heatable));
+}
+
+// 蓋をかぶせられる器具か
+export function acceptsLid(tool: KitchenTool) {
+  return tool.catalogId ? Boolean(getCatalogEntry(tool.catalogId).acceptsLid) : false;
+}
+
+// その器具にかぶせてある蓋
+export function lidOn(snapshot: KitchenSnapshot, toolId: string) {
+  return snapshot.tools.find((tool) => tool.location.area === "onTool" && tool.location.toolId === toolId);
+}
+
+// シンクに置いてある器具
+export function toolInSink(snapshot: KitchenSnapshot) {
+  return snapshot.tools.find((tool) => tool.location.area === "sink");
 }
 
 export function ingredientsInTool(snapshot: KitchenSnapshot, toolId: string) {
@@ -131,8 +184,21 @@ function apply(snapshot: KitchenSnapshot, action: Exclude<KitchenAction, { type:
     case "moveIngredient": {
       const ingredient = snapshot.ingredients.find((item) => item.id === action.ingredientId);
       if (!ingredient || ingredient.location.area === action.to) return null;
-      // 器具に入れた材料は取り出さない（調理済みの扱いにする）。
-      if (ingredient.location.area === "tool") return null;
+      if (ingredient.location.area === "tool") {
+        // 器具から出した材料はまな板に置く（調理した材料は棚には戻さない）
+        if (action.to !== "board") return null;
+        return {
+          ...snapshot,
+          ingredients: snapshot.ingredients.map((item) =>
+            item.id === ingredient.id ? { ...item, location: { area: "board" } } : item
+          ),
+          events: withEvent(snapshot, {
+            type: "takeOut",
+            toolId: ingredient.location.toolId,
+            ingredientId: ingredient.id,
+          }),
+        };
+      }
       return {
         ...snapshot,
         ingredients: snapshot.ingredients.map((item) =>
@@ -165,14 +231,23 @@ function apply(snapshot: KitchenSnapshot, action: Exclude<KitchenAction, { type:
         events: withEvent(snapshot, { type: "placeOnBurner", toolId: tool.id, burner: action.burner }),
       };
     }
-    case "returnToRack": {
+    case "putDownTool": {
       const tool = snapshot.tools.find((item) => item.id === action.toolId);
-      if (!tool || tool.location.area === "rack") return null;
+      if (!tool || tool.location.area === action.to) return null;
+      const location = { area: action.to } as const;
+      // かぶせてあった蓋を外す
+      if (tool.location.area === "onTool") {
+        return {
+          ...snapshot,
+          tools: updateTool(snapshot, tool.id, { location }),
+          events: withEvent(snapshot, { type: "removeLid", toolId: tool.location.toolId, lidId: tool.id }),
+        };
+      }
       // 火がついたまま下ろした場合は火を止めたことにする。
       const events = tool.heat ? withEvent(snapshot, { type: "turnOff", toolId: tool.id }) : snapshot.events;
       return {
         ...snapshot,
-        tools: updateTool(snapshot, tool.id, { location: { area: "rack" }, heat: null, boiling: false }),
+        tools: updateTool(snapshot, tool.id, { location, heat: null, boiling: false }),
         events,
       };
     }
@@ -220,6 +295,7 @@ function apply(snapshot: KitchenSnapshot, action: Exclude<KitchenAction, { type:
           toolId: tool.id,
           level: action.level,
           minutes: action.minutes,
+          action: action.action,
           ingredientIds: contents,
           withWater,
           // 加熱前から沸騰していた場合は「沸騰させる」ではなく「煮る」扱い。
@@ -234,6 +310,45 @@ function apply(snapshot: KitchenSnapshot, action: Exclude<KitchenAction, { type:
         ...snapshot,
         tools: updateTool(snapshot, tool.id, { heat: null, boiling: false }),
         events: withEvent(snapshot, { type: "turnOff", toolId: tool.id }),
+      };
+    }
+    case "placeInSink": {
+      const tool = snapshot.tools.find((item) => item.id === action.toolId);
+      // 火にかけたままは運べない。シンクには1つだけ置ける
+      if (!tool || !isContainer(tool) || tool.heat || toolInSink(snapshot)) return null;
+      return { ...snapshot, tools: updateTool(snapshot, tool.id, { location: { area: "sink" }, boiling: false }) };
+    }
+    case "addBurner": {
+      if (snapshot.burnerCount >= MAX_BURNER_COUNT) return null;
+      return { ...snapshot, burnerCount: snapshot.burnerCount + 1 };
+    }
+    case "wash": {
+      const ingredient = snapshot.ingredients.find((item) => item.id === action.ingredientId);
+      if (!ingredient || ingredient.location.area === "tool") return null;
+      return { ...snapshot, events: withEvent(snapshot, { type: "wash", ingredientId: ingredient.id }) };
+    }
+    case "drain": {
+      const tool = snapshot.tools.find((item) => item.id === action.toolId);
+      if (!tool || tool.waterMl === 0) return null;
+      return {
+        ...snapshot,
+        tools: updateTool(snapshot, tool.id, { waterMl: 0, boiling: false }),
+        events: withEvent(snapshot, {
+          type: "drain",
+          toolId: tool.id,
+          withIngredients: ingredientsInTool(snapshot, tool.id).length > 0,
+        }),
+      };
+    }
+    case "putLid": {
+      const lid = snapshot.tools.find((item) => item.id === action.lidId);
+      const tool = snapshot.tools.find((item) => item.id === action.toolId);
+      if (!lid || !tool || lid.kind !== "lid" || !acceptsLid(tool)) return null;
+      if (lidOn(snapshot, tool.id)) return null;
+      return {
+        ...snapshot,
+        tools: updateTool(snapshot, lid.id, { location: { area: "onTool", toolId: tool.id } }),
+        events: withEvent(snapshot, { type: "putLid", toolId: tool.id, lidId: lid.id }),
       };
     }
     case "toolAction": {
@@ -258,17 +373,11 @@ function apply(snapshot: KitchenSnapshot, action: Exclude<KitchenAction, { type:
       return {
         ...snapshot,
         ingredients,
-        tools:
-          action.level && tool.location.area === "burner"
-            ? updateTool(snapshot, tool.id, { heat: { level: action.level, minutes: action.minutes ?? 0 } })
-            : snapshot.tools,
         events: withEvent(snapshot, {
           type: "toolAction",
           toolId: tool.id,
           ingredientIds: targetIds,
           action: action.action,
-          level: action.level,
-          minutes: action.minutes,
         }),
       };
     }

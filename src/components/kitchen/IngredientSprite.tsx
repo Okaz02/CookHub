@@ -136,15 +136,17 @@ export function IngredientSprite({ ingredient, size, focused, showLabel = true }
   return (
     // 画像がタッチを奪うと（Web では画像のドラッグが始まってしまう）ドラッグできないので、絵は操作対象から外す。
     <View style={{ width: size, height: size, alignItems: "center", pointerEvents: "none" }}>
-      <View style={[focused && styles.focused, focused && { borderRadius: size / 2 }]}>
-        {ingredient.cut ? (
-          <CutPieces cut={ingredient.cut} size={size} seedKey={ingredient.id}>
-            {art}
-          </CutPieces>
-        ) : (
-          art
-        )}
-      </View>
+      {ingredient.cut ? (
+        <CutPieces cut={ingredient.cut} size={size} seedKey={ingredient.id}>
+          {art}
+        </CutPieces>
+      ) : (
+        art
+      )}
+      {/* 枠線で絵の大きさや位置が変わらないよう、上に重ねて描く */}
+      {focused ? (
+        <View style={[styles.focused, { position: "absolute", width: size, height: size, borderRadius: size / 2 }]} />
+      ) : null}
       {showLabel ? (
         <Text style={styles.label} numberOfLines={1}>
           {ingredient.name}

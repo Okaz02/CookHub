@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { Switch, Text, TextInput, View } from "react-native";
-import { HEAT_LEVELS, HEAT_MINUTE_PRESETS } from "../../lib/kitchen/constants";
-import { isContainer } from "../../lib/kitchen/reducer";
-import type { HeatLevel, KitchenTool } from "../../lib/kitchen/types";
-import { BottomSheet, Chip, ChipRow, NumberChoice, PrimaryButton, SectionLabel, sheetStyles } from "./BottomSheet";
+import { handActionsOf, isContainer } from "../../lib/kitchen/reducer";
+import type { KitchenTool } from "../../lib/kitchen/types";
+import { BottomSheet, Chip, ChipRow, PrimaryButton, SectionLabel, sheetStyles } from "./BottomSheet";
 
 export type ToolActionChoice = {
   action: string | null;
   putInside: boolean;
-  level?: HeatLevel;
-  minutes?: number;
 };
+
+// 火を使わない動作（混ぜる・巻くなど）を選ぶ。火を使う動作はコンロの加熱シートで選ぶ
 
 type Props = {
   visible: boolean;
@@ -22,17 +21,13 @@ type Props = {
 };
 
 export function ToolActionSheet({ visible, tool, ingredientName, onClose, onSelect }: Props) {
-  const definition = tool?.definition;
-  const [action, setAction] = useState<string | null>(definition?.actions[0] ?? null);
+  const actions = tool ? handActionsOf(tool) : [];
+  const [action, setAction] = useState<string | null>(actions[0] ?? "__custom");
   const [customAction, setCustomAction] = useState("");
   const [putInside, setPutInside] = useState(true);
-  const [useHeat, setUseHeat] = useState(false);
-  const [level, setLevel] = useState<HeatLevel>("medium");
-  const [minutes, setMinutes] = useState<number | null>(3);
 
   if (!tool) return null;
   const container = isContainer(tool);
-  const onBurner = tool.location.area === "burner";
   const chosenAction = action === "__custom" ? customAction.trim() : action;
 
   return (
@@ -44,7 +39,7 @@ export function ToolActionSheet({ visible, tool, ingredientName, onClose, onSele
     >
       <SectionLabel>動作</SectionLabel>
       <ChipRow>
-        {(definition?.actions ?? []).map((item) => (
+        {actions.map((item) => (
           <Chip key={item} label={item} active={action === item} onPress={() => setAction(item)} />
         ))}
         <Chip label="ほかの動作" active={action === "__custom"} onPress={() => setAction("__custom")} />
@@ -66,25 +61,6 @@ export function ToolActionSheet({ visible, tool, ingredientName, onClose, onSele
         </View>
       ) : null}
 
-      {onBurner ? (
-        <>
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-            <Text style={sheetStyles.hint}>火加減と時間を指定する</Text>
-            <Switch value={useHeat} onValueChange={setUseHeat} />
-          </View>
-          {useHeat ? (
-            <>
-              <ChipRow>
-                {HEAT_LEVELS.map((item) => (
-                  <Chip key={item.id} label={item.label} active={level === item.id} onPress={() => setLevel(item.id)} />
-                ))}
-              </ChipRow>
-              <NumberChoice presets={HEAT_MINUTE_PRESETS} value={minutes} unit="分" onChange={setMinutes} />
-            </>
-          ) : null}
-        </>
-      ) : null}
-
       <View style={sheetStyles.buttonRow}>
         {container && ingredientName ? (
           <PrimaryButton
@@ -97,14 +73,12 @@ export function ToolActionSheet({ visible, tool, ingredientName, onClose, onSele
         )}
         <PrimaryButton
           label="実行"
-          disabled={!chosenAction || (useHeat && onBurner && !minutes)}
+          disabled={!chosenAction}
           onPress={() =>
             chosenAction &&
             onSelect({
               action: chosenAction,
               putInside: container && putInside,
-              level: useHeat && onBurner ? level : undefined,
-              minutes: useHeat && onBurner ? (minutes ?? undefined) : undefined,
             })
           }
         />
