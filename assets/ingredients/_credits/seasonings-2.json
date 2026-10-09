@@ -138,5 +138,47 @@
     "width": null,
     "height": null,
     "notes": "条件を満たす写真なし（Wikimedia: cooking sake/料理酒/sake bottle isolated/sake masu glass、Openverse: cooking sake/料理酒 で検索）。見つかったのは居酒屋・店舗内の升酒や徳利（木のカウンターや雑多な背景）、紙パック清酒の手持ち写真、料理写真のみで、無地背景の日本酒・料理酒の写真はなかった。"
+  },
+  {
+    "id": "mentsuyu",
+    "name_ja": "めんつゆ",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "条件を満たす写真なし（Wikimedia: mentsuyu/めんつゆ/tsuyu sauce soba、Openverse: めんつゆ/soba dipping sauce で検索）。見つかったのはスーパーの陳列棚（Fundokin・寺岡有機醸造のつゆボトル）、手に持ったプラカップのてんつゆ、具材入りのつけ汁、そうめんと一緒の食卓写真、ラベル裏面のアップなどで、無地背景のものはなかった。"
+  },
+  {
+    "id": "ponzu",
+    "name_ja": "ポン酢",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "条件を満たす写真なし（Wikimedia: ponzu/ポン酢、Openverse: ponzu sauce/ポン酢 で検索）。見つかったのはスーパーの陳列（くばら六味ぽんず）、ビュッフェの容器と名札、花柄の器と花柄布の写真、店舗カウンターの卓上ボトル、斜めに写したボトル、料理写真のみ。File:Ponzu kabosu vert.jpg は321x400で小さすぎる。"
+  },
+  {
+    "id": "dashi-powder",
+    "name_ja": "顆粒だし",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "条件を満たす写真なし（Wikimedia: dashi powder/hondashi/和風だし/dashi granules、Openverse: dashi powder/hondashi で検索）。見つかったのは手に持ったほんだし瓶（キッチン背景）、黒い布の上に複数のだし製品パッケージを並べた写真（ブランド多数・中身は見えない）、パッケージ画像の合成図（文字入り）、店頭陳列、料理途中の写真のみ。顆粒そのものを写した写真はなかった。"
   }
 ]

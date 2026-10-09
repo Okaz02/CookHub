@@ -96,5 +96,61 @@
     "width": 960,
     "height": 720,
     "notes": "Plain white background. Block of Japanese tofu (momen-style) on a round bamboo mat. Bamboo mat is under the subject only."
+  },
+  {
+    "id": "aburaage",
+    "name_ja": "油揚げ",
+    "file": "aburaage.jpg",
+    "title": "Yubu (fried tofu).jpg",
+    "creator": "국립국어원",
+    "license": "CC BY-SA 2.0 kr",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/kr/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Yubu_(fried_tofu).jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Yubu_%28fried_tofu%29.jpg/960px-Yubu_%28fried_tofu%29.jpg",
+    "width": 960,
+    "height": 693,
+    "notes": "Pure white studio background. Two pieces of thin fried tofu pouch (Korean yubu = Japanese aburaage), no props. Creator: National Institute of Korean Language (국립국어원). Chosen over File:油揚げ.jpg (CC0, on a floral-rim plate) for the cleaner background."
+  },
+  {
+    "id": "atsuage",
+    "name_ja": "厚揚げ",
+    "file": "atsuage.jpg",
+    "title": "Atsuage.jpg",
+    "creator": "I (Potesara) took this photograph.",
+    "license": "CC BY-SA 2.5",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.5",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Atsuage.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Atsuage.jpg/960px-Atsuage.jpg",
+    "width": 960,
+    "height": 720,
+    "notes": "Plain white plate filling the frame (white background). Several cut pieces of atsuage showing golden fried skin and white tofu interior."
+  },
+  {
+    "id": "natto",
+    "name_ja": "納豆",
+    "file": "natto.jpg",
+    "title": "Natto mixed by Kinchan1.jpg",
+    "creator": "Kinchan1",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Natto_mixed_by_Kinchan1.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Natto_mixed_by_Kinchan1.jpg/960px-Natto_mixed_by_Kinchan1.jpg",
+    "width": 960,
+    "height": 640,
+    "notes": "Plain solid black background. Natto in a light ceramic dish with chopsticks lifting sticky strands. Alternative File:Natto mixed.jpg (white background) was only 400x394 px."
+  },
+  {
+    "id": "konnyaku",
+    "name_ja": "こんにゃく",
+    "file": "konnyaku.jpg",
+    "title": "Konnyaku 001.jpg",
+    "creator": "Ocdp",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Konnyaku_001.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Konnyaku_001.jpg/960px-Konnyaku_001.jpg",
+    "width": 960,
+    "height": 720,
+    "notes": "Plain white background. Thin slices of white sashimi-style konnyaku on a blue-striped rim plate. Concern: white sashimi konnyaku rather than the typical grey block; the grey-block candidate (File:Konnyaku on a plate 2026 03 29.jpeg, CC BY 4.0) was rejected because wood-grain table shows at the edges."
   }
 ]

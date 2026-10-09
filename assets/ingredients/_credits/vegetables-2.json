@@ -96,5 +96,61 @@
     "width": 815,
     "height": 605,
     "notes": "白一色のスタジオ背景に生の緑豆もやしをひと山。韓国国立国語院の素材。原寸815x605を保存。"
+  },
+  {
+    "id": "leek",
+    "name_ja": "長ねぎ",
+    "file": "leek.jpg",
+    "title": "File:Daepa (Allium fistulosum).jpg",
+    "creator": "국립국어원",
+    "license": "CC BY-SA 2.0 KR",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/kr/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Daepa_(Allium_fistulosum).jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Daepa_%28Allium_fistulosum%29.jpg/500px-Daepa_%28Allium_fistulosum%29.jpg",
+    "width": 500,
+    "height": 750,
+    "notes": "白一色のスタジオ背景に、根付きの太ねぎ（大파＝ネギ、Allium fistulosum）4本の束。白い軸と緑の葉がはっきり分かる。韓国国立国語院の素材。日本の長ねぎより葉部分がやや長め。"
+  },
+  {
+    "id": "green-onion",
+    "name_ja": "青ねぎ",
+    "file": "green-onion.jpg",
+    "title": "File:CSA-Red-Spring-Onions.jpg",
+    "creator": "Evan-Amos",
+    "license": "Public domain (PD-self)",
+    "license_url": "https://commons.wikimedia.org/wiki/Template:PD-self",
+    "source_url": "https://commons.wikimedia.org/wiki/File:CSA-Red-Spring-Onions.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/CSA-Red-Spring-Onions.jpg/960px-CSA-Red-Spring-Onions.jpg",
+    "width": 960,
+    "height": 638,
+    "notes": "白一色の背景に細い葉ねぎの束（根付き）。作者 Evan-Amos によるパブリックドメイン公開（Wikimedia表記 'Public domain'、CC0/PDMではなく作者のPD宣言）。注意: 根元が赤紫色の小さな球になった品種で、日本の青ねぎ（万能ねぎ）とは根元の色が異なる。"
+  },
+  {
+    "id": "chinese-chives",
+    "name_ja": "にら",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "Wikimedia/Openverseで6クエリ検索。候補は畑の株・花・種子標本・黄にらの市場陳列・背景なしの葉のアップのみで、無地背景で束になった生のにらは見つからず保存せず。"
+  },
+  {
+    "id": "asparagus",
+    "name_ja": "アスパラガス",
+    "file": "asparagus.jpg",
+    "title": "File:Asparagus-Bundle.jpg",
+    "creator": "Evan-Amos",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Asparagus-Bundle.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Asparagus-Bundle.jpg/500px-Asparagus-Bundle.jpg",
+    "width": 500,
+    "height": 1269,
+    "notes": "白一色の背景に立てたグリーンアスパラガスの束（切り抜き風）。束ねている紫の輪ゴムに小さく産地表記の文字あり（写真上の追加テキストではない）。縦長のため幅500pxで保存。"
   }
 ]

@@ -110,5 +110,61 @@
     "width": 1000,
     "height": 634,
     "notes": "White background; one whole fuzzy kiwi with a cut half and a slice showing green flesh. No watermark. rawpixel CC0 per Openverse listing."
+  },
+  {
+    "id": "peach",
+    "name_ja": "もも",
+    "file": "peach.jpg",
+    "title": "File:White-Peaches-Bunch.jpg",
+    "creator": "Evan-Amos",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:White-Peaches-Bunch.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/White-Peaches-Bunch.jpg/960px-White-Peaches-Bunch.jpg",
+    "width": 960,
+    "height": 480,
+    "notes": "Pure white studio background; four whole white-fleshed peaches plus one cut half showing pit and white flesh. No watermark. Wide 2:1 aspect. Skin is darker red than typical Japanese 白桃."
+  },
+  {
+    "id": "pineapple",
+    "name_ja": "パイナップル",
+    "file": "pineapple.jpg",
+    "title": "Pineapple fruit white background",
+    "creator": "rawpixel (creator not stated)",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://www.rawpixel.com/image/6033023/photo-image-background-public-domain-leaf",
+    "image_url": "https://images.rawpixel.com/image_1000/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvZnJwaW5lYXBwbGVfZnJ1aXRfd2hpdGVfYmFja2dyb3VuZC1pbWFnZS1reWJjdnVnMi5qcGc.jpg",
+    "width": 772,
+    "height": 1000,
+    "notes": "Pure white (cut-out style) background; one whole pineapple with crown, upright. No watermark. rawpixel CC0 per Openverse listing."
+  },
+  {
+    "id": "blueberry",
+    "name_ja": "ブルーベリー",
+    "file": "blueberry.jpg",
+    "title": "Blueberries white background",
+    "creator": "U.S. Department of Agriculture (via rawpixel)",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://www.rawpixel.com/image/8733774/photo-image-white-background-public-domain-food",
+    "image_url": "https://images.rawpixel.com/image_1000/cHJpdmF0ZS9zdGF0aWMvZmlsZXMvd2Vic2l0ZS8yMDIyLTExL2ZsNTE0Mjk5NDM4NTctaW1hZ2UuanBn.jpg",
+    "width": 1000,
+    "height": 980,
+    "notes": "Pure white background with soft shadows; a small cluster of about 20 loose fresh blueberries, top view. No watermark. USDA photo (public domain) distributed by rawpixel as CC0."
+  },
+  {
+    "id": "avocado",
+    "name_ja": "アボカド",
+    "file": "avocado.jpg",
+    "title": "File:Persea americana from Canadian supermarket.jpg",
+    "creator": "Wilfredor",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Persea_americana_from_Canadian_supermarket.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Persea_americana_from_Canadian_supermarket.jpg/960px-Persea_americana_from_Canadian_supermarket.jpg",
+    "width": 960,
+    "height": 640,
+    "notes": "Pure white studio background; one whole avocado and one cut avocado showing the pit. No watermark. Concern: smooth green-skinned variety rather than the dark bumpy Hass type most common in Japan (Hass candidates were GFDL-only or on wooden backgrounds)."
   }
 ]
