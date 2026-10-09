@@ -53,6 +53,9 @@ export function ToolSprite({ tool, size, height = size, contents = [], focused }
       );
     case "custom": {
       const appearance = tool.definition?.appearance ?? POT_APPEARANCE;
+      if (tool.catalogId && !tool.definition?.container) {
+        return <ImageUtensilArt box={box} name={tool.name} catalogId={tool.catalogId} focused={focused} />;
+      }
       if (tool.catalogId) {
         return (
           <ImageVesselArt box={box} tool={tool} catalogId={tool.catalogId} contents={contents} focused={focused} />
@@ -91,6 +94,38 @@ function ImageKnifeArt({ box, name, catalogId }: { box: Box; name: string; catal
   return (
     <View style={[styles.center, box]}>
       <Image source={getCatalogEntry(catalogId).image} style={{ width: rect.w, height: rect.h }} />
+      <Text style={styles.toolLabel} numberOfLines={1}>
+        {name}
+      </Text>
+    </View>
+  );
+}
+
+// 写真の道具（ピーラー・泡立て器など、中に入れられないもの）。枠に収めて描く
+function ImageUtensilArt({
+  box,
+  name,
+  catalogId,
+  focused,
+}: {
+  box: Box;
+  name: string;
+  catalogId: ToolCatalogId;
+  focused?: boolean;
+}) {
+  const { image: rect } = placeToolImage(catalogId, box.width, box.height, "contain");
+  return (
+    <View style={[styles.center, box]}>
+      <Image source={getCatalogEntry(catalogId).image} style={{ width: rect.w, height: rect.h }} />
+      {/* 枠線で画像が縮まないよう、上に重ねて描く */}
+      {focused ? (
+        <View
+          style={[
+            styles.focusedRing,
+            { position: "absolute", left: rect.x, top: rect.y, width: rect.w, height: rect.h, borderRadius: 8 },
+          ]}
+        />
+      ) : null}
       <Text style={styles.toolLabel} numberOfLines={1}>
         {name}
       </Text>

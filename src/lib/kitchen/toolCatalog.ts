@@ -9,6 +9,7 @@ import type { ImageRequireSource } from "react-native";
 //              vessel … 材料をドラッグすると中に入れる。actions のうち火を使う動作（炒める など）は
 //                       コンロの加熱シートで、それ以外（混ぜる など）は器具をタップして選ぶ
 //              lid    … acceptsLid の器具にかぶせる
+//              utensil … 中に入れられない道具（ピーラー・泡立て器など）。材料の上へドラッグすると actions から動作を選ぶ
 //   body     画像のうち器（材料や水が入る部分）の範囲。画像の幅・高さに対する割合
 //            （取っ手を除いた部分。省略すると画像全体）
 //   heatable コンロに乗せられるか
@@ -17,7 +18,7 @@ type Body = { x: number; y: number; w: number; h: number };
 
 type CatalogEntry = {
   name: string;
-  kind: "knife" | "water" | "pot" | "vessel" | "lid";
+  kind: "knife" | "water" | "pot" | "vessel" | "lid" | "utensil";
   image: ImageRequireSource;
   body?: Body;
   round?: boolean;

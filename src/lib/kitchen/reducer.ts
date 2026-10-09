@@ -76,7 +76,8 @@ export function createBaseTools(): KitchenTool[] {
       heat: null,
       boiling: false,
     };
-    if (entry.kind !== "vessel") return { ...tool, kind: entry.kind };
+    if (entry.kind !== "vessel" && entry.kind !== "utensil") return { ...tool, kind: entry.kind };
+    // 器と道具は、ユーザーが追加する器具と同じ仕組み（definition の動作）で扱う
     return {
       ...tool,
       kind: "custom",
@@ -86,7 +87,7 @@ export function createBaseTools(): KitchenTool[] {
         actions: entry.actions ?? [],
         // 写真で描くので見た目の設定は使わない
         appearance: { shape: "circle", color: "#3a3a3a", icon: "outdoor-grill" },
-        container: true,
+        container: entry.kind === "vessel",
         heatable: Boolean(entry.heatable),
       },
     };

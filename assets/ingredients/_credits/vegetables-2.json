@@ -152,5 +152,19 @@
     "width": 500,
     "height": 1269,
     "notes": "白一色の背景に立てたグリーンアスパラガスの束（切り抜き風）。束ねている紫の輪ゴムに小さく産地表記の文字あり（写真上の追加テキストではない）。縦長のため幅500pxで保存。"
+  },
+  {
+    "id": "okra",
+    "name_ja": "オクラ",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "Wikimedia/Openverseで7クエリ検索。最も近い候補は File:Okra (Abelmoschus esculentus) (3).jpg（Dinkun Chen, CC BY-SA 4.0、木目のまな板上に生オクラを並べた写真）だが、背景が木目で単色無地ではないため見送り。他は畑・市場の山積み・種子標本などで保存せず。"
   }
 ]

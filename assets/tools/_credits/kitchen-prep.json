@@ -1,0 +1,44 @@
+[
+  {
+    "id": "colander",
+    "name_ja": "ザル",
+    "file": "colander.jpg",
+    "title": "File:Yellow plastic colander 2017 - B.jpg",
+    "creator": "Fructibus",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Yellow_plastic_colander_2017_-_B.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Yellow_plastic_colander_2017_-_B.jpg/1280px-Yellow_plastic_colander_2017_-_B.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "width": 1280,
+    "height": 960,
+    "notes": "黄色のプラスチック製ザル（両手付き）をほぼ真上から撮影。背景は明るいグレー/白の無地。全体が収まり余白あり。"
+  },
+  {
+    "id": "measuring-cup",
+    "name_ja": "計量カップ",
+    "file": "measuring-cup.jpg",
+    "title": "File:Plastic measuring cup 2017 B1.jpg",
+    "creator": "Fructibus",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Plastic_measuring_cup_2017_B1.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Plastic_measuring_cup_2017_B1.jpg/1280px-Plastic_measuring_cup_2017_B1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "width": 1280,
+    "height": 1280,
+    "notes": "半透明プラスチック製の1L計量カップ（取っ手・注ぎ口付き）を横からやや斜め上に撮影。背景はダークグレーの無地（明るい背景の適合候補なし）。全体が収まり余白あり。目盛りの文字は製品自体の印刷。真上からの写真は見つからず。"
+  },
+  {
+    "id": "suribachi",
+    "name_ja": "すり鉢",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "条件を満たす写真なし。Commonsの『Category:Suribachi and surikogi』とOpenverseを確認。最有力は『北生涯学習センターの調理器具 20211017 154420 HDR 03.jpg』(CC BY-SA 4.0、真上からのすり鉢単体)だが、背景が傷・反射のあるステンレス作業台で隅に別の物体が写り込み、無地背景の条件を満たさない。他は内部のクローズアップ（縁が切れている）、手・人物・食材入り、木製テーブル上など。"
+  }
+]

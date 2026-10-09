@@ -1,0 +1,30 @@
+[
+  {
+    "id": "peeler",
+    "name_ja": "ピーラー",
+    "file": "peeler.jpg",
+    "title": "VEGETABLE PEELER",
+    "creator": "Ranjithkumar Murugesan",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:VEGETABLE_PEELER.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/VEGETABLE_PEELER.jpg/500px-VEGETABLE_PEELER.jpg",
+    "width": 500,
+    "height": 802,
+    "notes": "Y字ピーラー（ステンレス柄・黒グリップ）を真上から撮影。背景はオフホワイト〜薄灰色の無地の面（細かい汚れ・小さな点が少しある）。全体が写り四辺に余白あり。ノーブランド。"
+  },
+  {
+    "id": "grater",
+    "name_ja": "おろし金",
+    "file": "grater.jpg",
+    "title": "Küchenreibe 1",
+    "creator": "Superbass",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:K%C3%BCchenreibe_1.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/K%C3%BCchenreibe_1.jpg/960px-K%C3%BCchenreibe_1.jpg",
+    "width": 960,
+    "height": 1440,
+    "notes": "ステンレス製の四面おろし器（赤い樹脂の持ち手）。薄灰色の無地スタジオ背景、全体が写り余白あり。斜め上からの3/4ビュー（真上からの写真は見つからず）。日本式の平板おろし金で条件を満たすもの（無地背景・全体・高解像度）は見つからなかったため西洋式で代替。"
+  }
+]

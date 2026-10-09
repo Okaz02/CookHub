@@ -1,0 +1,30 @@
+[
+  {
+    "id": "large-pot",
+    "name_ja": "両手鍋",
+    "file": "large-pot.jpg",
+    "title": "Nickel silver pot",
+    "creator": "국립국어원 (National Institute of Korean Language)",
+    "license": "CC BY-SA 2.0 KR",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/kr/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Nickel_silver_pot.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Nickel_silver_pot.jpg/960px-Nickel_silver_pot.jpg",
+    "width": 960,
+    "height": 640,
+    "notes": "白背景のスタジオ写真。木製取っ手の両手鍋（蓋付き、打ち出しアルミ）を斜め上3/4視点で全体表示。真上視点は見つからず。右上隅にごく薄い汚れあり（背景除去で消える程度）。"
+  },
+  {
+    "id": "donabe",
+    "name_ja": "土鍋",
+    "file": "donabe.jpg",
+    "title": "Cainz Donabe Hakusen-nagashi 19cm 1",
+    "creator": "Qurren",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Cainz_Donabe_Hakusen-nagashi_19cm_1.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Cainz_Donabe_Hakusen-nagashi_19cm_1.jpg/960px-Cainz_Donabe_Hakusen-nagashi_19cm_1.jpg",
+    "width": 960,
+    "height": 720,
+    "notes": "白〜薄灰色の無地背景。白釉の土鍋（蓋付き）をやや上からの横視点で全体表示、余白あり。真上視点はなし。白い鍋×白背景のため背景除去時は輪郭に注意。"
+  }
+]
