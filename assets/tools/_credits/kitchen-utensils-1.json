@@ -26,5 +26,61 @@
     "width": 960,
     "height": 1440,
     "notes": "ステンレス製の四面おろし器（赤い樹脂の持ち手）。薄灰色の無地スタジオ背景、全体が写り余白あり。斜め上からの3/4ビュー（真上からの写真は見つからず）。日本式の平板おろし金で条件を満たすもの（無地背景・全体・高解像度）は見つからなかったため西洋式で代替。"
+  },
+  {
+    "id": "whisk",
+    "name_ja": "泡立て器",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "見つからず。Wikimedia/Openverseで6クエリ検索。候補はいずれも不適合: 'Balloon spiral ball whisks'(CC BY 2.5, 白背景だが3本の泡立て器が写っている)、'Whisk (IMG 0265)'(木目テーブル背景)、'Metla pro kuchaře'(柄物の布背景)、'Mini whisk'(グラスと布背景)、Schneebesen 2022(接写で全体が写らない)、Flickr 'Whisk' by jeff_golden(白背景だが柄がぼけて切れている・アート写真)。"
+  },
+  {
+    "id": "ladle",
+    "name_ja": "おたま",
+    "file": "ladle.jpg",
+    "title": "John Burt Lyng (American, 1785) - Soup Ladle - 1940.234 - Cleveland Museum of Art",
+    "creator": "Cleveland Museum of Art (photograph); ladle made by John Burt Lyng",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:John_Burt_Lyng_(American,_1785)_-_Soup_Ladle_-_1940.234_-_Cleveland_Museum_of_Art.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/John_Burt_Lyng_%28American%2C_1785%29_-_Soup_Ladle_-_1940.234_-_Cleveland_Museum_of_Art.jpg/960px-John_Burt_Lyng_%28American%2C_1785%29_-_Soup_Ladle_-_1940.234_-_Cleveland_Museum_of_Art.jpg",
+    "width": 960,
+    "height": 1317,
+    "notes": "18世紀の銀製スープレードル（美術館の収蔵品写真）を真上から撮影。背景は中間グレーの無地（白ではない）。全体が写り四辺に余白あり。柄の先に小さな刻印（モノグラム）あり。現代のステンレス/樹脂製おたまで無地背景・全体が写る写真は見つからなかったため、形が典型的なおたまであるこれを採用。"
+  },
+  {
+    "id": "turner",
+    "name_ja": "フライ返し",
+    "file": "turner.jpg",
+    "title": "Fishslice1.jpg (A common spatula design)",
+    "creator": "FreeDigitalPhotos.net",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Fishslice1.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Fishslice1.jpg",
+    "width": 640,
+    "height": 480,
+    "notes": "スロット付きフライ返し（黒い樹脂ヘッド・ステンレス軸・緑のグリップ）を斜め上から撮影。背景は白〜薄灰色の無地グラデーション、全体が写り余白あり。原寸が640x480のため原寸を保存。出典表記はFreeDigitalPhotos.net（Commons上でCC BY-SA 3.0として掲載）。"
+  },
+  {
+    "id": "saibashi",
+    "name_ja": "菜箸",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "見つからず（条件を満たすものなし）。最有力候補は 'Saibashi with normal hashi.jpg'（CC BY-SA 2.5, 1280x960, https://commons.wikimedia.org/wiki/File:Saibashi_with_normal_hashi.jpg）: 薄い青灰色の無地布背景で、赤い先の竹製菜箸1膳を斜め上から撮影しているが、普通の箸1膳も同じ画面に写っているため『道具1つだけ』の条件を満たさない（菜箸部分だけをトリミングすれば使える可能性あり。BY-SAなので改変は可）。他候補は不適合: 'Saibashi and ohashi'(袋入り・布団の上)、'Chopsticks for cooking'(手で持っている)、Flickrの箸写真はいずれも料理・食卓の中。"
   }
 ]

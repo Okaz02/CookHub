@@ -45,7 +45,8 @@ export type CatalogIngredient = {
   name: string;
   aliases: string[];
   category: IngredientCategory;
-  photo?: ImageRequireSource;
+  // 背景を消した写真（消せなかったものは transparent: false）
+  photo?: { source: ImageRequireSource; transparent: boolean };
 };
 
 type Entry = [id: string, name: string, aliases: string[]];
@@ -328,8 +329,10 @@ export function suggestIngredients(query: string, limit = 24): CatalogIngredient
 
 // 候補の材料の画像。写真が無ければ絵文字
 export function catalogImage(item: CatalogIngredient): IngredientImage {
-  // 背景が無地の写真なので、表示側で丸く切り抜く（transparent: false）
-  return item.photo ? { asset: item.photo, transparent: false, source: "catalog" } : emojiImage(item.name);
+  // 背景を消せなかった写真は、表示側で丸く切り抜く（transparent: false）
+  return item.photo
+    ? { asset: item.photo.source, transparent: item.photo.transparent, source: "catalog" }
+    : emojiImage(item.name);
 }
 
 // 名前がぴったり一致する材料（入力し終えたときに、写真を自動で付けるのに使う）

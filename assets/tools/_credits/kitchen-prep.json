@@ -40,5 +40,47 @@
     "width": null,
     "height": null,
     "notes": "条件を満たす写真なし。Commonsの『Category:Suribachi and surikogi』とOpenverseを確認。最有力は『北生涯学習センターの調理器具 20211017 154420 HDR 03.jpg』(CC BY-SA 4.0、真上からのすり鉢単体)だが、背景が傷・反射のあるステンレス作業台で隅に別の物体が写り込み、無地背景の条件を満たさない。他は内部のクローズアップ（縁が切れている）、手・人物・食材入り、木製テーブル上など。"
+  },
+  {
+    "id": "vat",
+    "name_ja": "バット",
+    "file": "vat.jpg",
+    "title": "File:GN11100.jpg",
+    "creator": "AlekseyFAN",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:GN11100.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/GN11100.jpg/960px-GN11100.jpg",
+    "width": 960,
+    "height": 960,
+    "notes": "ステンレス製ガストロノーム容器 GN1/1（業務用バット、深さ100mm）を斜め上から撮影した製品写真。背景は白の無地、全体が収まる。モノクロ画像。真上からの写真はなし。日本の調理バットより深型。"
+  },
+  {
+    "id": "rice-cooker",
+    "name_ja": "炊飯器",
+    "file": "rice-cooker.jpg",
+    "title": "File:Hanabishi HRC-10WS 20130912 Rice cooker.jpg",
+    "creator": "Hans Olav Lien",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Hanabishi_HRC-10WS_20130912_Rice_cooker.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Hanabishi_HRC-10WS_20130912_Rice_cooker.jpg/1280px-Hanabishi_HRC-10WS_20130912_Rice_cooker.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "width": 1280,
+    "height": 1237,
+    "notes": "白いシンプルな電気炊飯器（ステンレス蓋）を斜め上から撮影。白い台＋白い壁のほぼ無地背景で全体が余白付きで収まる。電源コードが手前に伸びている。前面に小さなメーカーロゴ（Hanabishi）あり。真上からの写真は見つからず。"
+  },
+  {
+    "id": "blender",
+    "name_ja": "ミキサー",
+    "file": "blender.jpg",
+    "title": "File:Elektrische blender van het merk Princess - INDUS V09861.JPG",
+    "creator": "Industriemuseum Gent (via Wikimedia Belgium)",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Elektrische_blender_van_het_merk_Princess_-_INDUS_V09861.JPG",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Elektrische_blender_van_het_merk_Princess_-_INDUS_V09861.JPG/1280px-Elektrische_blender_van_het_merk_Princess_-_INDUS_V09861.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "width": 1280,
+    "height": 1707,
+    "notes": "ガラス容器・赤い本体のミキサー（Princess製）を正面やや上から撮影した博物館の収蔵品写真。背景は明るいグレー/白の無地スタジオ。全体が余白付きで収まる。電源コードが右に伸び、プラグに収蔵番号（V9861）の手書きラベルあり。本体に小さなメーカーロゴ。真上からの写真はなし。"
   }
 ]

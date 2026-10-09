@@ -26,5 +26,61 @@
     "width": 960,
     "height": 720,
     "notes": "白〜薄灰色の無地背景。白釉の土鍋（蓋付き）をやや上からの横視点で全体表示、余白あり。真上視点はなし。白い鍋×白背景のため背景除去時は輪郭に注意。"
+  },
+  {
+    "id": "wok",
+    "name_ja": "中華鍋",
+    "file": "wok.jpg",
+    "title": "Stickhandle-pekingpan",
+    "creator": "FiveRings (English Wikipedia)",
+    "license": "CC BY-SA 1.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/1.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Stickhandle-pekingpan.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Stickhandle-pekingpan.jpg/960px-Stickhandle-pekingpan.jpg",
+    "width": 960,
+    "height": 488,
+    "notes": "白〜オフホワイトの布（しわあり）背景。片手の北京鍋タイプ中華鍋を斜め上3/4視点で全体表示、余白あり。真上視点で無地背景の候補は見つからず。画質はやや古いデジカメ品質。"
+  },
+  {
+    "id": "steamer",
+    "name_ja": "蒸し器",
+    "file": "steamer.jpg",
+    "title": "Bamboo steamer-top cover PNr°0731",
+    "creator": "D-Kuru",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Bamboo_steamer-top_cover_PNr%C2%B00731.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Bamboo_steamer-top_cover_PNr%C2%B00731.jpg/960px-Bamboo_steamer-top_cover_PNr%C2%B00731.jpg",
+    "width": 960,
+    "height": 960,
+    "notes": "淡い青灰色の無地スタジオ背景。竹製せいろ（蒸籠）を真上から撮影、蓋の編み目が見える。全体が収まり余白あり。金属製の蒸し器ではなく竹せいろ。同作者の斜め視点版（PNr°0727）も候補。"
+  },
+  {
+    "id": "kettle",
+    "name_ja": "やかん",
+    "file": "kettle.jpg",
+    "title": "Bollitore bricco",
+    "creator": "Carnby",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Bollitore_bricco.jpg",
+    "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Bollitore_bricco.jpg/960px-Bollitore_bricco.jpg",
+    "width": 960,
+    "height": 720,
+    "notes": "純白背景（切り抜き済みに近い）。アルミ製のやかん（つる手・蓋付き）を真横から全体表示、余白あり。真上視点ではない。"
+  },
+  {
+    "id": "tempura-pot",
+    "name_ja": "天ぷら鍋",
+    "file": null,
+    "title": null,
+    "creator": null,
+    "license": null,
+    "license_url": null,
+    "source_url": null,
+    "image_url": null,
+    "width": null,
+    "height": null,
+    "notes": "条件を満たす写真なし。Wikimedia/Openverseで tempura pot / 天ぷら鍋 / 揚げ鍋 / tempura nabe / deep fryer pot を検索。見つかったのは店頭の箱上・ビニール包装の天ぷら鍋（File:Tempura nabe.jpg 等、背景が雑多・説明書が載っている）、電気フライヤー（別物）、窓際の調理台上のフライバスケット付き鍋（File:Frituurpan BK .jpg、背景が無地でない）のみ。"
   }
 ]

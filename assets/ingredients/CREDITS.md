@@ -1,7 +1,7 @@
 # 材料の写真の出典
 
 CC BY / CC BY-SA の写真は、アプリ内で作者名・ライセンスの表記が必要です。
-CC BY-SA の写真は、背景を消すなどの加工をしたものも CC BY-SA で公開する必要があります。
+CC BY-SA の写真は、背景を消すなどの加工をしたものも CC BY-SA で公開する必要があります（アプリ内の thumbs はすべて加工済み）。
 
 | 材料 | ファイル | 作者 | ライセンス | 出典 |
 |---|---|---|---|---|
@@ -147,4 +147,4 @@ CC BY-SA の写真は、背景を消すなどの加工をしたものも CC BY-S
 | ヨーグルト | yogurt.jpg | Rainer Zenz (Wikimedia Commons) | [CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/) | [Joghurt.jpg](https://commons.wikimedia.org/wiki/File:Joghurt.jpg) |
 | ズッキーニ | zucchini.jpg | Donovan Govan. | [CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/) | [Courgette.jpg](https://commons.wikimedia.org/wiki/File:Courgette.jpg) |
 
-写真が見つからなかった材料: 小豆、ひじき、干ししいたけ、春雨、マカロニ、ビーフン、ほたて、たこ、いわし、さんま、豚こま切れ肉、ココナッツミルク、クリームチーズ、焼肉のたれ、ナンプラー、甜麺醤、あじ、ぶり、ごま油、オリーブオイル、みりん、料理酒、めんつゆ、ポン酢、顆粒だし、パクチー、山椒、キャベツ、レタス、大根、さつまいも、にら、長芋、かいわれ大根、三つ葉
+写真が見つからなかった材料: 小豆、ひじき、干ししいたけ、春雨、マカロニ、ビーフン、ほたて、たこ、いわし、さんま、豚こま切れ肉、ココナッツミルク、クリームチーズ、焼肉のたれ、ナンプラー、甜麺醤、あじ、ぶり、ごま油、オリーブオイル、みりん、料理酒、めんつゆ、ポン酢、顆粒だし、パクチー、山椒、キャベツ、レタス、大根、さつまいも、にら、オクラ、長芋、かいわれ大根、三つ葉
