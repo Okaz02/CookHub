@@ -329,9 +329,7 @@ export function suggestIngredients(query: string, limit = 24): CatalogIngredient
 
 // 卵かどうか（器に入れるとき「割り入れる」を選べるようにする）
 export function isEgg(name: string) {
-  const q = normalizeIngredientName(name);
-  const egg = INGREDIENT_CATALOG.find((item) => item.id === "egg");
-  return Boolean(egg && [egg.name, ...egg.aliases].some((alias) => normalizeIngredientName(alias) === q));
+  return findByAnyName(name)?.id === "egg";
 }
 
 // 候補の材料の画像。写真が無ければ絵文字
@@ -347,4 +345,100 @@ export function findCatalogIngredient(name: string): CatalogIngredient | undefin
   const q = normalizeIngredientName(name);
   if (!q) return undefined;
   return NORMALIZED.find(({ item }) => normalizeIngredientName(item.name) === q)?.item;
+}
+
+// 材料を別の材料の上に重ねたときに選べる動作（重ねる側の材料で決まる）。
+// 肉・野菜のように、重ねても何もしない材料は載せない
+const POWDER = ["振る", "まぶす", "揉み込む"];
+const LIQUID = ["かける", "揉み込む", "漬ける"];
+const OIL = ["かける", "回しかける", "塗る"];
+const PASTE = ["塗る", "和える", "揉み込む"];
+const COATING = ["まぶす", "衣をつける"];
+const TOPPING = ["ふりかける", "散らす", "のせる"];
+const GARNISH = ["のせる", "散らす", "添える"];
+const DAIRY = ["かける", "加える"];
+
+const APPLY_ACTIONS: Record<string, string[]> = {
+  salt: POWDER,
+  sugar: POWDER,
+  "brown-sugar": POWDER,
+  "black-pepper": POWDER,
+  shichimi: ["振る", "かける"],
+  "chicken-bouillon": POWDER,
+  "dashi-powder": POWDER,
+  consomme: ["振る", "加える"],
+  "curry-powder": POWDER,
+  cumin: POWDER,
+  cinnamon: ["振る", "まぶす"],
+  nutmeg: POWDER,
+  sansho: ["振る", "かける"],
+  "red-chili": ["散らす", "加える"],
+  "soy-sauce": LIQUID,
+  mirin: LIQUID,
+  "cooking-sake": LIQUID,
+  vinegar: LIQUID,
+  mentsuyu: LIQUID,
+  ponzu: LIQUID,
+  "worcestershire-sauce": LIQUID,
+  "oyster-sauce": LIQUID,
+  "fish-sauce": LIQUID,
+  "yakiniku-sauce": LIQUID,
+  "red-wine": LIQUID,
+  "white-wine": LIQUID,
+  honey: ["かける", "塗る", "漬ける"],
+  "salad-oil": OIL,
+  "sesame-oil": OIL,
+  "olive-oil": OIL,
+  miso: PASTE,
+  mayonnaise: ["かける", "和える", "塗る"],
+  ketchup: ["かける", "和える", "塗る"],
+  doubanjiang: PASTE,
+  gochujang: PASTE,
+  tianmianjiang: PASTE,
+  karashi: ["塗る", "添える", "和える"],
+  wasabi: ["のせる", "添える", "塗る"],
+  "garlic-paste": PASTE,
+  "ginger-paste": PASTE,
+  "grain-mustard": ["塗る", "添える"],
+  butter: ["のせる", "塗る"],
+  flour: COATING,
+  "potato-starch": COATING,
+  panko: COATING,
+  "white-sesame": TOPPING,
+  katsuobushi: TOPPING,
+  nori: TOPPING,
+  parsley: GARNISH,
+  basil: GARNISH,
+  cilantro: GARNISH,
+  rosemary: ["のせる", "添える"],
+  shiso: GARNISH,
+  mitsuba: GARNISH,
+  "green-onion": GARNISH,
+  "beni-shoga": ["のせる", "添える"],
+  "radish-sprouts": GARNISH,
+  cheese: ["のせる", "かける"],
+  parmesan: ["かける", "ふりかける"],
+  egg: ["からめる", "くぐらせる"],
+  lemon: ["しぼる", "添える"],
+  milk: DAIRY,
+  "fresh-cream": DAIRY,
+  "soy-milk": DAIRY,
+  "coconut-milk": DAIRY,
+  yogurt: ["かける", "和える", "漬ける"],
+};
+
+// 名前（または別名）がぴったり一致する一覧の材料。ユーザーが入力した名前から探す
+function findByAnyName(name: string): CatalogIngredient | undefined {
+  const q = normalizeIngredientName(name);
+  if (!q) return undefined;
+  return (
+    NORMALIZED.find(({ item }) => normalizeIngredientName(item.name) === q)?.item ??
+    NORMALIZED.find(({ names }) => names.includes(q))?.item
+  );
+}
+
+// その材料を別の材料に重ねたときに選べる動作。何もしない材料なら空
+export function applyActionsFor(name: string): string[] {
+  const item = findByAnyName(name);
+  return item ? (APPLY_ACTIONS[item.id] ?? []) : [];
 }

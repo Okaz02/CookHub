@@ -25,6 +25,8 @@ const PAD = 12;
 const GAP = 10;
 const LABEL = 24;
 const CELL_GAP = 8;
+// 材料・器具の名前は絵の下にはみ出して出すので、その分の高さを各段に足す（無いとスクロールする枠で切れる）
+const NAME_SPACE = 14;
 // 調理台のうちまな板が占める割合（右側）
 const BOARD_SHARE = 0.45;
 // まな板は手前（下）に持ち手の穴があるので、材料はその上に並べる
@@ -78,10 +80,10 @@ function gridScrollArea(view: Rect, columns: number, w: number, h: number, count
   return {
     view,
     contentWidth: CELL_GAP + columns * (w + CELL_GAP),
-    contentHeight: rows * (h + CELL_GAP) + CELL_GAP,
+    contentHeight: rows * (h + CELL_GAP + NAME_SPACE) + CELL_GAP,
     slot: (index) => ({
       x: CELL_GAP + (index % columns) * (w + CELL_GAP),
-      y: CELL_GAP + Math.floor(index / columns) * (h + CELL_GAP),
+      y: CELL_GAP + Math.floor(index / columns) * (h + CELL_GAP + NAME_SPACE),
       w,
       h,
     }),
@@ -90,9 +92,10 @@ function gridScrollArea(view: Rect, columns: number, w: number, h: number, count
 
 // 1行だけで横にスクロールする。枠は縦の真ん中に置く
 function rowScrollArea(area: Rect, w: number, h: number, count: number): ScrollArea {
-  const top = LABEL + (area.h - LABEL - (h + CELL_GAP * 2)) / 2;
+  const rowHeight = h + CELL_GAP * 2 + NAME_SPACE;
+  const top = LABEL + (area.h - LABEL - rowHeight) / 2;
   return gridScrollArea(
-    { x: area.x, y: area.y + top, w: area.w, h: h + CELL_GAP * 2 },
+    { x: area.x, y: area.y + top, w: area.w, h: rowHeight },
     Math.max(1, count),
     w,
     h,
@@ -136,7 +139,7 @@ function layoutAt(
   const bottomHeight = LABEL + 4 + burnerRows.length * rowHeight + 4;
 
   // 上の段：左が棚、右が器具置き場。高さは器具の枠に合わせる
-  const topHeight = LABEL + TOOL_CELL_HEIGHT + CELL_GAP * 2;
+  const topHeight = LABEL + TOOL_CELL_HEIGHT + CELL_GAP * 2 + NAME_SPACE;
   const shelfWidth = Math.floor((innerWidth - GAP) / 2);
   const shelf: Rect = { x: PAD, y: PAD, w: shelfWidth, h: topHeight };
   const rack: Rect = { x: PAD + shelfWidth + GAP, y: PAD, w: innerWidth - GAP - shelfWidth, h: topHeight };
@@ -144,7 +147,7 @@ function layoutAt(
   // 調理台：残りの高さをすべて使う。右側だけまな板
   const counterTop = shelf.y + shelf.h + GAP;
   // 作業する場所なので、最低でも器具の枠が1段まるごと見える高さにする
-  const minCounter = LABEL + TOOL_CELL_HEIGHT + CELL_GAP * 2;
+  const minCounter = LABEL + TOOL_CELL_HEIGHT + CELL_GAP * 2 + NAME_SPACE;
   const restHeight = height - PAD - bottomHeight - GAP - counterTop;
   if (restHeight < minCounter && !allowOverflow) return null;
   const counter: Rect = { x: PAD, y: counterTop, w: innerWidth, h: Math.max(minCounter, restHeight) };

@@ -118,6 +118,8 @@ export type CookEvent = EventBase &
     | { type: "placeOnBurner"; toolId: string; burner: number }
     | { type: "addWater"; toolId: string; ml: number }
     | { type: "addIngredient"; toolId: string; ingredientId: string; intoBoiling: boolean }
+    // 材料を別の材料に重ねて動作する（肉に塩を振る など）。ingredientId が重ねた側、targetId が重ねられた側
+    | { type: "applyIngredient"; ingredientId: string; targetId: string; action: string }
     // 卵を器に割り入れる
     | { type: "crackEgg"; toolId: string; ingredientId: string }
     // 器具の中の材料をまな板に取り出す
@@ -146,6 +148,8 @@ export type CookEvent = EventBase &
         toolId: string;
         ingredientIds: string[];
         action: string;
+        // 「たたく」など、回数を選べる動作の回数
+        count?: number;
       }
   );
 

@@ -39,6 +39,7 @@ export type KitchenAction =
   | { type: "addWater"; toolId: string; ml: number }
   | { type: "addIngredientToTool"; toolId: string; ingredientId: string }
   | { type: "crackEgg"; toolId: string; ingredientId: string }
+  | { type: "applyIngredient"; ingredientId: string; targetId: string; action: string }
   | { type: "heat"; toolId: string; level: HeatLevel; minutes: number; action?: string }
   | { type: "turnOff"; toolId: string }
   | { type: "addBurner" }
@@ -51,6 +52,7 @@ export type KitchenAction =
       ingredientId?: string;
       action: string;
       putInside: boolean;
+      count?: number;
     }
   | { type: "addCustomTool"; definition: CustomToolDefinition }
   | { type: "undo" };
@@ -281,6 +283,21 @@ function apply(snapshot: KitchenSnapshot, action: Exclude<KitchenAction, { type:
         }),
       };
     }
+    case "applyIngredient": {
+      const ingredient = snapshot.ingredients.find((item) => item.id === action.ingredientId);
+      const target = snapshot.ingredients.find((item) => item.id === action.targetId);
+      if (!ingredient || !target || ingredient.id === target.id || !action.action) return null;
+      // 重ねた側（調味料など）は使った分だけ減る想定なので、置き場所は変えない
+      return {
+        ...snapshot,
+        events: withEvent(snapshot, {
+          type: "applyIngredient",
+          ingredientId: ingredient.id,
+          targetId: target.id,
+          action: action.action,
+        }),
+      };
+    }
     case "crackEgg": {
       const tool = snapshot.tools.find((item) => item.id === action.toolId);
       const ingredient = snapshot.ingredients.find((item) => item.id === action.ingredientId);
@@ -392,6 +409,7 @@ function apply(snapshot: KitchenSnapshot, action: Exclude<KitchenAction, { type:
           toolId: tool.id,
           ingredientIds: targetIds,
           action: action.action,
+          count: action.count,
         }),
       };
     }

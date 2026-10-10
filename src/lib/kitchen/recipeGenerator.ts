@@ -41,6 +41,47 @@ function joinClauses(clauses: Clause[]): string {
   return [...head, clauses[clauses.length - 1].end].join("、") + "。";
 }
 
+// 材料を別の材料に重ねたときの言い方。a が重ねた材料（塩など）、b が重ねられた材料（肉など）
+//   ni   … 「b に a を振る」     wo-ni … 「b を a に漬ける」
+//   wo-de … 「b を a で和える」  ni-de … 「b に a で衣をつける」
+const APPLY_PHRASES: Record<string, { te: string; pattern: "ni" | "wo-ni" | "wo-de" | "ni-de" }> = {
+  振る: { te: "振り", pattern: "ni" },
+  まぶす: { te: "まぶし", pattern: "ni" },
+  揉み込む: { te: "揉み込み", pattern: "ni" },
+  かける: { te: "かけ", pattern: "ni" },
+  回しかける: { te: "回しかけ", pattern: "ni" },
+  塗る: { te: "塗り", pattern: "ni" },
+  のせる: { te: "のせ", pattern: "ni" },
+  散らす: { te: "散らし", pattern: "ni" },
+  添える: { te: "添え", pattern: "ni" },
+  ふりかける: { te: "ふりかけ", pattern: "ni" },
+  からめる: { te: "からめ", pattern: "ni" },
+  しぼる: { te: "しぼり", pattern: "ni" },
+  加える: { te: "加え", pattern: "ni" },
+  漬ける: { te: "漬け", pattern: "wo-ni" },
+  くぐらせる: { te: "くぐらせ", pattern: "wo-ni" },
+  和える: { te: "和え", pattern: "wo-de" },
+  衣をつける: { te: "衣をつけ", pattern: "ni-de" },
+};
+
+// withTarget が false のときは b を省く（同じ材料に続けて行うとき「豚肉に塩を振り、こしょうを振る」）
+function applyClause(a: string, b: string, verb: string, withTarget: boolean): Clause {
+  const phrase = APPLY_PHRASES[verb] ?? { te: verb, pattern: "ni" as const };
+  const build = (form: string) => {
+    switch (phrase.pattern) {
+      case "ni":
+        return `${withTarget ? `${b}に` : ""}${a}を${form}`;
+      case "wo-ni":
+        return `${withTarget ? `${b}を` : ""}${a}に${form}`;
+      case "wo-de":
+        return `${withTarget ? `${b}を` : ""}${a}で${form}`;
+      case "ni-de":
+        return `${withTarget ? `${b}に` : ""}${a}で${form}`;
+    }
+  };
+  return { te: build(phrase.te), end: build(verb) };
+}
+
 function heatPhrase(level: HeatLevel, minutes: number) {
   return `${getHeatLevel(level).label}で${formatNumber(minutes)}分`;
 }
@@ -87,8 +128,10 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
 
   const bodies: string[] = [];
   let pending: Clause[] = [];
-  let pendingKind: "wash" | "cut" | "tool" | null = null;
+  let pendingKind: "wash" | "cut" | "apply" | "tool" | null = null;
   let pendingToolId: string | null = null;
+  // 材料を重ねる動作は、同じ材料に続けて行ったものを1つの手順にまとめる
+  let pendingTargetId: string | null = null;
   // 器具ごとに、手順文の中でまだ名前を出していないかどうか。
   let mentionedTool = false;
 
@@ -97,6 +140,7 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
     pending = [];
     pendingKind = null;
     pendingToolId = null;
+    pendingTargetId = null;
     mentionedTool = false;
   };
 
@@ -117,6 +161,24 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
       }
       pendingKind = "wash";
       pending.push({ te: `${joinNames(names)}を水で洗い`, end: `${joinNames(names)}を水で洗う` });
+      continue;
+    }
+
+    if (event.type === "applyIngredient") {
+      const sameTarget = pendingKind === "apply" && pendingTargetId === event.targetId;
+      if (!sameTarget) {
+        flush();
+        pendingKind = "apply";
+        pendingTargetId = event.targetId;
+      }
+      pending.push(
+        applyClause(
+          lookup.ingredientName(event.ingredientId),
+          lookup.ingredientName(event.targetId),
+          event.action,
+          !sameTarget
+        )
+      );
       continue;
     }
 
@@ -240,7 +302,8 @@ export function generateSteps(snapshot: KitchenSnapshot): Step[] {
       case "toolAction": {
         const names = event.ingredientIds.map(lookup.ingredientName);
         const target = names.length > 0 ? `${joinNames(names)}を` : "";
-        const sentence = `${toolLabel(tool)}で${target}${event.action}`;
+        const count = event.count ? `${event.count}回` : "";
+        const sentence = `${toolLabel(tool)}で${target}${count}${event.action}`;
         pending.push({ te: sentence, end: sentence });
         flush();
         break;
@@ -299,6 +362,15 @@ export function getIngredientHistory(snapshot: KitchenSnapshot, ingredientId: st
           });
         }
         break;
+      case "applyIngredient":
+        if (event.targetId === ingredientId) {
+          const name = snapshot.ingredients.find((item) => item.id === event.ingredientId)?.name ?? "材料";
+          entries.push({ id: event.id, icon: "add-circle-outline", text: `${name}を${event.action}` });
+        } else if (event.ingredientId === ingredientId) {
+          const name = snapshot.ingredients.find((item) => item.id === event.targetId)?.name ?? "材料";
+          entries.push({ id: event.id, icon: "add-circle-outline", text: `${name}に使った（${event.action}）` });
+        }
+        break;
       case "crackEgg":
         if (event.ingredientId === ingredientId) {
           entries.push({ id: event.id, icon: "egg", text: `${toolName(event.toolId)}に割り入れた` });
@@ -320,7 +392,8 @@ export function getIngredientHistory(snapshot: KitchenSnapshot, ingredientId: st
         break;
       case "toolAction":
         if (event.ingredientIds.includes(ingredientId)) {
-          entries.push({ id: event.id, icon: "build", text: `${toolName(event.toolId)}で「${event.action}」` });
+          const count = event.count ? `（${event.count}回）` : "";
+          entries.push({ id: event.id, icon: "build", text: `${toolName(event.toolId)}で「${event.action}」${count}` });
         }
         break;
       default:

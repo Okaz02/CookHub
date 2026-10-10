@@ -52,6 +52,10 @@ export const HEAT_ACTIONS: { verb: string; te: string; past: string }[] = [
   { verb: "揚げる", te: "揚げ", past: "揚げた" },
 ];
 
+// 回数を選べる動作と、その選択肢
+export const COUNTED_ACTIONS = ["たたく"];
+export const ACTION_COUNT_PRESETS = [5, 10, 20, 30];
+
 export function isHeatAction(verb: string) {
   return HEAT_ACTIONS.some((item) => item.verb === verb);
 }

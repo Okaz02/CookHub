@@ -26,13 +26,14 @@ import {
   type IngredientSeed,
   type KitchenSnapshot,
 } from "../../lib/kitchen/reducer";
-import { isEgg } from "../../lib/kitchen/ingredientCatalog";
+import { applyActionsFor, isEgg } from "../../lib/kitchen/ingredientCatalog";
 import { generateIngredients, generateSteps } from "../../lib/kitchen/recipeGenerator";
 import type { HeatLevel, KitchenIngredient, KitchenTool } from "../../lib/kitchen/types";
 import type { Ingredient, Step } from "../../lib/api-recipe";
 import { CustomToolSheet } from "./CustomToolSheet";
 import { CutSheet } from "./CutSheet";
 import { EggSheet } from "./EggSheet";
+import { ApplySheet } from "./ApplySheet";
 import { Draggable } from "./Draggable";
 import { FocusSheet, type FocusTarget } from "./FocusSheet";
 import { HeatSheet } from "./HeatSheet";
@@ -47,6 +48,7 @@ import { WaterSheet } from "./WaterSheet";
 type Sheet =
   | { type: "cut"; ingredientId: string }
   | { type: "egg"; ingredientId: string; toolId: string }
+  | { type: "apply"; ingredientId: string; targetId: string }
   // fromFaucet: シンクの蛇口から入れる（入れるときに蛇口から水を出す）
   | { type: "water"; toolId: string; fromFaucet?: boolean }
   | { type: "heat"; toolId: string }
@@ -290,6 +292,12 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
 
   function dropIngredient(ingredient: KitchenIngredient, point: Point): boolean {
     if (!layout) return false;
+    // 調味料などを別の材料に重ねたら、何をするか選ぶ（肉など、重ねても何もしない材料は下の処理へ）
+    const targetIngredient = hitIngredient(point, ingredient.id);
+    if (targetIngredient && applyActionsFor(ingredient.name).length > 0) {
+      setSheet({ type: "apply", ingredientId: ingredient.id, targetId: targetIngredient.id });
+      return false;
+    }
     const hit = hitTool(point);
     const tool = hit ? underLid(hit) : undefined;
     if (tool && lidOn(snapshot, tool.id)) {
@@ -767,6 +775,20 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
         />
       ) : null}
 
+      {sheet?.type === "apply" ? (
+        <ApplySheet
+          visible
+          ingredientName={findIngredient(sheet.ingredientId)?.name ?? ""}
+          targetName={findIngredient(sheet.targetId)?.name ?? ""}
+          actions={applyActionsFor(findIngredient(sheet.ingredientId)?.name ?? "")}
+          onClose={() => setSheet(null)}
+          onSelect={(action) => {
+            dispatch({ type: "applyIngredient", ingredientId: sheet.ingredientId, targetId: sheet.targetId, action });
+            setSheet(null);
+          }}
+        />
+      ) : null}
+
       {sheet?.type === "egg" ? (
         <EggSheet
           visible
@@ -831,6 +853,7 @@ export function KitchenEditor({ seeds, onBack, onFinish }: Props) {
                 ingredientId: sheet.ingredientId ?? undefined,
                 action: choice.action,
                 putInside: choice.putInside,
+                count: choice.count,
               });
             }
             setSheet(null);
