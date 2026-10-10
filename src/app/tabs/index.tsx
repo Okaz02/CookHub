@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, TextInput, Pressable, ScrollView, Image } from 
 import { useFocusEffect, useRouter } from "expo-router";
 import { getTrend, type Recipe } from "../../lib/api-recipe";
 import { useAuth } from "../../context/AuthContext";
+import { RecipeCard } from "../../components/RecipeCard";
 import { colors, textStyles } from "../../theme";
 
 export default function Index() {
@@ -38,17 +39,7 @@ export default function Index() {
       <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
 
         {trendRecipes.map((recipe) => (
-          <Pressable key={recipe.id} style={styles.recipe} onPress={() => router.push(`/tabs/recipe/${recipe.id}`)}>
-            {recipe.thumbnail ? (
-              <Image style={styles.recipeImage} source={{ uri: recipe.thumbnail }} />
-            ) : (
-              <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
-            )}
-            <View style={styles.recipeExplain}>
-              <Text style={textStyles.h3Text}>{recipe.name}</Text>
-              <Text style={textStyles.text}>{recipe.owner.username}</Text>
-            </View>
-          </Pressable>
+          <RecipeCard key={recipe.id} recipe={recipe} style={styles.recipe} />
         ))}
 
         {trendRecipes.length === 0 ? <Text style={textStyles.text}>まだ公開されたレシピがありません。</Text> : null}
@@ -153,23 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.outline,
   },
   recipe: {
-    backgroundColor: colors.primary,
-    height: 350,
     width: 300,
-    overflow: "hidden",
-    borderRadius: 20,
-  },
-  recipeImage: {
-    width: 300,
-    height: 200,
-  },
-  recipeImagePlaceholder: {
-    backgroundColor: colors.surfaceContainerHigh,
-  },
-  recipeExplain: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: colors.surfaceContainerLow,
   },
   update: {
     height: 125,

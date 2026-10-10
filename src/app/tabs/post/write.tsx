@@ -75,7 +75,7 @@ export default function Write() {
         .then((res) => {
           if (cancelled) return;
           const recipe = res.data;
-          setTitle(recipe.name);
+          setTitle(recipe.title);
           setDescription(recipe.description ?? "");
           setThumbnail(recipe.thumbnail ?? "");
           setIsDraft(recipe.draft);
@@ -190,7 +190,7 @@ export default function Write() {
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <Pressable style={styles.discardButton} onPress={() => router.back()}>
+        <Pressable style={styles.discardButton} onPress={() => router.push("/tabs/post")}>
           <MaterialIcons name="close" size={20} color={colors.onSurfaceVariant} />
           <Text style={styles.discardText}>破棄</Text>
         </Pressable>

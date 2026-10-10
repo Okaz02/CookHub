@@ -13,7 +13,7 @@ export type Permissions = {
 
 export type Recipe = {
     id: number;
-    name: string;
+    title: string;
     full_name: string;
     description: string;
     owner: Owner;
@@ -174,42 +174,42 @@ export type ForkInput = RecipeInput & {
 
 // バックエンドのエンドポイントは /api/repos のままなので、URL だけは repos を使う。
 export async function getTrend(token?: string | null): Promise<RecipesResponse> {
-    return request<RecipesResponse>("/api/repos/trend", {
+    return request<RecipesResponse>("/api/recipes/trend", {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function getUserRecipe(token: string): Promise<RecipesResponse> {
-    return request<RecipesResponse>("/api/repos/mine", {
+    return request<RecipesResponse>("/api/recipes/mine", {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function getRecipe(id: number, token?: string | null): Promise<RecipeResponse> {
-    return request<RecipeResponse>(`/api/repos/${id}`, {
+    return request<RecipeResponse>(`/api/recipes/${id}`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function getRecipeCommits(id: number, token?: string | null): Promise<CommitsResponse> {
-    return request<CommitsResponse>(`/api/repos/${id}/commits`, {
+    return request<CommitsResponse>(`/api/recipes/${id}/commits`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function getRecipeCommit(id: number, commitId: string, token?: string | null): Promise<CommitResponse> {
-    return request<CommitResponse>(`/api/repos/${id}/commits/${commitId}`, {
+    return request<CommitResponse>(`/api/recipes/${id}/commits/${commitId}`, {
         method: "GET",
         headers: authHeaders(token),
     });
 }
 
 export async function createRecipe(input: RecipeInput, token: string): Promise<RecipeResponse> {
-    return request<RecipeResponse>("/api/repos", {
+    return request<RecipeResponse>("/api/recipes", {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify(input),
@@ -217,7 +217,7 @@ export async function createRecipe(input: RecipeInput, token: string): Promise<R
 }
 
 export async function updateRecipe(id: number, input: RecipeInput, token: string): Promise<RecipeResponse> {
-    return request<RecipeResponse>(`/api/repos/${id}`, {
+    return request<RecipeResponse>(`/api/recipes/${id}`, {
         method: "PATCH",
         headers: authHeaders(token),
         body: JSON.stringify(input),
@@ -225,14 +225,14 @@ export async function updateRecipe(id: number, input: RecipeInput, token: string
 }
 
 export async function deleteRecipe(id: number, token: string): Promise<{ ok: boolean; commit?: string | null; data: { id: number } }> {
-    return request(`/api/repos/${id}`, {
+    return request(`/api/recipes/${id}`, {
         method: "DELETE",
         headers: authHeaders(token),
     });
 }
 
 export async function forkRecipe(id: number, input: ForkInput, token: string): Promise<RecipeResponse> {
-    return request<RecipeResponse>(`/api/repos/${id}/fork`, {
+    return request<RecipeResponse>(`/api/recipes/${id}/fork`, {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify(input),

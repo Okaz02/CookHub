@@ -37,7 +37,7 @@ export async function createPullRequest(
     input: CreatePullRequestInput,
     token: string
 ): Promise<PullRequestResponse> {
-    return request<PullRequestResponse>(`/api/repos/${forkRecipeId}/pull-request/create`, {
+    return request<PullRequestResponse>(`/api/recipes/${forkRecipeId}/pull-request/create`, {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify(input),
@@ -49,7 +49,7 @@ export async function mergePullRequest(
     input: MergePullRequestInput,
     token: string
 ): Promise<PullRequestResponse> {
-    return request<PullRequestResponse>(`/api/repos/${pullRequestId}/pull-request/merge`, {
+    return request<PullRequestResponse>(`/api/recipes/${pullRequestId}/pull-request/merge`, {
         method: "POST",
         headers: authHeaders(token),
         body: input.commit_message ? JSON.stringify(input) : undefined,

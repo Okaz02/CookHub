@@ -78,7 +78,7 @@ export default function PostList() {
                   <View style={styles.draftThumbnail} />
                 )}
                 <View style={styles.draftInfo}>
-                  <Text style={styles.draftTitle}>{recipe.name}</Text>
+                  <Text style={styles.draftTitle}>{recipe.title}</Text>
                   <RecipeStateBadges recipe={recipe} showFork />
                   <Text style={styles.draftMeta}>
                     最終更新: {new Date(recipe.updated_at).toLocaleDateString("ja-JP")}

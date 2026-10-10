@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
-import { Text, TextInput, View, StyleSheet, ScrollView, Image, Pressable, ActivityIndicator } from "react-native";
-import { useFocusEffect, useRouter } from "expo-router";
+import { Text, TextInput, View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { useFocusEffect } from "expo-router";
 import { getTrend, type Recipe } from "../../lib/api-recipe";
 import { useAuth } from "../../context/AuthContext";
+import { RecipeCard } from "../../components/RecipeCard";
 import { colors, textStyles } from "../../theme";
 
 export default function Search() {
-  const router = useRouter();
   const { token } = useAuth();
   const [query, setQuery] = useState("");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -27,7 +27,7 @@ export default function Search() {
     if (!normalized) return recipes;
     return recipes.filter(
       (recipe) =>
-        recipe.name.toLowerCase().includes(normalized) ||
+        recipe.title.toLowerCase().includes(normalized) ||
         recipe.description?.toLowerCase().includes(normalized) ||
         recipe.owner.username.toLowerCase().includes(normalized)
     );
@@ -46,17 +46,7 @@ export default function Search() {
       ) : (
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
           {filteredRecipes.map((recipe) => (
-            <Pressable key={recipe.id} style={styles.recipe} onPress={() => router.push(`/tabs/recipe/${recipe.id}`)}>
-              {recipe.thumbnail ? (
-                <Image style={styles.recipeImage} source={{ uri: recipe.thumbnail }} />
-              ) : (
-                <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
-              )}
-              <View style={styles.recipeExplain}>
-                <Text style={textStyles.h3Text}>{recipe.name}</Text>
-                <Text style={textStyles.text}>{recipe.owner.username}</Text>
-              </View>
-            </Pressable>
+            <RecipeCard key={recipe.id} recipe={recipe} />
           ))}
           {filteredRecipes.length === 0 ? <Text style={textStyles.text}>該当するレシピが見つかりませんでした。</Text> : null}
         </ScrollView>
@@ -89,22 +79,5 @@ const styles = StyleSheet.create({
     borderColor: colors.outlineVariant,
     backgroundColor: colors.surfaceContainerLow,
     color: colors.onSurface,
-  },
-  recipe: {
-    backgroundColor: colors.primary,
-    height: 350,
-    overflow: "hidden",
-    borderRadius: 20,
-  },
-  recipeImage: {
-    height: 200,
-  },
-  recipeImagePlaceholder: {
-    backgroundColor: colors.surfaceContainerHigh,
-  },
-  recipeExplain: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: colors.surfaceContainerLow,
   }
 });

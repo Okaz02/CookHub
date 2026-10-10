@@ -4,26 +4,17 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
 import { getUserRecipe, type Recipe } from "../../lib/api-recipe";
+import { RecipeCard } from "../../components/RecipeCard";
 import { RecipeStateBadges } from "../../components/RecipeStateBadges";
 import { colors, textStyles } from "../../theme";
 
 function RecipeListRoute({ recipes, emptyText }: { recipes: Recipe[]; emptyText: string }) {
-  const router = useRouter();
-
   return (
     <ScrollView contentContainerStyle={styles.tabContent}>
       {recipes.map((recipe) => (
-        <Pressable key={recipe.id} style={styles.recipe} onPress={() => router.push(`/tabs/recipe/${recipe.id}`)}>
-          {recipe.thumbnail ? (
-            <Image style={styles.recipeImage} source={{ uri: recipe.thumbnail }} />
-          ) : (
-            <View style={[styles.recipeImage, styles.recipeImagePlaceholder]} />
-          )}
-          <View style={styles.recipeExplain}>
-            <Text style={textStyles.h3Text}>{recipe.name}</Text>
-            <RecipeStateBadges recipe={recipe} />
-          </View>
-        </Pressable>
+        <RecipeCard key={recipe.id} recipe={recipe}>
+          <RecipeStateBadges recipe={recipe} />
+        </RecipeCard>
       ))}
       {recipes.length === 0 ? <Text style={styles.emptyText}>{emptyText}</Text> : null}
     </ScrollView>
@@ -229,23 +220,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceContainerLow,
     padding: 20,
     borderRadius: 20,
-  },
-  recipe: {
-    backgroundColor: colors.primary,
-    height: 350,
-    overflow: "hidden",
-    borderRadius: 20,
-  },
-  recipeImage: {
-    height: 200,
-  },
-  recipeImagePlaceholder: {
-    backgroundColor: colors.surfaceContainerHigh,
-  },
-  recipeExplain: {
-    flex: 1,
-    gap: 6,
-    padding: 20,
-    backgroundColor: colors.surfaceContainerLow,
   },
 });

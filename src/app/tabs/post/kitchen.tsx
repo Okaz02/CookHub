@@ -37,8 +37,9 @@ export default function KitchenScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={() => router.back()} hitSlop={6}>
+        <Pressable style={styles.discardButton} onPress={() => router.push("/tabs/post")} hitSlop={6}>
           <MaterialIcons name="close" size={20} color={colors.onSurfaceVariant} />
+          <Text style={styles.discardText}>破棄</Text>
         </Pressable>
         <Text style={styles.headerTitle}>材料をそろえる</Text>
         <View style={{ width: 28 }} />
@@ -70,5 +71,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     color: colors.primary,
+  },
+  discardButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  discardText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: colors.onSurfaceVariant,
   },
 });
