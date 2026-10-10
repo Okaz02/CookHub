@@ -11,20 +11,23 @@ export type Permissions = {
     pull: boolean;
 };
 
+export type RecipeStatus = "public" | "private" | "public_draft" | "private_draft";
+
+// port = 別の環境・人数に作り直したもの
+export type ForkType = "original" | "arrange" | "port";
+
 export type Recipe = {
     id: number;
     title: string;
-    full_name: string;
-    description: string;
+    description: string | null;
     owner: Owner;
-    private: boolean;
-    draft: boolean;
+    recipe_status: RecipeStatus;
     thumbnail: string | null;
     permissions: Permissions;
     default_branch: string;
-    fork: boolean;
-    fork_type: number;
-    parent_id: number | null;
+    is_fork: boolean;
+    fork_type: ForkType;
+    parent_recipe_id: number | null;
     stars_count: number;
     created_at: string;
     updated_at: string;
@@ -41,32 +44,52 @@ export type RecipeStateBadge = {
     tone: RecipeStateTone;
 };
 
-export type RecipeState = Pick<Recipe, "draft" | "private">;
+export type RecipeState = Pick<Recipe, "recipe_status">;
+
+// バックエンドは2つの軸を recipe_status の1つの ENUM にまとめて持っている
+export function isDraftRecipe(recipe: RecipeState): boolean {
+    return recipe.recipe_status === "public_draft" || recipe.recipe_status === "private_draft";
+}
+
+export function isPrivateRecipe(recipe: RecipeState): boolean {
+    return recipe.recipe_status === "private" || recipe.recipe_status === "private_draft";
+}
+
+export function toRecipeStatus(draft: boolean, isPrivate: boolean): RecipeStatus {
+    if (draft) return isPrivate ? "private_draft" : "public_draft";
+    return isPrivate ? "private" : "public";
+}
 
 export function getRecipeStatusLabel(recipe: RecipeState): string {
-    return recipe.draft ? "下書き" : "公開済み";
+    return isDraftRecipe(recipe) ? "下書き" : "公開済み";
 }
 
 export function getRecipeVisibilityLabel(recipe: RecipeState): string {
-    return recipe.private ? "自分のみ" : "全体公開";
+    return isPrivateRecipe(recipe) ? "自分のみ" : "全体公開";
 }
 
 export function getRecipeStateBadges(recipe: RecipeState): RecipeStateBadge[] {
     return [
-        { key: "status", label: getRecipeStatusLabel(recipe), tone: recipe.draft ? "draft" : "public" },
-        { key: "visibility", label: getRecipeVisibilityLabel(recipe), tone: recipe.private ? "private" : "public" },
+        { key: "status", label: getRecipeStatusLabel(recipe), tone: isDraftRecipe(recipe) ? "draft" : "public" },
+        { key: "visibility", label: getRecipeVisibilityLabel(recipe), tone: isPrivateRecipe(recipe) ? "private" : "public" },
     ];
+}
+
+export function getForkTypeLabel(forkType: ForkType): string {
+    return forkType === "port" ? "移植" : "アレンジ";
 }
 
 // 2つの軸の組み合わせを、閲覧できる相手の観点で説明する。
 export function getRecipeStateNotice(recipe: RecipeState): string | null {
-    if (recipe.draft && recipe.private) {
+    const draft = isDraftRecipe(recipe);
+    const isPrivate = isPrivateRecipe(recipe);
+    if (draft && isPrivate) {
         return "下書きです。公開範囲も「自分のみ」なので、自分だけが閲覧できます。";
     }
-    if (recipe.draft) {
+    if (draft) {
         return "下書きです。公開範囲は「全体公開」ですが、公開するまで他の人には表示されません。";
     }
-    if (recipe.private) {
+    if (isPrivate) {
         return "公開済みですが、公開範囲が「自分のみ」のため他の人には表示されません。";
     }
     return null;
@@ -159,8 +182,7 @@ export type RecipeInput = {
     title?: string;
     name?: string;
     description?: string;
-    is_private?: boolean;
-    is_draft?: boolean;
+    recipe_status?: RecipeStatus;
     thumbnail?: string | null;
     environment?: Environment[];
     ingredients?: Ingredient[];
@@ -169,7 +191,7 @@ export type RecipeInput = {
 };
 
 export type ForkInput = RecipeInput & {
-    fork_type?: 1 | 2;
+    fork_type?: Exclude<ForkType, "original">;
 };
 
 // バックエンドのエンドポイントは /api/repos のままなので、URL だけは repos を使う。

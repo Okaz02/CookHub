@@ -4,7 +4,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter, Stack } from "expo-rou
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { colors } from "../../../../theme";
 import { useAuth } from "../../../../context/AuthContext";
-import { getRecipe, forkRecipe, deleteRecipe, getRecipeStateNotice, type RecipeDetail } from "../../../../lib/api-recipe";
+import { getRecipe, forkRecipe, deleteRecipe, getForkTypeLabel, getRecipeStateNotice, isDraftRecipe, type RecipeDetail } from "../../../../lib/api-recipe";
 import { RecipeStateBadges } from "../../../../components/RecipeStateBadges";
 import { createPullRequest, mergePullRequest } from "../../../../lib/api-pull-request";
 import { ApiError } from "../../../../lib/api";
@@ -88,7 +88,7 @@ export default function RecipeDetail() {
     }
     setIsForking(true);
     try {
-      const res = await forkRecipe(recipe.id, { title: recipe.name + " (forked)" }, token);
+      const res = await forkRecipe(recipe.id, { title: recipe.title + " (forked)" }, token);
       router.replace(`/tabs/recipe/${res.data.id}`);
     } catch {
       setErrorMessage("フォークに失敗しました。");
@@ -163,7 +163,7 @@ export default function RecipeDetail() {
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen options={{ title: recipe.name }} />
+      <Stack.Screen options={{ title: recipe.title }} />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {recipe.thumbnail ? (
           <Image style={styles.thumbnail} source={{ uri: recipe.thumbnail }} />
@@ -173,7 +173,7 @@ export default function RecipeDetail() {
 
         <View style={styles.titleRow}>
           <View style={styles.titleGroup}>
-            <Text style={styles.title}>{recipe.name}</Text>
+            <Text style={styles.title}>{recipe.title}</Text>
             <Text style={styles.subtitle}>{recipe.owner.username}</Text>
           </View>
           <RecipeStateBadges recipe={recipe} />
@@ -182,7 +182,7 @@ export default function RecipeDetail() {
         {isOwner && stateNotice ? (
           <View style={styles.stateNotice}>
             <MaterialIcons
-              name={recipe.draft ? "edit-note" : "lock"}
+              name={isDraftRecipe(recipe) ? "edit-note" : "lock"}
               size={16}
               color={colors.dustyRose}
             />
@@ -190,11 +190,11 @@ export default function RecipeDetail() {
           </View>
         ) : null}
 
-        {recipe.fork ? (
+        {recipe.is_fork ? (
           <View style={styles.forkNotice}>
             <MaterialIcons name="fork-right" size={16} color={colors.mutedForest} />
             <Text style={styles.forkNoticeText}>
-              {recipe.fork_type === 2 ? "移植" : "アレンジ"} ・元レシピ #{recipe.parent_id}
+              {getForkTypeLabel(recipe.fork_type)} ・元レシピ #{recipe.parent_recipe_id}
             </Text>
           </View>
         ) : null}
@@ -235,7 +235,7 @@ export default function RecipeDetail() {
           )}
         </View>
 
-        {isOwner && recipe.fork ? (
+        {isOwner && recipe.is_fork ? (
           <View style={styles.section}>
             <Pressable style={styles.sectionToggle} onPress={() => setShowProposeForm((v) => !v)}>
               <MaterialIcons name="call-merge" size={16} color={colors.mutedForest} />

@@ -68,8 +68,8 @@ export default function Profile() {
     }, [token])
   );
 
-  const ownRecipes = useMemo(() => recipes.filter((recipe) => !recipe.fork), [recipes]);
-  const forkedRecipes = useMemo(() => recipes.filter((recipe) => recipe.fork), [recipes]);
+  const ownRecipes = useMemo(() => recipes.filter((recipe) => !recipe.is_fork), [recipes]);
+  const forkedRecipes = useMemo(() => recipes.filter((recipe) => recipe.is_fork), [recipes]);
 
   async function handleSignOut() {
     await signOut();

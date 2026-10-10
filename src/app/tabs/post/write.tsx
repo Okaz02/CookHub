@@ -8,6 +8,9 @@ import { ApiError } from "../../../lib/api";
 import {
   createRecipe,
   getRecipe,
+  isDraftRecipe,
+  isPrivateRecipe,
+  toRecipeStatus,
   updateRecipe,
   type Environment,
   type Ingredient,
@@ -75,24 +78,29 @@ export default function Write() {
         .then((res) => {
           if (cancelled) return;
           const recipe = res.data;
-          setTitle(recipe.title);
+          setTitle(recipe.title ?? "");
           setDescription(recipe.description ?? "");
           setThumbnail(recipe.thumbnail ?? "");
-          setIsDraft(recipe.draft);
-          setIsPrivate(recipe.private);
+          setIsDraft(isDraftRecipe(recipe));
+          setIsPrivate(isPrivateRecipe(recipe));
           const servingEnv = recipe.environment.find((env) => env.key_name === "人数");
           if (servingEnv) {
-            setServing(servingEnv.value);
-            setIsCustomServing(!SERVING_PRESETS.includes(servingEnv.value));
+            setServing(servingEnv.value ?? "");
+            setIsCustomServing(!SERVING_PRESETS.includes(servingEnv.value ?? ""));
           }
           setIngredients(
             recipe.ingredients.length > 0
-              ? recipe.ingredients.map((item) => ({ ...item, key: nextKey() }))
+              ? recipe.ingredients.map((item) => ({
+                  key: nextKey(),
+                  name: item.name ?? "",
+                  amount: item.amount ?? "",
+                  unit: item.unit ?? "",
+                }))
               : [{ key: nextKey(), name: "", amount: "", unit: "" }]
           );
           setSteps(
             recipe.steps.length > 0
-              ? recipe.steps.map((item) => ({ ...item, key: nextKey() }))
+              ? recipe.steps.map((item) => ({ key: nextKey(), body: item.body ?? "", image_url: item.image_url ?? null }))
               : [{ key: nextKey(), body: "", image_url: null }]
           );
         })
@@ -143,6 +151,11 @@ export default function Write() {
     const cleanedIngredients = ingredients
       .filter((item) => item.name.trim())
       .map(({ name, amount, unit }) => ({ name, amount, unit }));
+    // バックエンドの amount は DECIMAL 列なので、数値以外を送ると 400 になる
+    if (cleanedIngredients.some((item) => String(item.amount).trim() && Number.isNaN(Number(String(item.amount).trim())))) {
+      setErrorMessage("材料の分量は数値で入力してください（「少々」などは単位欄へ）。");
+      return;
+    }
     const cleanedSteps = steps
       .filter((item) => item.body.trim())
       .map(({ body, image_url }) => ({ body, image_url: image_url || null }));
@@ -155,8 +168,7 @@ export default function Write() {
         description,
         thumbnail: thumbnail || null,
         // 公開範囲は下書き保存でも公開でもユーザーの選択をそのまま送る。
-        is_private: isPrivate,
-        is_draft: nextIsDraft,
+        recipe_status: toRecipeStatus(nextIsDraft, isPrivate),
         environment,
         ingredients: cleanedIngredients,
         steps: cleanedSteps,
@@ -171,6 +183,8 @@ export default function Write() {
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         setErrorMessage("同じ名前のレシピを既に持っています。");
+      } else if (error instanceof ApiError && error.status === 400) {
+        setErrorMessage(`入力内容に誤りがあります: ${error.message}`);
       } else {
         setErrorMessage("保存に失敗しました。");
       }
